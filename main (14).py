@@ -41,10 +41,10 @@ import requests
 # ══════════════════════════════════════════════════════════════════
 
 # ایم‌جا: توکنی که ربات‌ساز بله داده را بین کوتیشن‌ها بگذار ↓
-BOT_TOKEN = "PUT_YOUR_BALE_BOT_TOKEN_HERE"      # مثل: "1234567890:AAf3k..."
+BOT_TOKEN = "1907079142:3ZbqH3BxKwIdGBttQTgOR_7TcNfRVUYZqG0"      # مثل: "1234567890:AAf3k..."
 
 # ایم‌جا: آیدی عددی خودت در بله (برای حق ادمین) ↓
-MY_ADMIN_IDS = []                                # مثل: [123456789]
+MY_ADMIN_IDS = [1975639269]                                # مثل: [123456789]
 
 _env_tok = (os.getenv("BALE_BOT_TOKEN") or "").strip()
 if _env_tok:                                       # اولویت با متغیر محیطی
