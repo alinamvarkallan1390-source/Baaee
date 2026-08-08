@@ -1,8 +1,12 @@
-# ════════════════════════════════════════════════════
-#  ⚙️ fly.toml — تنظیمات اجرای ربات روی fly.io
-# ════════════════════════════════════════════════════
-app = 'baaee'
+# fly.toml app configuration file generated for baaee-8oen6w on 2026-08-08T10:06:38Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'baaee-8oen6w'
 primary_region = 'ams'
+
+[build]
 
 [env]
   PORT = '8080'
@@ -26,4 +30,4 @@ primary_region = 'ams'
   memory = '256mb'
   cpu_kind = 'shared'
   cpus = 1
-  
+  memory_mb = 256
