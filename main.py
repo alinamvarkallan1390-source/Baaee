@@ -50,10 +50,10 @@ except ImportError:   # 🆕 هاست requirements.txt را نصب نکرده؟ 
 # ══════════════════════════════════════════════════════════════════
 
 # ایم‌جا: توکنی که ربات‌ساز بله داده را بین کوتیشن‌ها بگذار ↓
-BOT_TOKEN = "714361062:qA9tKgbV8RDWobS6ZCHi-khu5IYnPmhp4Bs"      # مثل: "1234567890:AAf3k..."
+BOT_TOKEN = "1907079142:3ZbqH3BxKwIdGBttQTgOR_7TcNfRVUYZqG0"  # ⬅ توکن ربات (جایگذاری شد ✅) — مراقبش باش، لو نره!
 
 # ایم‌جا: آیدی عددی خودت در بله (برای حق ادمین) ↓
-MY_ADMIN_IDS = [1975639269]                                # مثل: [123456789]
+MY_ADMIN_IDS = [1975639269]                     # ⬅ آیدی عددی ادمین (جایگذاری شد ✅)
 
 _env_tok = (os.getenv("BALE_BOT_TOKEN") or "").strip()
 if _env_tok:                                       # اولویت با متغیر محیطی
@@ -121,6 +121,59 @@ CHANNEL_DEFAULT = ""                        # ← مثل: "@mynewschannel" یا 
 
 # ⚡ نام تیم سازنده — در بنر، پیام خوش‌آمد، جوین اجباری و بکاپ استفاده می‌شود ↓
 TEAM_NAME = "تیم XR"
+
+# 🏷 نسخه‌ی رسمی ربات — در بنر و «همه‌ی» پیام‌های کاربر نمایش داده می‌شود
+BOT_VERSION = "۱.۰.۳"
+# 🖋 پانوشتی که خودکار به دمِ هر پیام کاربر اضافه می‌شود (داخل کلاس BaleAPI)
+DEV_FOOTER  = f"\n\n👨‍💻 توسعه: XR Team | نسخه {BOT_VERSION} ⚡"
+
+# ══════════════════ 🛡 ضدفحش اسامی (فیلتر ساخت اسم) ══════════════════
+# لیست کلمات ممنوعه — با حذف فاصله/نیم‌فاصله/اعراب و یکدست‌سازی عربی چک می‌شود
+BAD_WORDS = [
+    # فارسی
+    "کیر", "کیرر", "کیره", "کیرم", "کیرمدهن", "کون", "کونی", "کونده",
+    "کوس", "کوص", "کص", "کشکس", "کسکش", "کسشر", "جنده", "جنی", "ممه",
+    "سکس", "سکسی", "جق", "ساک", "زنا", "فاحشه", "قحبه", "حرومزاده",
+    "حرومی", "مادرجنده", "ننه‌جنده", "پدرسگ", "پدرسوخته", "بی‌غیرت",
+    "بیشرف", "عوضی", "احمق", "دیوث", "لاشی", "گاییدن", "گایدن",
+    "میگای", "میگام", "بکنمت", "گوه", "خره", "خرکسه", "تخمی", "ننت",
+    # انگلیسی
+    "fuck", "fucking", "fck", "fuk", "shit", "bitch", "dick", "pussy",
+    "cock", "whore", "slut", "nigga", "porn", "sex",
+]
+# اسم‌های سالم که نباید اشتباهی بن شوند (substring امن)
+_SAFE_NAME_PARTS = ["گوهر", "گوهرناز", "کیروش", "کوروش", "کسرا", "کسری", "ساکورا"]
+
+def _norm_name(t):
+    """نرمال‌سازی برای تشخیص دورزدن فیلتر (فاصله/نیم‌فاصله/عربی/اعراب/تزئینات)"""
+    t = str(t).lower()
+    for a, b in (("ي", "ی"), ("ك", "ک"), ("ة", "ه"), ("ۀ", "ه"), ("أ", "ا"),
+                 ("إ", "ا"), ("ؤ", "و"), ("ئ", "ی"), ("ھ", "ه"), ("ﻻ", "لا")):
+        t = t.replace(a, b)
+    for ch in ("‌", "ـ", " ", "\t", "\n", "\r", "-", "_", ".", ",", "!", "؟", "?",
+               "*", "#", "@", "(", ")", "[", "]", "{", "}", "«", "»", '"', "'", "٬", "/"):
+        t = t.replace(ch, "")
+    for ch in "ًٌٍَُِّْٰأ":
+        t = t.replace(ch, "ا" if ch == "أ" else "")
+    return t
+
+def name_is_bad(name) -> bool:
+    """آیا اسم حاوی فحش است؟"""
+    n = _norm_name(name)
+    if not n:
+        return False
+    for s in _SAFE_NAME_PARTS:           # اسم‌های سالم را خنثی کن
+        n = n.replace(_norm_name(s), "")
+    for w in BAD_WORDS:
+        wn = _norm_name(w)
+        if len(wn) <= 2:
+            if n == wn:
+                return True
+        elif wn in n:
+            return True
+    return False
+
+
 
 # 💎 بسته‌های سکه طلا (پول واقعی → سکه → درآمد صاحب ربات)
 #    (شناسه, عنوان, تعداد سکه, قیمت به تومان)
@@ -285,6 +338,7 @@ ACHIEVEMENTS = [
     ("lvl20",   "🌟 افسانه (لول ۲۰)",           lambda uid, p: p["level"] >= 20,                  {"gems": 12}),
     ("rich1m",  "💰 میلیونر (۱ میلیون💰)",       lambda uid, p: p["money"] >= 1000000,             {"gems": 20}),
     ("reborn",  "🔥 بازمتولد (۱ بازتولد)",        lambda uid, p: log_count(uid, "rebirth") >= 1,    {"gems": 5}),
+    ("khair5",  "🧡 بخشنده (۵ صدقه)",            lambda uid, p: log_count(uid, "charity") >= 5,     {"money": 1500}),
 ]
 
 FORTUNES = [("lucky",  "🌟 خوش‌اقبال! امروز بورس بدون کارمزد و حقوق +۱۰٪"),
@@ -622,14 +676,22 @@ class BaleAPI:
         return []
 
     # ── ارسال ──
+    def _brand(self, text):
+        """🖋 پانوشت «توسعه: XR Team | نسخه» به دمِ هر پیام کاربر — خودکار"""
+        t = str(text)
+        if "توسعه: XR Team" in t:
+            return t[:4096]
+        room = 4096 - len(DEV_FOOTER)
+        return (t[:room] if len(t) > room else t) + DEV_FOOTER
+
     def send_message(self, chat_id, text, reply_markup=None):
-        p = {"chat_id": chat_id, "text": text[:4096]}
+        p = {"chat_id": chat_id, "text": self._brand(text)}
         if reply_markup:
             p["reply_markup"] = reply_markup
         return self.call("sendMessage", **p)
 
     def edit_message(self, chat_id, message_id, text, reply_markup=None):
-        p = {"chat_id": chat_id, "message_id": message_id, "text": text[:4096]}
+        p = {"chat_id": chat_id, "message_id": message_id, "text": self._brand(text)}
         if reply_markup:
             p["reply_markup"] = reply_markup
         return self.call("editMessageText", **p)
@@ -649,7 +711,7 @@ class BaleAPI:
                     files = {"document": (os.path.basename(file_path), f)}
                     data  = {"chat_id": str(chat_id)}
                     if caption:
-                        data["caption"] = caption[:1024]
+                        data["caption"] = (caption + (" ⚡ XR" if "XR" not in caption else ""))[:1024]
                     r = self.session.post(url, data=data, files=files, timeout=120)
                 j = r.json()
                 if j.get("ok"):
@@ -706,6 +768,7 @@ ADMIN_KB = reply_keyboard([
     ["📢 پیام همگانی", "📨 پیام به کاربر"],
     ["📣 اطلاعیه همگانی", "🛰 تنظیمات کانال"],
     ["🌍 رویداد جهانی", "💾 بکاپ دیتابیس"],
+    ["💸 جایزه همگانی", "⚡ ساعت گاد"],
     ["🔒 جوین اجباری", "🔗 لینک‌های بازی"],
     ["♻️ بازیابی بکاپ", "🚪 خروج از پنل ادمین"],
 ])
@@ -1637,6 +1700,10 @@ def handle_state_text(chat_id, uid, text, state, data):
         if not (2 <= len(text) <= 30):
             api.send_message(chat_id, "⚠️ اسم باید بین ۲ تا ۳۰ حرف باشه. دوباره بنویس:")
             return True
+        if name_is_bad(text):
+            log_action(uid, "bad_name", _norm_name(text)[:40])
+            api.send_message(chat_id, "🚫 این اسم تو این شهر ممنوعه! 😅 یه اسم شیک و محترمانه انتخاب کن که گاد باشه 😎")
+            return True
         data["name"] = text                      # ref و داده‌های قبلی حفظ شوند
         set_state(uid, "create_age", data)
         api.send_message(chat_id, f"👍 خوش اومدی {text}!\n🎂 حالا سنت رو به عدد بنویس (۱۰ تا ۹۰):")
@@ -1673,6 +1740,10 @@ def handle_state_text(chat_id, uid, text, state, data):
         if not (2 <= len(text) <= 30):
             api.send_message(chat_id, "⚠️ اسم باید بین ۲ تا ۳۰ حرف باشه:")
             return True
+        if name_is_bad(text):
+            log_action(uid, "bad_name", _norm_name(text)[:40])
+            api.send_message(chat_id, "🚫 اسم درشت و توهین‌آمیز! یه اسم قابل‌قبول بنویس 😇")
+            return True
         set_profile(uid, name=text)
         set_state(uid)
         api.send_message(chat_id, f"✅ نامت به «{text}» تغییر کرد.", MAIN_KB)
@@ -1682,6 +1753,10 @@ def handle_state_text(chat_id, uid, text, state, data):
     if state == "guild_create":
         if not (2 <= len(text) <= 30):
             api.send_message(chat_id, "⚠️ نام اتحاد باید بین ۲ تا ۳۰ حرف باشه:")
+            return True
+        if name_is_bad(text):
+            log_action(uid, "bad_guild_name", _norm_name(text)[:40])
+            api.send_message(chat_id, "🚫 این اسم برای اتحاد ممنوعه! یه اسم محترمانه بذار 🤝")
             return True
         guild_create_done(chat_id, uid, text)
         return True
@@ -1866,7 +1941,8 @@ def panel_profile(chat_id, uid):
                          WHERE inv.user_id=? ORDER BY inv.id DESC""", (uid,))
     inv_txt = "، ".join(f"{r['emoji']} {r['name']}" for r in inv) if inv else "خالی"
     api.send_message(chat_id, render_profile(uid) + f"\n\n🎒 دارایی‌ها: {inv_txt}",
-                     inline_keyboard([[("🏅 دستاوردها و افتخارات", "achv:view")]]))
+                     inline_keyboard([[("🏅 دستاوردها و افتخارات", "achv:view")],
+                                      [("🃏 کارت گاد من (نشونش بده! 😎)", "gcard:me")]]))
 
 
 # ───────── 💼 شغل ─────────
@@ -1950,7 +2026,8 @@ def job_work(chat_id, uid):
         nv = gain_skill(uid, job["min_skill"])
         extra = f"\n📈 {SKILLS[job['min_skill']]} +۱ (لول {fn(nv)})"
     contract_txt = work_contract_tick(uid, salary)   # 🆕 v7: پیمان کاری ۵ شیفتی
-    return (f"🛠 یک شیفت {job['title']} کامل کردی!\n💵 درآمد: {fmt_money(salary)} تومان"
+    gh = "\n⚡ ساعت گاد فعاله — این حقوق ×۲ شد! 🔥" if god_hour_active() else ""
+    return (f"🛠 یک شیفت {job['title']} کامل کردی!\n💵 درآمد: {fmt_money(salary)} تومان{gh}"
             f"\n⭐ +۱۵ XP | ⚡ -۲۰ انرژی{extra}{contract_txt}" + ("\n" + "\n".join(lines) if lines else ""))
 
 
@@ -3591,6 +3668,8 @@ def salary_mult(uid):
     if p:                                        # 🆕 v7: بونس حقوق درجه افتخار
         _, bonus = honor_rank(p["level"])
         mult *= 1 + bonus
+    if god_hour_active():                          # ⚡ v1.0.3: ساعت گاد → حقوق ×۲
+        mult *= 2
     return mult
 
 
@@ -4797,7 +4876,9 @@ def panel_fun(chat_id, uid):
             [("🧗 برج قهرمانان", "fun:twr"), ("🗺️ ماجراجویی (-۲۰⚡)", "xpl:go")],
             [("🧩 کوییز روزانه", "qiz:play"), ("🔮 طالع امروز", "fun:fort")],
             [("🎁 شکار گنج", "trs:view"), ("💪 باشگاه (+۱۵٪ جنگ)", "gym:go")],
-            [("🎯 جایزه‌گذاری‌ها", "fun:bty")]]
+            [("🎯 جایزه‌گذاری‌ها", "fun:bty")],
+            [("🧙 پند حکیم (روزانه ⭐)", "hkm:go")],
+            [("🎯 چالش گاد روزانه", "gdc:claim"), ("🌟 چک‌لیست گاد", "gdcl:view")]]
     p = profile(uid)
     floor = p.get("tower_floor") or 1
     chest = treasure_active()
@@ -4806,7 +4887,8 @@ def panel_fun(chat_id, uid):
                      f"🌙 همه بازی‌ها فرهنگی و بدون شرط‌بندی هستند\n"
                      f"🧗 طبقه برج تو: {fn(floor)} | 🔮 طالع: {'کشیدی' if fortune_of(uid) else 'نکشیدی'}\n"
                      f"🏛 خزانه شهر: {fmt_money(treasury_amount())}💰 | 🎁 گنج: {'فعال! بدو 🏃' if chest else 'بزودی...'}\n"
-                     f"💪 باف باشگاه: {('فعال تا ' + gym_active(uid)[11:16]) if gym_active(uid) else '—'}",
+                     f"💪 باف باشگاه: {('فعال تا ' + gym_active(uid)[11:16]) if gym_active(uid) else '—'}\n"
+                     f"{'⚡🔥 ساعت گاد فعاله — حقوق کار ×۲! بدو کار کن!' if god_hour_active() else ''}",
                      inline_keyboard(rows))
 
 
@@ -4817,7 +4899,7 @@ def panel_city(chat_id, uid):
     rows = [[("✈️ سفر بین شهرها", "cty:trv"), ("🎓 تحصیل", "cty:edu")],
             [("🏥 بیمه روزانه (۲۰۰💰)", "cty:ins"), ("📰 روزنامه شهر", "cty:news")],
             [("🗳 شهردار هفته (رأی‌گیری!)", "ele:menu"), ("🚔 تابلوی زندان", "jli:board")],
-            [("🛡 استخدام گارد روزانه", "grd:hire")],
+            [("🛡 استخدام گارد روزانه", "grd:hire"), ("🧡 صدقه (صندوق شهر)", "chr:menu")],
             [("🚨 جنایت (ریسک زندان!)", "cty:crim")]]
     if jail:
         rows.append([(f"🔓 وثیقه آزادی ({fmt_money(BAIL_COST)}💰)", "cty:bail")])
@@ -6024,6 +6106,7 @@ def panel_leaderboard_tabs(chat_id, uid, mode="money"):
     tabs = [("💰", "lb:money"), ("💪", "lb:war"), ("🤝", "lb:guild"), ("🧗", "lb:tower"), ("🐾", "lb:pet")]
     rows = [[tuple(x) for x in tabs[:3]], [tuple(x) for x in tabs[3:]]]
     lines = []
+    lines.append(f"🌟 گاد امروز: {_god_name(god_of_day())}\n👑 گاد هفته: {_god_name(god_of_week())}\n")
     if mode == "war":
         lines.append("💪 قدرتمندترین جنگجویان (قدرت فعلی):\n")
         allu = db.fetchall("SELECT user_id, name FROM profiles ORDER BY level DESC LIMIT 40")
@@ -6240,6 +6323,12 @@ def admin_router(chat_id, uid, text):
         else:
             api.send_message(chat_id, "❌ ارسال بکاپ ناموفق بود — لاگ سرور رو چک کن.", ADMIN_KB)
         return True
+    if text == "💸 جایزه همگانی":
+        panel_admin_massgift(chat_id)
+        return True
+    if text == "⚡ ساعت گاد":
+        panel_admin_godhour(chat_id)
+        return True
     if text == "🔒 جوین اجباری":
         panel_force_join(chat_id)
         return True
@@ -6431,6 +6520,24 @@ def handle_admin_state(chat_id, uid, text, state, data):
         set_setting("game_group", text.strip() if text.startswith("http") else _norm_chat(text))
         set_state(uid)
         api.send_message(chat_id, "✅ گروه بازی تنظیم شد! 👥", ADMIN_KB)
+        return True
+
+    if state == "adm_mass_money":
+        if not text.isdigit() or not (1 <= int(text) <= 10_000_000):
+            api.send_message(chat_id, "⚠️ مقدار سکه رو به عدد بنویس (۱ تا ۱۰٬۰۰۰٬۰۰۰):")
+            return True
+        _, txt = mass_gift(uid, "money", int(text))
+        set_state(uid)
+        api.send_message(chat_id, txt, ADMIN_KB)
+        return True
+
+    if state == "adm_mass_gem":
+        if not text.isdigit() or not (1 <= int(text) <= 1000):
+            api.send_message(chat_id, "⚠️ تعداد الماس رو به عدد بنویس (۱ تا ۱۰۰۰):")
+            return True
+        _, txt = mass_gift(uid, "gem", int(text))
+        set_state(uid)
+        api.send_message(chat_id, txt, ADMIN_KB)
         return True
 
     if state == "adm_broadcast":
@@ -6921,6 +7028,47 @@ def gl_admin_cb(chat_id, uid, data, cb_id):
     return False
 
 
+# ── ♻️ هسته‌ی بازیابی دیتابیس (مشترک: فایل بله + آپلود وب‌پنل) ──
+def restore_db_bytes(uid, payload, fname="backup.db"):
+    """بایت‌های فایل .db را گرفته و امن جایگزین دیتابیس فعلی می‌کند.
+    خروجی: (True, تعداد کاربران) یا (False, متن خطا)"""
+    global db
+    if not payload or len(payload) < 100:
+        return False, "❌ فایل خالیه یا خیلی کوچیکه! همون فایل life_simulator.db رو بده 💾"
+    if not payload.startswith(b"SQLite format 3"):
+        return False, "❌ این فایل دیتابیس SQLite نیست! همون بکاپی که بات برات فرستاده رو بفرست 💾"
+    tmp = DB_PATH + ".incoming"
+    try:
+        with open(tmp, "wb") as f:
+            f.write(payload)
+        probe = sqlite3.connect(tmp)
+        cnt = probe.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+        probe.close()
+    except Exception as e:
+        try: os.remove(tmp)
+        except Exception: pass
+        return False, f"❌ ساختار دیتابیس معتبر نیست: {str(e)[:120]}"
+    # 🛟 قبل از تعویض، از وضعیت فعلی هم یه بکاپ خودکار می‌گیرد که هیچ سیوی گم نشود
+    try:
+        send_backup()
+    except Exception:
+        pass
+    try:
+        db.conn.close()
+    except Exception:
+        pass
+    for sfx in ("-wal", "-shm"):
+        try: os.remove(DB_PATH + sfx)
+        except Exception: pass
+    os.replace(tmp, DB_PATH)
+    db = Database(DB_PATH)
+    try:
+        log_action(uid, "db_restore", f"{fname} users={cnt}")
+    except Exception:
+        pass
+    return True, cnt
+
+
 # ── ♻️ بازیابی دیتابیس از فایل بکاپ ──
 def restore_db_from_document(chat_id, uid, doc):
     """ادمین فایل .db می‌فرستد → ربات چک می‌کند و کل سیوها را برمی‌گرداند"""
@@ -6936,45 +7084,203 @@ def restore_db_from_document(chat_id, uid, doc):
         api.send_message(chat_id, "❌ نتونستم آدرس فایل رو از بله بگیرم!")
         return
     payload = api.download_file(fpath)
-    if not payload or len(payload) < 100:
-        api.send_message(chat_id, "❌ دانلود فایل ناموفق بود یا خیلی کوچیکه!")
+    ok, res = restore_db_bytes(uid, payload, doc.get("file_name") or "backup.db")
+    if not ok:
+        api.send_message(chat_id, res)
         return
-    if not payload.startswith(b"SQLite format 3"):
-        api.send_message(chat_id, "❌ این فایل دیتابیس SQLite نیست! همون بکاپی که بات برات فرستاده رو بفرست 💾")
-        return
-    tmp = DB_PATH + ".incoming"
-    try:
-        with open(tmp, "wb") as f:
-            f.write(payload)
-        probe = sqlite3.connect(tmp)
-        cnt = probe.execute("SELECT COUNT(*) FROM users").fetchone()[0]
-        probe.close()
-    except Exception as e:
-        try: os.remove(tmp)
-        except Exception: pass
-        api.send_message(chat_id, f"❌ ساختار دیتابیس معتبر نیست: {e}")
-        return
-    # قبل از تعویض، از وضعیت فعلی هم یه بکاپ بگیر که چیزی گم نشه
-    try:
-        send_backup(chat_id)
-    except Exception:
-        pass
-    try:
-        db.conn.close()
-    except Exception:
-        pass
-    for sfx in ("-wal", "-shm"):
-        try: os.remove(DB_PATH + sfx)
-        except Exception: pass
-    os.replace(tmp, DB_PATH)
-    db = Database(DB_PATH)
-    log_action(uid, "db_restore", f"{name} users={cnt}")
     api.send_message(chat_id, (
         "✅♻️ بازیابی کامل انجام شد!\n━━━━━━━━━━━\n"
-        f"👥 کاربران برگشته: {fn(cnt)}\n"
+        f"👥 کاربران برگشته: {fn(res)}\n"
         f"🗂 فایل: {doc.get('file_name')}\n\n"
         "از همین لحظه ربات با دیتای جدید ادامه می‌ده! ⚡"
     ), ADMIN_KB)
+
+
+# ═════════════════ 🌟 فیچرهای گاد — نسخه ۱.۰.۳ ═════════════════
+
+def god_of_day():
+    """🌟 فعال‌ترین بازیکنِ امروز (بر اساس لاگ)"""
+    return db.fetchone(
+        "SELECT actor a, COUNT(*) c FROM logs WHERE created_at LIKE ? "
+        "GROUP BY actor ORDER BY c DESC LIMIT 1", (today() + "%",))
+
+
+def god_of_week():
+    """👑 فعال‌ترین بازیکنِ ۷ روز اخیر"""
+    from datetime import timedelta
+    cutoff = (datetime.now() - timedelta(days=7)).isoformat(timespec="seconds")
+    return db.fetchone(
+        "SELECT actor a, COUNT(*) c FROM logs WHERE created_at >= ? "
+        "GROUP BY actor ORDER BY c DESC LIMIT 1", (cutoff,))
+
+
+def _god_name(row):
+    if not row:
+        return "—"
+    pp = profile(row["a"]) if has_character(row["a"]) else None
+    return f"{pp['name'] if pp else 'بازیکن #' + fn(row['a'])} ({fn(row['c'])} اکشن)"
+
+
+# ── 🎯 چالش گاد روزانه: ۳ بازی مهارتی در شهربازی = جایزه ویژه ──
+GOD_CHALLENGE_NEED = 3
+
+def god_challenge_count(uid) -> int:
+    return sum(today_logs(uid, f"arcade_{k}") for k in ("math", "word", "mem", "pnl"))
+
+def god_challenge_claim(chat_id, uid):
+    if today_logs(uid, "god_challenge"):
+        return "🎯 چالش گاد امروزت رو قبلاً گرفتی! فردا دوباره شارژ می‌شه ⚡"
+    n = god_challenge_count(uid)
+    if n < GOD_CHALLENGE_NEED:
+        return (f"🎯 چالش گاد: امروز {fn(GOD_CHALLENGE_NEED)} بازی مهارتی تو «شهربازی» بزن!\n"
+                f"پیشرفت الان: {fn(n)}/{fn(GOD_CHALLENGE_NEED)} 🎡 برو غلتش بزن!")
+    log_action(uid, "god_challenge", today())
+    change_money(uid, 700, "god_challenge", "جایزه چالش گاد روزانه")
+    gain_xp(uid, 40)
+    try:
+        treasury_feed(200, "برکت چالش گاد")
+    except Exception:
+        pass
+    return ("🎯 چالش گاد فتح شد، وحشی! 🏆\n━━━━━━━━━━━\n"
+            "+۷۰۰💰 | +۴۰⭐ | +۲۰۰💰 هدیه به خزانه‌ی شهر 🏛\nبقیه بازیکنا باید دنبالت بدوند! 😎")
+
+
+# ── 🌟 چک‌لیست گاد امروز ──
+def god_checklist(chat_id, uid):
+    p = profile(uid)
+    worked = int(p.get("work_shifts") or 0) if p.get("work_shifts_day") == today() else 0
+    items = [
+        ("💼 کار کردی", worked > 0),
+        ("📚 مهارت‌تو تقویت کردی", today_logs(uid, "skill_train") > 0),
+        ("🧙 پند حکیم رو شنیدی", today_logs(uid, "hakim") > 0),
+        ("🎡 تو شهربازی بازی کردی", god_challenge_count(uid) > 0),
+        ("🧡 صدقه دادی", today_logs(uid, "charity") > 0),
+    ]
+    done = sum(1 for _, ok in items if ok)
+    lines = [f"🌟 چک‌لیست گاد امروز — {fn(done)}/{fn(len(items))}\n━━━━━━━━━━━"]
+    for label, ok in items:
+        lines.append(("✅ " if ok else "⬜ ") + label)
+    if done >= 4:
+        lines.append("\n😎 امروز رسمی گادی! کم مونده همه‌ش رو تموم کنی 🔥")
+    elif done == 0:
+        lines.append("\n🌱 هنوز هیچی نشده — بزن بریم!")
+    else:
+        lines.append("\n⚡ داری می‌کشی! ادامه بده")
+    return "\n".join(lines)
+
+
+# ═════════════════ ⚡ قابلیت‌های گاد ادمین + کاربر (v1.0.3) ═════════════════
+
+def god_hour_active() -> bool:
+    try:
+        return float(get_setting("god_hour_until", "0") or 0) > time.time()
+    except Exception:
+        return False
+
+
+def god_hour_left() -> str:
+    try:
+        left = int(float(get_setting("god_hour_until", "0") or 0) - time.time())
+    except Exception:
+        left = 0
+    return f"{fn(left // 60)} دقیقه" if left > 0 else "—"
+
+
+def god_hour_start(minutes: int):
+    set_setting("god_hour_until", str(time.time() + minutes * 60))
+    log_action(0, "god_hour_start", str(minutes))
+    try:
+        channel_news(f"⚡🔥 ساعت گاد شروع شد! {fn(minutes)} دقیقه حقوق کار برای همه ×۲ است — همه به کار! 💼💰")
+    except Exception:
+        pass
+
+
+def panel_admin_godhour(chat_id):
+    on = god_hour_active()
+    rows = [[("⚡ شروع ۳۰ دقیقه", "gh:start:30"), ("⚡⚡ شروع ۶۰ دقیقه", "gh:start:60")]]
+    if on:
+        rows.append([("🛑 خاموش کردن ساعت گاد", "gh:stop")])
+    api.send_message(chat_id,
+                     f"⚡ ساعت گاد — حقوق کار ×۲\n━━━━━━━━━━━\n"
+                     f"وضعیت: {'🔥 فعال! باقی‌مانده: ' + god_hour_left() if on else '⏹ خاموش'}\n"
+                     "وقتی روشنش کنی حقوق همه دوبل می‌شه و خبرش تو کانال شهر میاد 📣",
+                     inline_keyboard(rows))
+
+
+def panel_admin_massgift(chat_id):
+    cnt = db.fetchone("SELECT COUNT(*) c FROM users")["c"]
+    rows = [[("💰 سکه به همه", "mg:money")], [("💎 الماس به همه", "mg:gem")]]
+    api.send_message(chat_id,
+                     f"💸 جایزه همگانی\n━━━━━━━━━━━\n"
+                     f"👥 کاربران ثبت‌شده: {fn(cnt)}\n"
+                     "«سکه» یا «الماس» رو انتخاب کن، مقدار رو می‌پرسم و به همه واریز می‌کنم 🎁",
+                     inline_keyboard(rows))
+
+
+def mass_gift(admin_uid, kind, amount):
+    """واریز همگانی سکه/الماس به همه‌ی کاربران + اطلاع‌رسانی"""
+    users = db.fetchall("SELECT user_id FROM users")
+    tag = "💰 سکه" if kind == "money" else "💎 الماس"
+    okc = 0
+    for r in users:
+        try:
+            if kind == "money":
+                db.execute("UPDATE profiles SET money=money+? WHERE user_id=?", (amount, r["user_id"]))
+            else:
+                add_gems(r["user_id"], amount)
+            okc += 1
+        except Exception:
+            pass
+    log_action(admin_uid, f"mass_gift_{kind}", f"{amount} x {okc}")
+    gift_txt = ("🎁 جایزه‌ی همگانی رسید! 🎉\n━━━━━━━━━━━\n"
+                f"مدیریت به همه {fn(amount)} {tag} داد!\n"
+                "برو حالش رو ببر ⚡")
+    sent = 0
+    for r in users:
+        try:
+            if api.send_message(r["user_id"], gift_txt):
+                sent += 1
+        except Exception:
+            pass
+    try:
+        channel_news(f"🎁 هدیه‌ی همگانی مدیریت: به همه {fn(amount)} {tag} رسید! 🎉")
+    except Exception:
+        pass
+    return okc, (f"✅ جایزه همگانی انجام شد!\n━━━━━━━━━━━\n"
+                 f"🎁 {fn(amount)} {tag} × {fn(okc)} کاربر\n"
+                 f"📨 اطلاع‌رسانی به {fn(sent)} نفر ارسال شد\n⚡ خفن بود مدیر! 👑")
+
+
+# ── 🃏 کارت گاد — قابل نمایش به بقیه! ──
+def god_card(chat_id, uid):
+    p = profile(uid)
+    if not p:
+        return "❌ اول کاراکتر بساز! /start"
+    rank = db.fetchone("SELECT COUNT(*) c FROM profiles WHERE money > ?", (p["money"],))["c"] + 1
+    total = db.fetchone("SELECT COUNT(*) c FROM profiles")["c"]
+    ach = db.fetchone("SELECT COUNT(*) c FROM achievements WHERE user_id=?", (uid,))["c"]
+    wins = log_count(uid, "war_win")
+    try:
+        degree = honor_rank(int(p["level"]))[0]
+    except Exception:
+        degree = "شهروند"
+    med = "👑" if rank == 1 else ("🥇" if rank <= 3 else ("⭐" if rank <= 10 else "🎖"))
+    return (
+        "👑 کارت گاد — Life Simulator\n"
+        "━━━━━━━━━━━━━━━━━━\n"
+        f"🎭 نام: {p['name']}\n"
+        f"🎖 درجه: {degree}\n"
+        f"{med} رتبه‌ی ثروت: #{fn(rank)} از {fn(total)}\n"
+        f"💰 دارایی: {fmt_money(p['money'])}\n"
+        f"💎 سکه طلا: {fn(p.get('gems') or 0)}\n"
+        f"⭐ لول: {fn(p['level'])}\n"
+        f"⚔️ بردهای جنگ: {fn(wins)}\n"
+        f"🏅 دستاوردها: {fn(ach)}/۲۶\n"
+        f"🔄 بازتولد: {fn(p.get('rebirth') or 0)}\n"
+        "━━━━━━━━━━━━━━━━━━\n"
+        "😎 گادی که وقته — نشونش بده!\n"
+        f"⚡ خلق‌شده توسط {TEAM_NAME}"
+    )
 
 
 MENU_ROUTES = {
@@ -7674,6 +7980,45 @@ def handle_callback(cb):
     if data.startswith("grd:hire"):
         api.answer_callback(cb_id, "🛡")
         api.send_message(chat_id, guard_hire(chat_id, uid)); return
+    if data == "chr:menu":
+        api.answer_callback(cb_id, "🧡")
+        panel_charity(chat_id, uid); return
+    if data.startswith("chr:don:"):
+        api.answer_callback(cb_id, "🧡")
+        api.send_message(chat_id, charity_donate(chat_id, uid, data.split(":")[2])); return
+    if data == "hkm:go":
+        api.answer_callback(cb_id, "🧙")
+        api.send_message(chat_id, hakim_daily(chat_id, uid)); return
+    if data == "gdc:claim":
+        api.answer_callback(cb_id, "🎯")
+        api.send_message(chat_id, god_challenge_claim(chat_id, uid)); return
+    if data == "gdcl:view":
+        api.answer_callback(cb_id, "🌟")
+        api.send_message(chat_id, god_checklist(chat_id, uid)); return
+    if data == "gcard:me":
+        api.answer_callback(cb_id, "🃏")
+        api.send_message(chat_id, god_card(chat_id, uid)); return
+    if data == "mg:money" or data == "mg:gem":
+        if not is_admin(uid):
+            api.answer_callback(cb_id, "⛔ فقط ادمین!"); return
+        kind = "money" if data == "mg:money" else "gem"
+        set_state(uid, "adm_mass_" + kind)
+        api.answer_callback(cb_id, "🎁")
+        api.send_message(chat_id, ("💸 چند سکه به «همه» بدم؟" if kind == "money" else "💎 چند الماس به «همه» بدم؟")
+                         + "\nعدد رو بنویس (لغو: /cancel):", reply_keyboard([["لغو ❌"]]))
+        return
+    if data.startswith("gh:start:") or data == "gh:stop":
+        if not is_admin(uid):
+            api.answer_callback(cb_id, "⛔ فقط ادمین!"); return
+        if data == "gh:stop":
+            set_setting("god_hour_until", "0")
+            log_action(uid, "god_hour_stop")
+            api.answer_callback(cb_id, "🛑")
+            api.send_message(chat_id, "🛑 ساعت گاد خاموش شد.", ADMIN_KB); return
+        mins = int(data.split(":")[2])
+        god_hour_start(mins)
+        api.answer_callback(cb_id, "⚡")
+        api.send_message(chat_id, f"⚡ ساعت گاد فعال شد — {fn(mins)} دقیقه حقوق کار ×۲! 🔥\n📣 خبرش هم به کانال شهر رفت!", ADMIN_KB); return
     if data.startswith("ele:tax:"):
         api.answer_callback(cb_id, "🏛")
         api.send_message(chat_id, mayor_set_tax(chat_id, uid, data.split(":")[2])); return
@@ -7789,7 +8134,7 @@ def handle_update(update):
 BANNER = """
 ╔══════════════════════════════════════════╗
 ║   🤖  Life Simulator AI برای بله  🤖     ║
-║   بازی متنی شبیه‌ساز زندگی — نسخه ۷.XR    ║
+║   بازی متنی شبیه‌ساز زندگی — نسخه ۱.۰.۳    ║
 ║        ⚡ ساخته‌ی تیم XR ⚡                ║
 ╚══════════════════════════════════════════╝
 """
@@ -7837,29 +8182,83 @@ def start_backup_loop():
     log.info(f"💾 بکاپ خودکار فعال شد — هر {BACKUP_INTERVAL // 3600} ساعت برای ادمین 📬")
 
 
+# ───────────────── 🧡 صدقه (کمک به صندوق شهر) ─────────────────
+def panel_charity(chat_id, uid):
+    rows = [[("🧡 ۱٬۰۰۰ 💰", "chr:don:1000"), ("🧡 ۵٬۰۰۰ 💰", "chr:don:5000")],
+            [("🧡 ۲۰٬۰۰۰ 💰 (خبر کانال! 📣)", "chr:don:20000")]]
+    api.send_message(chat_id,
+        "🧡 صدقه — کمک به صندوق شهر\n━━━━━━━━━━━\n"
+        "صدقه‌ات مستقیم میره لای خزانه‌ی شهر 🏛 و شهردار باهاش ایونت برگزار می‌کنه!\n"
+        "توی کار بله… اعتبار + شادی + XP هم برمی‌داری 🌱", inline_keyboard(rows))
+
+def charity_donate(chat_id, uid, amount):
+    amount = int(amount)
+    p = profile(uid)
+    if p["money"] < amount:
+        return f"💸 برای این صدقه {fmt_money(amount)}💰 لازم داری؛ الان فقط {fmt_money(p['money'])}💰 داری!"
+    rep = {1000: 1, 5000: 3, 20000: 8}.get(amount, 1)
+    change_money(uid, -amount, "charity", "صدقه به صندوق شهر")
+    try: treasury_feed(amount, f"صدقه‌ی {p['name']}")
+    except Exception: pass
+    db.execute("UPDATE profiles SET reputation=MIN(100,reputation+?), happiness=MIN(100,happiness+2) WHERE user_id=?", (rep, uid))
+    gain_xp(uid, 5)
+    log_action(uid, "charity", str(amount))
+    if amount >= 20000:
+        channel_news(f"🧡 {p['name']} امروز {fmt_money(amount)}💰 صدقه به صندوق شهر داد! دستش درد نکنه 🙏⚡")
+    return (f"🧡 صدقه‌ات ثبت شد، خدا قبول کنه! 🌱\n━━━━━━━━━━━\n"
+            f"-💰 {fmt_money(amount)} | ＋{fn(rep)} اعتبار | ＋۲ شادی | ＋۵⭐")
+
+
+# ───────────────── 🧙 پند روزانه‌ی حکیم ─────────────────
+HAKIM_LINES = [
+    "پول رو سخت دربیار، ولی قلبت رو نرم نگه دار. 🌱",
+    "هر روز یه تیک کار کوچیک = آخر ماه یه امپراتوری کامل. 👑",
+    "توی این شهر، اعتبار از طلا گرون‌تره؛ از دستش نده! 🏆",
+    "کسیکه استریکشو نشکنه، گنج خودشو پیدا می‌کنه. 🔥",
+    "به اتحادت غذا برسون، به پتت محبت کن — وفاداری برمی‌گرده سمتت. 🐾",
+    "بورس مثل دریاست: با طمع غرق می‌شی، با صبر شنا می‌کنی. 📈",
+    "بهترین سپر، دوستانیه که حواسشون بهت هست. 🤝",
+    "یه روز بد، آخر دنیا نیست؛ فردا بورس می‌تونه برگرده! 🌤",
+    "صندوق شهر رو پُر کنی، شهرتم رو زیاد می‌کنی. 🧡",
+    "سرباز بی‌غذا، سپر بی‌فایده است — اول انبار، بعد جنگ! 🌾",
+    "حکیم می‌گه: قبل از خواب یه نگاه به اچیومنت‌هات بنداز، انگاری فردا جایزت منتظرته. 🏅",
+    "خنده رایگانه! تو شهربازی مهارتتو تیز کن، مغزت رو بیشتر. 🎡",
+]
+
+def hakim_daily(chat_id, uid):
+    used = db.fetchone("SELECT COUNT(*) c FROM logs WHERE actor=? AND action='hakim' AND created_at LIKE ?",
+                       (uid, today() + "%"))["c"]
+    if used:
+        return "🧙 حکیم امروز پندشو داد! فردا برگرد، باتجربه‌تر می‌شی 🌙"
+    log_action(uid, "hakim", "")
+    gain_xp(uid, 10)
+    return f"🧙 پند امروز حکیم:\n\n«{pick(HAKIM_LINES)}»\n\n＋۱۰⭐ پاداش شنیدن پند! فردا تشریف بیار 🌙"      # ✨ کوچیک ولی بامزه
+
+
 # ─────────────── 🌐 کیپ‌الایو برای هاست‌های رایگان (Render / Phemeral / Koyeb...) ───────────────
 def start_keepalive():
-    """یک سرور HTTP کوچک روی پورت $PORT باز می‌کند تا هاست تصور کند وب‌سرویس داریم و ربات را خاموش نکند.
-    روی هاست: همان لینکی که پنل می‌دهد را در UptimeRobot (رایگان) بگذار تا هر ۵ دقیقه پینگ بخورد."""
+    """سرور HTTP کوچک روی پورت $PORT — فقط health-check برای هاست‌های رایگان.
+    لینک پنل هاست را در UptimeRobot (رایگان) بگذار تا هر ۵ دقیقه پینگ بخورد."""
     port = int(os.getenv("PORT") or "8080")
 
     def _run():
         from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
         class Handler(BaseHTTPRequestHandler):
-            def _reply(self, body):
-                body = body.encode("utf-8")
-                self.send_response(200)
+            def _reply(self, body="OK", code=200):
+                data = str(body).encode("utf-8")
+                self.send_response(code)
                 self.send_header("Content-Type", "text/plain; charset=utf-8")
-                self.send_header("Content-Length", str(len(body)))
+                self.send_header("Content-Length", str(len(data)))
                 self.end_headers()
-                self.wfile.write(body)
+                self.wfile.write(data)
 
             def do_GET(self):
-                if self.path.startswith("/health"):
-                    self._reply("OK")
-                else:
-                    self._reply("🤖 Life Simulator Bot برای بله آنلاین است!")
+                self._reply("OK" if self.path.startswith("/health")
+                            else f"🤖 Life Simulator v{BOT_VERSION} آنلاین است! ⚡ {TEAM_NAME}")
+
+            def do_POST(self):
+                self._reply("OK")
 
             def do_HEAD(self):
                 self._reply("")
@@ -7869,7 +8268,7 @@ def start_keepalive():
 
         try:
             srv = ThreadingHTTPServer(("0.0.0.0", port), Handler)
-            log.info(f"🌐 کیپ‌الایو روی پورت {port} فعال شد (برای هاست‌هایی که health-check دارند)")
+            log.info(f"🌐 کیپ‌الایو روی پورت {port} فعال شد")
             srv.serve_forever()
         except Exception as e:
             log.warning(f"⚠️ کیپ‌الایو روی پورت {port} باز نشد: {e} (روی موبایل مهم نیست)")
