@@ -1530,22 +1530,67 @@ def rate_limit_ok(uid) -> bool:
 
 def cooldown_ok(uid, field, seconds):
     p = profile(uid)
+
+    # اگر پروفایل وجود ندارد، خطای None نده
+    if not p:
+        return True
+
     last = p.get(field)
-    return (not last) or ((datetime.now() - datetime.fromisoformat(last)).total_seconds() >= seconds)
+
+    if not last:
+        return True
+
+    try:
+        last_time = datetime.fromisoformat(last)
+        elapsed = (datetime.now() - last_time).total_seconds()
+        return elapsed >= seconds
+    except (ValueError, TypeError):
+        return True
+
 
 def touch_cooldown(uid, field):
-    db.execute(f"UPDATE profiles SET {field}=? WHERE user_id=?", (now_iso(), uid))
+    db.execute(
+        f"UPDATE profiles SET {field}=? WHERE user_id=?",
+        (now_iso(), uid)
+    )
 
 
 # ───── رندر پروفایل ─────
 
 def render_profile(uid):
+
     p = profile(uid)
+
     if not p:
         return "❌ هنوز کاراکتری نساختی! /start رو بزن."
-    job = db.fetchone("SELECT title FROM jobs WHERE id=?", (p["job_id"],)) if p["job_id"] else None
+
+    job = db.fetchone(
+        "SELECT title FROM jobs WHERE id=?",
+        (p["job_id"],)
+    ) if p["job_id"] else None
+
     job_txt = f"{job['title']} (سطح {fn(p['job_level'])})" if job else "بیکار 😅"
+
     trait = TRAITS.get(p["trait"], {})
+
+    # GOD MODE
+    god_line = (
+        "⚡⚡ GOD MODE — درجه‌ی الهی فعاله! 👑\n"
+        if p.get("god")
+        else ""
+    )
+
+    # VIP
+    vip_line = " 👑 VIP" if p.get("vip") else ""
+
+    # Credit
+    credit = p.get("credit")
+    if credit is None:
+        credit = 50
+
+    # Gems
+    gems = p.get("gems") or 0
+
     return (
         f"👤 پروفایل {p['name']}\n"
         f"───────────────\n"
@@ -1555,17 +1600,20 @@ def render_profile(uid):
         f"🌟 ویژگی: {trait.get('label', '—')}\n"
         f"───────────────\n"
         f"💰 پول: {fmt_money(p['money'])} تومان\n"
-        f"⭐ لول: {fn(p['level'])}  (XP: {fn(p['xp'])}/{fn(xp_needed(p['level']))})\n"
-        f"⚡ انرژی:  {bar(p['energy'])} {fn(p['energy'])}\n"
+        f"⭐ لول: {fn(p['level'])} "
+        f"(XP: {fn(p['xp'])}/{fn(xp_needed(p['level']))})\n"
+        f"⚡ انرژی: {bar(p['energy'])} {fn(p['energy'])}\n"
         f"❤️ سلامتی: {bar(p['health'])} {fn(p['health'])}\n"
-        f"😊 شادی:   {bar(p['happiness'])} {fn(p['happiness'])}\n"
-        f"🏆 اعتبار: {fn(p['reputation'])} ({rep_name(p['reputation'])})\n"
+        f"😊 شادی: {bar(p['happiness'])} {fn(p['happiness'])}\n"
+        f"🏆 اعتبار: {fn(p['reputation'])} "
+        f"({rep_name(p['reputation'])})\n"
         f"───────────────\n"
         f"💼 شغل: {job_txt}\n"
         f"🏠 خانه: {home_name(p)} | 🗺 محله: {district_name(p)}\n"
-        f"🏅 لیگ: {league_of(p['level'])[0]} | 📊 اعتبار بانکی: {fn(p.get('credit') if p.get('credit') is not None else 50)}\n"
-        f"💎 سکه طلا: {fn(p.get('gems') or 0)}{' 👑 VIP' if p.get('vip') else ''}\n"
-        f"{'⚡⚡ GOD MODE — درجه‌ی الهی فعاله! 👑\n' if p.get('god') else ''}"
+        f"🏅 لیگ: {league_of(p['level'])[0]} | "
+        f"📊 اعتبار بانکی: {fn(credit)}\n"
+        f"💎 سکه طلا: {fn(gems)}{vip_line}\n"
+        f"{god_line}"
         f"⚔️ قدرت جنگ: {fn(battle_power(uid))}\n"
         f"{family_line(uid)}"
         f"🎲 رویدادهای زندگی: {fn(p['games_played'])}"
@@ -1573,12 +1621,21 @@ def render_profile(uid):
 
 
 def family_line(uid):
-    fam = db.fetchone("SELECT spouse_id, children FROM family WHERE user_id=?", (uid,))
+
+    fam = db.fetchone(
+        "SELECT spouse_id, children FROM family WHERE user_id=?",
+        (uid,)
+    )
+
     if fam and fam["spouse_id"]:
         sp = profile(fam["spouse_id"]) or {}
-        return f"💑 همسر: {sp.get('name','?')} | 👶 فرزند: {fn(fam['children'])}\n"
-    return ""
 
+        return (
+            f"💑 همسر: {sp.get('name', '?')} | "
+            f"👶 فرزند: {fn(fam['children'])}\n"
+        )
+
+    return ""
 
 # ══════════════════════════════════════════════════════════════════
 # [6] موتور داستانی (AI) — تولید رویداد، داستان و رفتار NPC
