@@ -1557,11 +1557,42 @@ def touch_cooldown(uid, field):
 
 def render_profile(uid):
     p = profile(uid)
+
     if not p:
         return "❌ هنوز کاراکتری نساختی! /start رو بزن."
-    job = db.fetchone("SELECT title FROM jobs WHERE id=?", (p["job_id"],)) if p["job_id"] else None
-    job_txt = f"{job['title']} (سطح {fn(p['job_level'])})" if job else "بیکار 😅"
-    trait = TRAITS.get(p["trait"], {})
+
+    job = (
+        db.fetchone(
+            "SELECT title FROM jobs WHERE id=?",
+            (p["job_id"],)
+        )
+        if p.get("job_id")
+        else None
+    )
+
+    job_txt = (
+        f"{job['title']} (سطح {fn(p['job_level'])})"
+        if job
+        else "بیکار 😅"
+    )
+
+    trait = TRAITS.get(p.get("trait"), {})
+    credit = p.get("credit") if p.get("credit") is not None else 50
+
+    bio_txt = (
+        f"💌 بیو: «{p['bio']}»\n"
+        if p.get("bio")
+        else ""
+    )
+
+    god_txt = (
+        "⚡⚡ GOD MODE — درجه‌ی الهی فعاله! 👑\n"
+        if p.get("god")
+        else ""
+    )
+
+    vip_txt = " 👑 VIP" if p.get("vip") else ""
+
     return (
         f"👤 پروفایل {p['name']}\n"
         f"───────────────\n"
@@ -1571,23 +1602,25 @@ def render_profile(uid):
         f"🌟 ویژگی: {trait.get('label', '—')}\n"
         f"───────────────\n"
         f"💰 پول: {fmt_money(p['money'])} تومان\n"
-        f"⭐ لول: {fn(p['level'])}  (XP: {fn(p['xp'])}/{fn(xp_needed(p['level']))})\n"
-        f"⚡ انرژی:  {bar(p['energy'])} {fn(p['energy'])}\n"
+        f"⭐ لول: {fn(p['level'])} "
+        f"(XP: {fn(p['xp'])}/{fn(xp_needed(p['level']))})\n"
+        f"⚡ انرژی: {bar(p['energy'])} {fn(p['energy'])}\n"
         f"❤️ سلامتی: {bar(p['health'])} {fn(p['health'])}\n"
-        f"😊 شادی:   {bar(p['happiness'])} {fn(p['happiness'])}\n"
-        f"🏆 اعتبار: {fn(p['reputation'])} ({rep_name(p['reputation'])})\n"
+        f"😊 شادی: {bar(p['happiness'])} {fn(p['happiness'])}\n"
+        f"🏆 اعتبار: {fn(p['reputation'])} "
+        f"({rep_name(p['reputation'])})\n"
         f"───────────────\n"
         f"💼 شغل: {job_txt}\n"
         f"🏠 خانه: {home_name(p)} | 🗺 محله: {district_name(p)}\n"
-        f"🏅 لیگ: {league_of(p['level'])[0]} | 📊 اعتبار بانکی: {fn(p.get('credit') if p.get('credit') is not None else 50)}\n"
-        f"💎 سکه طلا: {fn(p.get('gems') or 0)}{' 👑 VIP' if p.get('vip') else ''}\n"
-        f"{'⚡⚡ GOD MODE — درجه‌ی الهی فعاله! 👑\n' if p.get('god') else ''}"
+        f"🏅 لیگ: {league_of(p['level'])[0]} | "
+        f"📊 اعتبار بانکی: {fn(credit)}\n"
+        f"💎 سکه طلا: {fn(p.get('gems') or 0)}{vip_txt}\n"
+        f"{god_txt}"
         f"⚔️ قدرت جنگ: {fn(battle_power(uid))}\n"
         f"{family_line(uid)}"
-        f"{'💌 بیو: «' + p.get('bio') + '»' + chr(10) if p.get('bio') else ''}"   # 🆕 v1.0.6: بیو کاربر
+        f"{bio_txt}"
         f"🎲 رویدادهای زندگی: {fn(p['games_played'])}"
     )
-
 
 def family_line(uid):
     fam = db.fetchone("SELECT spouse_id, children FROM family WHERE user_id=?", (uid,))
