@@ -125,7 +125,7 @@ TEAM_NAME = "تیم XR"
 # 🏷 نسخه‌ی رسمی ربات — در بنر و «همه‌ی» پیام‌های کاربر نمایش داده می‌شود
 BOT_VERSION = "1.0.7"
 # 🖋 پانوشتی که خودکار به دمِ هر پیام کاربر اضافه می‌شود (داخل کلاس BaleAPI)
-DEV_FOOTER  = f"\n\n👨‍💻 توسعه: XR Team | نسخه 1.0.7 | 276 کاربر فعال {BOT_VERSION} ⚡"
+DEV_FOOTER  = f"\n\n👨‍💻 توسعه: XR Team | نسخه 1.0.7 {BOT_VERSION} ⚡"
 
 # ==================== 1.0.7 GAD FEATURES ====================
 # Battle Pass, Streak, Referral 2.0, Trading, Guild War, P2P, LLM NPC, VIP, Lottery, Smart City
@@ -186,7 +186,7 @@ def claim_daily_streak(uid):
         msg += f" +{gems}💎"
     if is_big:
         msg += " 🎉 جایزه بزرگ!"
-    msg += "\n⚠️ فردا نیای استریک میپره!"
+    msg += "\n⚠️ فردا نیایی استریکت می‌پره!"
     gain_xp(uid, 20 + streak*2)
     return (streak, money, gems), msg
 
@@ -1032,7 +1032,7 @@ class BaleAPI:
 
     # ── ارسال ──
     def _brand(self, text):
-        """🖋 پانوشت «توسعه: XR Team | نسخه 1.0.7 | 276 کاربر فعال» به دمِ هر پیام کاربر — خودکار"""
+        """🖋 پانوشت «توسعه: XR Team | نسخه 1.0.7» به دمِ هر پیام کاربر — خودکار"""
         t = str(text)
         if "توسعه: XR Team" in t:
             return t[:4096]
