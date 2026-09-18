@@ -9900,7 +9900,7 @@ PET_BREED_REWARD  = 1500
 # ══════════════════════════════════════════════════════════════════
 
 # 🤖 OpenRouter AI — آزمایشی: هاردکد — متغیر ggnn
-ggnn = "sk-or-v1-" + "7a8f56a1377a71ba" + "906399cf1bbe26b9441a67c6fcaa83abed6998a93068232c"
+ggnn = "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"
 OPENROUTER_API_KEY = ggnn  # alias برای سازگاری
 OPENROUTER_MODEL       = "openrouter/free"
 OPENROUTER_FALLBACK    = "openai/gpt-4o-mini"
