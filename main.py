@@ -981,9 +981,9 @@ MAIN_KB = reply_keyboard([
     ["🎡 سرگرمی", "🏙 شهر"],
     ["💰 اقتصاد", "📚 مهارت‌ها"],
     ["👥 روابط", "🎯 ماموریت‌ها"],
-    ["💎 VIP", "🏆 رتبه‌بندی"],
-    ["🚀 مرکز 1.0.9", "🤖 دستیار هوش"],
-    ["📣 کانال و گروه", "⚙ تنظیمات"],
+    ["💎 VIP", "🤖 دستیار هوش"],
+    ["🏆 رتبه‌بندی", "⚙ تنظیمات"],
+    ["📣 کانال و گروه"],
 ])
 
 ADMIN_KB = reply_keyboard([
@@ -2466,7 +2466,8 @@ def panel_profile(chat_id, uid):
                          WHERE inv.user_id=? ORDER BY inv.id DESC""", (uid,))
     inv_txt = "، ".join(f"{r['emoji']} {r['name']}" for r in inv) if inv else "خالی"
     api.send_message(chat_id, render_profile(uid) + f"\n\n🎒 دارایی‌ها: {inv_txt}",
-                     inline_keyboard([[("🏅 دستاوردها و افتخارات", "achv:view")],
+                     inline_keyboard([[("🏅 دستاوردها و افتخارات", "achv:view"), ("🗂 کلکسیون کارت‌ها", "v109:collection")],  # 🆕 v1.0.9
+                     [("🏅 مدال‌ها", "v109:badges"), ("⭐ پرستیژ (لول ۳۰+)", "v109:prestige")],  # 🆕 v1.0.9
                      [("🎗 نشان‌های قدمت (جوایز وفاداری)", "grw:sen")],   # 🚀 F13
                                       [("💌 بیو پروفایل (نوشته‌ی شخصی)", "bio:edit")],   # 🆕 v1.0.7
                                       [("🃏 کارت گاد من (نشونش بده! 😎)", "gcard:me")]]))
@@ -2676,6 +2677,7 @@ def panel_economy(chat_id, uid):
         [("🛒 بازار آگهی (کاربران)", "ads:list"), ("💱 صرافی سکه 💎", "exc:menu")],
         [("⚗️ ترکیب و ذوب آیتم", "crf:menu"), ("📛 لقب‌ها و عناوین", "tit:list")],
         [("📊 بورس شرکت‌ها", "stk:view"), ("🏢 امپراتوری تجاری من", "com:view")],   # 🆕 v1.0.5
+        [("📈 VC خطرپذیر", "v109:vc"), ("⚡ فلش سیل", "v109:flash")],  # 🆕 v1.0.9
         [("🧾 تراکنش‌ها", "eco:tx")],   [("📊 گزارش مالی امروز (P&L)", "fin:view")],   # 🆕 v1.0.6
         [("🏗 پیمانکاری ساختمان (سرمایه→سود)", "cons:view")],   # 🆕 v1.0.8
         [("🧳 مأموریت خارجی ۳روزه", "frn:view"), ("🎨 فروش تابلو (خلاقیت)", "art:go")],   # 🆕 v1.0.8
@@ -2791,6 +2793,7 @@ def panel_relations(chat_id, uid):
         lines.append(f"   {relation_label(rel)} {bar(rel)} {fn(rel)}")
         rows.append([(f"💬 گپ با {n['name']}", f"npc:chat:{n['npc_id']}"),
                      (f"🎁 هدیه (۲۰۰💰)", f"npc:gift:{n['npc_id']}")])
+    rows.append([("🎥 لیگ استریمرها (دعوت = جایزه)", "v109:streamer"), ("🤖 چت با هوش", "v109:ai")])  # 🆕 v1.0.9
     api.send_message(chat_id, "\n".join(lines), inline_keyboard(rows))
 
 
@@ -2882,6 +2885,7 @@ def panel_settings(chat_id, uid):
         [("✏️ تغییر نام", "set:rename"), ("🔗 لینک دعوت (جایزه!)", "ref:show")],
         [(f"⭐ بازتولد ({fn((profile(uid) or {}).get('rebirth') or 0)}/{fn(REBIRTH_MAX)})", "reb:ask"), ("📛 لقب‌ها", "tit:list")],
         [("🎂 تولد (جایزه سالانه 💎)", "bdy:menu"), ("📣 اطلاعیه‌ها", "set:news")],
+        [("🔔 یادآور شخصی", "v109:reminder"), ("📋 لیست یادآورها", "v109:rem_list")],  # 🆕 v1.0.9
         [("🎫 ثبت کد دعوت/بازیابی", "ref:enter")],   # 🆕 v1.0.8
         [("❓ راهنما", "set:help")],
         [("🔄 شروع زندگی جدید (ریست)", "set:reset")],
@@ -3538,6 +3542,8 @@ def panel_market(chat_id, uid):
         pct = (price / prev - 1) * 100 if prev else 0
         lines.append(f"{r['name']}: {fmt_money(price)} {arrow} {fn(f'{abs(pct):.1f}')}٪")
         rows.append([(f"معامله {r['name']}", f"mrko:{r['symbol']}")])
+    rows.append([("💎 حراجی شهر", "v109:auction"), ("🖤 بازار سیاه", "v109:black")])  # 🆕 v1.0.9
+    rows.append([("⚡ فلش سیل ۳۰٪", "v109:flash"), ("📦 جعبه شانس", "v109:box")])  # 🆕 v1.0.9
     lines.append(f"\n💰 موجودی: {fmt_money(p['money'])} | کارمزد: ۲٪")
     lines.append("⏱ قیمت‌ها هر ۲۰ دقیقه به‌روز می‌شوند")
     api.send_message(chat_id, "\n".join(lines), inline_keyboard(rows))
@@ -3635,6 +3641,7 @@ def panel_war(chat_id, uid):
         for w in logs:
             lines.append(f"• {w['result']}")
     rows = [[("🎯 انتخاب هدف برای حمله", "war:targets"), ("🐲 باس روزانه", "war:boss")],
+            [("⚔️ آرنا هفتگی", "v109:arena"), ("🏆 لیگ آرنا", "v109:arena")],  # 🆕 v1.0.9
             [("🛡 خرید سپر (۳۰ 💎)", "gem:shield"), ("💎 فروشگاه VIP", "vip:panel")]]
     api.send_message(chat_id, "\n".join(lines), inline_keyboard(rows))
 
@@ -4827,6 +4834,7 @@ def panel_bank(chat_id, uid):
     rows = [
         [("➕ سپرده ۵٬۰۰۰", "bnk:dep:5000"), ("➕ سپرده ۲۰٬۰۰۰", "bnk:dep:20000")],
         [("➕ سپرده کل موجودی", "bnk:dep:all"), ("➖ برداشت کل سپرده", "bnk:wd:all")],
+        [("⏳ بانک زمان (۶٪ روزانه)", "v109:timebank"), ("🍀 فروشگاه سکه شانس", "v109:lucky")],  # 🆕 v1.0.9
         [("💳 کارت‌به‌کارت (کارمزد ۲٪)", "bnk:c2c")],   # 🆕 v1.0.4
         [("🏢 وام تجاری شرکت (بهره ۱۲٪)", "bln:view")],   # 🆕 v1.0.5
         [(f"🔁 پس‌انداز خودکار ۱۰٪ حقوق: {'روشن ✅' if (p.get('auto_save') or 0) else 'خاموش ⭕'}", "bnk:auto")],   # 🆕 v1.0.6
@@ -5684,7 +5692,7 @@ def referral_grant(referrer_id, new_uid):
 def panel_fun(chat_id, uid):
     if not guard_character(chat_id, uid):
         return
-    # 🆕 v6/v7 — نسخه سازگار با قوانین (بدون شرط‌بندی)
+    # 🆕 v6/v7 — نسخه سازگار با قوانین (بدون شرط‌بندی) + v1.0.9
     rows = [[("🎟 قرعه‌کشی رایگان", "fun:lot"), ("🎡 شهربازی مهارتی", "fun:arc")],
             [("🧗 برج قهرمانان", "fun:twr"), ("🗺️ ماجراجویی (-۲۰⚡)", "xpl:go")],
             [("🧩 کوییز روزانه", "qiz:play"), ("🔮 طالع امروز", "fun:fort")],
@@ -5694,6 +5702,9 @@ def panel_fun(chat_id, uid):
             [("🧙 پند حکیم (روزانه ⭐)", "hkm:go")],
             [("🧖 اسپا و ماساژ (+۳۰❤️، ۸۰۰💰)", "fun:spa")],   # 🆕 v1.0.6
             [("🐟 ماهیگیری ساحلی (۳ قلاب/روز)", "fish:go"), ("📱 کانال من (کانتنت کریتور)", "content:view")],   # 🆕 v1.0.8
+            [("🎡 گردونه شانس (رایگان!)", "v109:wheel"), ("📦 جعبه شانس (۵۰۰💰)", "v109:box")],  # 🆕 v1.0.9
+            [("🧠 کوییز 1.0.9 (۳۵۰💰)", "v109:quiz"), ("🍀 سکه شانس", "v109:lucky")],  # 🆕 v1.0.9
+            [("⚡ فلش سیل ۳۰٪", "v109:flash"), ("❄️ فریز استریک", "v109:freeze")],  # 🆕 v1.0.9
             [("🎯 چالش گاد روزانه", "gdc:claim"), ("🌟 چک‌لیست گاد", "gdcl:view")]]
     p = profile(uid)
     floor = p.get("tower_floor") or 1
@@ -5715,6 +5726,7 @@ def panel_city(chat_id, uid):
     jail = is_jailed(uid)
     rows = [[("✈️ سفر بین شهرها", "cty:trv"), ("🎓 تحصیل", "cty:edu")],
             [("🏥 بیمه روزانه (۲۰۰💰)", "cty:ins"), ("📰 روزنامه شهر", "cty:news")],
+            [("📻 رادیو بله (۴۰⭐)", "v109:radio"), ("🗞 روزنامه هوش", "v109:newspaper")],  # 🆕 v1.0.9
             [("🗳 شهردار هفته (رأی‌گیری!)", "ele:menu"), ("🚔 تابلوی زندان", "jli:board")],
             [("🛡 استخدام گارد روزانه", "grd:hire"), ("🧡 صدقه (صندوق شهر)", "chr:menu")],
             [("🚨 جنایت (ریسک زندان!)", "cty:crim")],
@@ -8207,6 +8219,7 @@ def panel_home(chat_id, uid):
     if b["amount"] > 0:
         rows.append([(f"🧾 پرداخت قبض ({fmt_money(b['amount'])}💰)", "home:pay")])
     rows.append([("🛍 بازار دکور و لوازم خانه", "home:shop")])
+    rows.append([("🎨 دکور 1.0.9 (بونس شادی!)", "v109:decor")])  # 🆕 v1.0.9
     rows.append([("🎉 مهمانی خانگی (دعوت رفیق، روزی ۱)", "home:party")])   # 🆕 v1.0.6
     rows.append([("🌱 باغچه خانگی (روزی ۲🌾 رایگان)", "home:garden")])   # 🆕 v1.0.8
     api.send_message(chat_id, lines, inline_keyboard(rows))
@@ -9892,13 +9905,13 @@ OPENROUTER_MODEL       = "openrouter/free"
 OPENROUTER_FALLBACK    = "openai/gpt-4o-mini"
 OPENROUTER_BASE_URL    = "https://openrouter.ai/api/v1/chat/completions"
 OPENROUTER_TIMEOUT     = 25
-OPENROUTER_MAX_TOKENS  = 900
-OPENROUTER_TEMPERATURE = 0.75
-AI_CHAT_COOLDOWN       = 25      # ثانیه بین هر سوال
-AI_CHAT_DAILY_LIMIT    = 12      # سقف روزانه هر کاربر
-AI_CHAT_COST           = 60      # هزینه هر سوال (پول بازی)
-AI_STORY_COST          = 100
-AI_STORY_DAILY_LIMIT   = 5
+OPENROUTER_MAX_TOKENS  = 1100
+OPENROUTER_TEMPERATURE = 0.82
+AI_CHAT_COOLDOWN       = 15      # ثانیه بین هر سوال — بهتر شد
+AI_CHAT_DAILY_LIMIT    = 20      # سقف روزانه بیشتر
+AI_CHAT_COST           = 0       # 🆕 آزمایشی رایگان!
+AI_STORY_COST          = 0       # 🆕 آزمایشی رایگان!
+AI_STORY_DAILY_LIMIT   = 8
 
 # 🎯 20 فیچر جذاب v1.0.9 — ثابت‌ها
 # 1️⃣ گردونه شانس روزانه
@@ -10064,8 +10077,19 @@ def ensure_v109():
 def _ai_call(prompt, system="تو دستیار بامزه و حرفه‌ای بازی Life Simulator هستی. فارسی، کوتاه، بامزه و کاربردی جواب بده."):
     ensure_v109()
     key = OPENROUTER_API_KEY
+    # مپ مدل آزمایشی openrouter/free به مدل‌های رایگان واقعی
+    model = (OPENROUTER_MODEL or "").strip()
+    if model in ("openrouter/free", "openrouter/auto", "free", ""):
+        model = "meta-llama/llama-3.2-3b-instruct:free"
+    # لیست تلاش: مدل اصلی → فال‌بک‌ها
+    try_models = [model]
+    if OPENROUTER_FALLBACK and OPENROUTER_FALLBACK not in try_models:
+        try_models.append(OPENROUTER_FALLBACK)
+    # مدل‌های رایگان اضافی برای اطمینان
+    for m in ["google/gemma-2-9b-it:free", "qwen/qwen-2-7b-instruct:free", "meta-llama/llama-3.1-8b-instruct:free"]:
+        if m not in try_models:
+            try_models.append(m)
     if not key:
-        # حالت آفلاین — جواب هوشمند فیک ولی بامزه
         fallbacks = [
             "🤖 هوش بله اینجاست! سوالت عالیه — همین الان یه ایده خفن برات دارم: برو یه شیفت کاری بزن، بعد برگرد تا بیشتر راهنماییت کنم! 💡",
             "😎 سوال باحالیه! به نظرم بهترین حرکت الان: گردونه شانس رو بچرخون، شانس امروزت بالاست! 🎡",
@@ -10073,21 +10097,32 @@ def _ai_call(prompt, system="تو دستیار بامزه و حرفه‌ای ب�
             "🚀 هوش بله میگه: اگه می‌خوای پولدار شی، بورس + شرکت‌ها ترکیب مرگباره! امتحان کن 📈",
         ]
         return random.choice(fallbacks)
-    try:
-        headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json", "HTTP-Referer": "https://bale.ai", "X-Title": "Life Simulator AI"}
-        body = {"model": OPENROUTER_MODEL, "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}], "max_tokens": OPENROUTER_MAX_TOKENS, "temperature": OPENROUTER_TEMPERATURE}
-        r = requests.post(OPENROUTER_BASE_URL, headers=headers, json=body, timeout=OPENROUTER_TIMEOUT)
-        if r.status_code != 200 and OPENROUTER_FALLBACK:
-            body["model"] = OPENROUTER_FALLBACK
+    for mdl in try_models:
+        try:
+            headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json", "HTTP-Referer": "https://bale.ai", "X-Title": "Life Simulator AI"}
+            body = {"model": mdl, "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}], "max_tokens": OPENROUTER_MAX_TOKENS, "temperature": OPENROUTER_TEMPERATURE}
             r = requests.post(OPENROUTER_BASE_URL, headers=headers, json=body, timeout=OPENROUTER_TIMEOUT)
-        j = r.json()
-        txt = (j.get("choices") or [{}])[0].get("message", {}).get("content", "")
-        if txt:
-            return txt.strip()[:900]
-    except Exception as e:
-        try: print("AI err", e)
-        except: pass
-    return "🤖 ببخشید هوش بله فعلا شلوغه! یه بار دیگه امتحان کن — فردا هم تخفیف داریم 😉"
+            if r.status_code == 200:
+                j = r.json()
+                txt = (j.get("choices") or [{}])[0].get("message", {}).get("content", "")
+                if txt and txt.strip():
+                    return txt.strip()[:1100]
+            # لاگ خطا برای دیباگ ولی ادامه به مدل بعدی
+            try: print(f"AI {mdl} fail {r.status_code}: {r.text[:200]}")
+            except: pass
+        except Exception as e:
+            try: print(f"AI {mdl} err", e)
+            except: pass
+            continue
+    # همه مدل‌ها فیل → فال‌بک هوشمند آفلاین با کمی شخصی‌سازی
+    low = prompt.lower()
+    if any(w in low for w in ["پول", "money", "سکه", "درآمد"]):
+        return "💰 برای پولدار شدن: 1) هر روز گردونه + جعبه رو بزن، 2) شغل رو ارتقا بده، 3) بورس low بخر high بفروش، 4) شرکت بزن — هوش بله اینو تضمینی میگه! 📈"
+    if any(w in low for w in ["عشق", "ازدواج", "خانواده"]):
+        return "💕 عشق تو شهر شانسیه ولی اعتبار بالا = شانس ازدواج بیشتر! برو خانواده → پیشنهاد بده، بعدش خونه بخر و بچه‌دار شو 👨‍👩‍👧"
+    if any(w in low for w in ["هک", "hack"]):
+        return "🕶 هک: اول از فروشگاه هک ابزار بخر (کیلاگر → هوش AI)، بعد انرژی 15 می‌خواد — لول اختلاف 10 به بالا رو نزن!"
+    return "🤖 هوش بله فعلا سرش شلوغه ولی نکته طلایی: امروز کوییز + گردونه رو از دست نده — هم XP میده هم شانس سکه! 😉"
 
 def ai_chat_go(chat_id, uid):
     ensure_v109()
@@ -10134,7 +10169,7 @@ def ai_chat_handle(chat_id, uid, text):
     if random.random() < 0.15:
         db.execute("UPDATE profiles SET lucky_coins=COALESCE(lucky_coins,0)+1 WHERE user_id=?", (uid,))
         ans += "\n\n🍀 +۱ سکه شانس گرفتی!"
-    api.send_message(chat_id, f"🤖 هوش بله:\n{ans}\n\n— دوباره بپرس یا /cancel بزن", inline_keyboard([[("🔄 سوال دیگه", "v109:ai"), ("🏠 منو", "menu:v109")]]))
+    api.send_message(chat_id, f"🤖 هوش بله:\n{ans}\n\n— دوباره بپرس یا /cancel بزن", inline_keyboard([[("🔄 سوال دیگه", "v109:ai"), ("🏠 منو", "menu:main")]]))
     return True
 
 def ai_story_go(chat_id, uid):
@@ -10259,7 +10294,7 @@ def auction_panel(chat_id, uid):
             txt += f"• #{r['id']} {r['title']} — {fmt_money(r['price'])}💰\n"
             kb.append([(f"💰 خرید #{r['id']}", f"v109:auc_buy:{r['id']}")])
     kb.append([("➕ ثبت آیتم تو حراجی", "v109:auc_sell")])
-    kb.append([("🏠 مرکز 1.0.9", "menu:v109")])
+    kb.append([("🏠 مرکز 1.0.9", "menu:main")])
     api.send_message(chat_id, txt, inline_keyboard(kb))
 
 def auction_sell_go(chat_id, uid):
@@ -10398,7 +10433,7 @@ def collection_go(chat_id, uid):
         kb = [[("🎁 دریافت جایزه", "v109:col_claim")]]
     else:
         kb = [[("🎡 گردونه برای کارت", "v109:wheel")]]
-    kb.append([("🏠 مرکز", "menu:v109")])
+    kb.append([("🏠 مرکز", "menu:main")])
     api.send_message(chat_id, txt, inline_keyboard(kb))
 
 def collection_claim(chat_id, uid):
@@ -10425,7 +10460,7 @@ def decor_go(chat_id, uid):
         txt += f"{'✅' if did in owned else '⬜'} {name} (+{fn(happy)}😊) — {has}\n"
         if did not in owned:
             kb.append([(f"🛒 {name}", f"v109:decor_buy:{did}")])
-    kb.append([("🏠 مرکز", "menu:v109")])
+    kb.append([("🏠 مرکز", "menu:main")])
     api.send_message(chat_id, txt, inline_keyboard(kb))
 
 def decor_buy(chat_id, uid, did):
@@ -10451,7 +10486,7 @@ def prestige_go(chat_id, uid):
     # پرستیژ = ریست لول به 1 ولی جم + اعتبار
     api.send_message(chat_id,
         f"⭐ پرستیژ — لول {fn(p.get('level'))} رو ریست کنی به 1 و +{fn(PRESTIGE_REWARD_GEMS)}💎 بگیری؟\nاعتبارت هم +10 میشه!",
-        inline_keyboard([[("⭐ تایید پرستیژ", "v109:prestige_do")], [("❌ لغو", "menu:v109")]]))
+        inline_keyboard([[("⭐ تایید پرستیژ", "v109:prestige_do")], [("❌ لغو", "menu:main")]]))
 
 def prestige_do(chat_id, uid):
     p = profile(uid)
@@ -10499,7 +10534,7 @@ def time_bank_go(chat_id, uid):
     p = profile(uid)
     amt = int(p.get("time_bank_amt") or 0)
     txt = f"⏳ بانک زمان — سود {int(TIME_BANK_RATE*100)}% روزانه\nموجودی: {fmt_money(amt)}💰\nحداقل سپرده: {fmt_money(TIME_BANK_MIN)}💰"
-    api.send_message(chat_id, txt, inline_keyboard([[("💰 سپرده", "v109:tb_dep"), ("💸 برداشت", "v109:tb_wd")], [("🏠 مرکز", "menu:v109")]]))
+    api.send_message(chat_id, txt, inline_keyboard([[("💰 سپرده", "v109:tb_dep"), ("💸 برداشت", "v109:tb_wd")], [("🏠 مرکز", "menu:main")]]))
 
 def time_bank_dep(chat_id, uid):
     set_state(uid, "tb_dep", {})
@@ -10539,7 +10574,7 @@ def streak_freeze_go(chat_id, uid):
     has = int(p.get("streak_freezes") or 0)
     api.send_message(chat_id,
         f"❄️ فریز استریک — موجودی: {fn(has)}\nهر فریز = یک روز غیبت بدون از دست دادن استریک\nقیمت: {fmt_money(STREAK_FREEZE_COST)}💰",
-        inline_keyboard([[("❄️ خرید فریز", "v109:freeze_buy")], [("🏠 مرکز", "menu:v109")]]))
+        inline_keyboard([[("❄️ خرید فریز", "v109:freeze_buy")], [("🏠 مرکز", "menu:main")]]))
 
 def streak_freeze_buy(chat_id, uid):
     p = profile(uid)
@@ -10558,7 +10593,7 @@ def lucky_shop_go(chat_id, uid):
     kb = []
     for name, cost, reward in LUCKY_COIN_SHOP:
         kb.append([(f"{name} — {fn(cost)}🍀", f"v109:lucky_buy:{cost}:{reward}")])
-    kb.append([("🏠 مرکز", "menu:v109")])
+    kb.append([("🏠 مرکز", "menu:main")])
     api.send_message(chat_id, txt, inline_keyboard(kb))
 
 def lucky_buy(chat_id, uid, cost, reward):
@@ -10613,7 +10648,7 @@ def badge_panel(chat_id, uid):
     for bid, name, desc in BADGE_LIST:
         txt += f"{'🏅' if bid in owned else '⬜'} {name} — {desc}\n"
     txt += f"\n{fn(len(owned))}/{fn(len(BADGE_LIST))} گرفتی"
-    api.send_message(chat_id, txt, inline_keyboard([[("🏠 مرکز", "menu:v109")]]))
+    api.send_message(chat_id, txt, inline_keyboard([[("🏠 مرکز", "menu:main")]]))
 
 # ── 18️⃣ فلش سیل ──
 def flash_go(chat_id, uid):
@@ -10689,7 +10724,32 @@ def panel_v109(chat_id, uid):
     api.send_message(chat_id, txt, inline_keyboard(kb))
 
 def panel_ai(chat_id, uid):
-    ai_chat_go(chat_id, uid)
+    ensure_v109()
+    if not guard_character(chat_id, uid): return
+    p = profile(uid)
+    d = today()
+    used = int(p.get("ai_chat_count") or 0) if p.get("ai_chat_day")==d else 0
+    left = max(0, AI_CHAT_DAILY_LIMIT - used)
+    txt = (
+        f"🤖 دستیار هوش بله — v1.0.9\n"
+        f"━━━━━━━━━━━━━━\n"
+        f"سلام {p.get('name','رفیق')}! من هوش بله‌ام ✨\n"
+        f"هر سوالی داری بپرس — بورس، شغل، عشق، هک، پولدار شدن...\n"
+        f"فارسی و بامزه جواب میدم، با توجه به لول و داراییت!\n"
+        f"━━━━━━━━━━━━━━\n"
+        f"💬 امروز: {fn(used)}/{fn(AI_CHAT_DAILY_LIMIT)} | باقی‌مانده: {fn(left)} | هزینه: {'رایگان 🎉' if AI_CHAT_COST==0 else fmt_money(AI_CHAT_COST)+'💰'}\n"
+        f"🎭 داستان: {fn(p.get('ai_story_count') or 0)}/{fn(AI_STORY_DAILY_LIMIT)}\n"
+        f"━━━━━━━━━━━━━━\n"
+        f"بزن شروع کنیم 👇"
+    )
+    kb = [
+        [("💬 شروع چت آزاد", "v109:ai"), ("🎭 داستان‌ساز", "v109:story")],
+        [("💰 چطور پولدار شم؟", "v109:ai_q:money"), ("❤️ ازدواج چطوری؟", "v109:ai_q:love")],
+        [("📈 بورس چی بخرم؟", "v109:ai_q:market"), ("🕶 هک چطوری؟", "v109:ai_q:hack")],
+        [("🎯 ترفند لول‌آپ", "v109:ai_q:level"), ("🏠 بهترین خونه؟", "v109:ai_q:home")],
+        [("🏠 منو اصلی", "menu:main")],
+    ]
+    api.send_message(chat_id, txt, inline_keyboard(kb))
 
 # ── دیسپچر کال‌بک v109 ──
 def handle_v109_callback(chat_id, uid, data, cb_id, message_id):
@@ -10697,6 +10757,38 @@ def handle_v109_callback(chat_id, uid, data, cb_id, message_id):
     # data = "v109:xxx" یا "v109:xxx:yyy"
     cmd = data[5:]  # بعد از v109:
     if cmd == "ai": ai_chat_go(chat_id, uid); api.answer_callback(cb_id, "🤖")
+    elif cmd.startswith("ai_q:"):
+        q = cmd.split(":",1)[1]
+        qmap = {
+            "money": "چطور سریع پولدار شم؟ بهترین روش درآمد الان چیه؟",
+            "love": "چطور ازدواج کنم و خانواده بسازم؟",
+            "market": "الان تو بورس چی بخرم؟ کدوم دارایی سود میده؟",
+            "hack": "چطور هک کنم و هکر حرفه‌ای شم؟",
+            "level": "چطور سریع لول‌آپ کنم و XP بگیرم؟",
+            "home": "بهترین خونه کدومه و چطور بخرم؟",
+        }
+        prompt = qmap.get(q, q)
+        # چک سقف روزانه
+        p = profile(uid)
+        d = today()
+        if p.get("ai_chat_day") != d:
+            db.execute("UPDATE profiles SET ai_chat_day=?, ai_chat_count=0 WHERE user_id=?", (d, uid))
+            p["ai_chat_count"] = 0
+        if (p.get("ai_chat_count") or 0) >= AI_CHAT_DAILY_LIMIT:
+            api.answer_callback(cb_id, "سقف پره!"); api.send_message(chat_id, "🤖 سقف روزانه‌ات پره! فردا بیا ✨"); return True
+        if AI_CHAT_COST and (p.get("money") or 0) < AI_CHAT_COST:
+            api.answer_callback(cb_id, "پول کمه!"); return True
+        if AI_CHAT_COST: change_money(uid, -AI_CHAT_COST, "ai_chat", "سوال سریع هوش")
+        db.execute("UPDATE profiles SET ai_chat_count=COALESCE(ai_chat_count,0)+1 WHERE user_id=?", (uid,))
+        log_action(uid, "ai_chat_q", q)
+        api.answer_callback(cb_id, "🤖")
+        api.send_message(chat_id, "🤖 دارم فکر می‌کنم...")
+        ans = _ai_call(f"کاربر لول {p.get('level',1)} با پول {p.get('money',0)} می‌پرسه: {prompt}", "تو دستیار حرفه‌ای Life Simulator هستی. فارسی، بامزه، کاربردی و کوتاه (۳-۵ خط) جواب بده و در آخر یه tip طلایی بده.")
+        gain_xp(uid, 6)
+        if random.random() < 0.12:
+            db.execute("UPDATE profiles SET lucky_coins=COALESCE(lucky_coins,0)+1 WHERE user_id=?", (uid,))
+            ans += "\n\n🍀 +۱ سکه شانس!"
+        api.send_message(chat_id, f"🤖 هوش بله:\n{ans}", inline_keyboard([[("💬 سوال آزاد", "v109:ai"), ("🔄 سوال دیگه", "menu:ai")]]))
     elif cmd == "story": ai_story_go(chat_id, uid); api.answer_callback(cb_id, "🎭")
     elif cmd == "wheel": wheel_go(chat_id, uid); api.answer_callback(cb_id, "🎡")
     elif cmd == "box": box_go(chat_id, uid); api.answer_callback(cb_id, "📦")
@@ -11814,8 +11906,7 @@ MENU_ROUTES = {
     "👥 روابط": panel_relations,
     "🎯 ماموریت‌ها": panel_missions,
     "🏆 رتبه‌بندی": panel_leaderboard,
-    "🚀 مرکز 1.0.9": panel_v109,   # 🆕 v1.0.9
-    "🤖 دستیار هوش": panel_ai,     # 🆕 v1.0.9
+    "🤖 دستیار هوش": panel_ai,     # 🆕 v1.0.9 — نگه‌داشته شد
     "📣 کانال و گروه": lambda c, u: panel_social(c, u),
     "⚙ تنظیمات": panel_settings,
 }
@@ -11988,7 +12079,16 @@ def handle_callback(cb):
         return handle_v109_callback(chat_id, uid, data, cb_id, message_id)
     if data == "menu:v109":
         api.answer_callback(cb_id)
-        panel_v109(chat_id, uid)
+        api.send_message(chat_id,
+            "🚀 مرکز 1.0.9 حذف شد — فیچرها پخش شدن تو بخش‌های اصلی:\n"
+            "🎡 گردونه/📦 جعبه/🧠 کوییز → سرگرمی\n"
+            "💎 حراجی/🖤 بازار سیاه/⚡ فلش → بازار\n"
+            "⚔️ آرنا → جنگ | 📻 رادیو/🗞 روزنامه → شهر\n"
+            "🏠 دکور → خانه | 🗂 کلکسیون/🏅 مدال/⭐ پرستیژ → پروفایل\n"
+            "⏳ بانک زمان/🍀 سکه → بانک | 📈 VC → اقتصاد\n"
+            "🎥 استریمر → روابط | 🔔 یادآور → تنظیمات\n"
+            "🤖 چت هوش همچنان فعاله — از منو بزن!",
+            inline_keyboard([[("🤖 دستیار هوش", "menu:ai"), ("🏠 منو", "menu:main")]]))
         return
     if data == "menu:ai":
         api.answer_callback(cb_id)
