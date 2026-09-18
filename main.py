@@ -10073,56 +10073,76 @@ def ensure_v109():
         try: print("v109 migrate warn:", e)
         except: pass
 
-# ── 🤖 OpenRouter helper ──
+# ── 🤖 OpenRouter helper (با فال‌بک Pollinations رایگان) ──
+_openrouter_invalid = False
 def _ai_call(prompt, system="تو دستیار بامزه و حرفه‌ای بازی Life Simulator هستی. فارسی، کوتاه، بامزه و کاربردی جواب بده."):
+    global _openrouter_invalid
     ensure_v109()
     key = OPENROUTER_API_KEY
-    # مپ مدل آزمایشی openrouter/free به مدل‌های رایگان واقعی
     model = (OPENROUTER_MODEL or "").strip()
     if model in ("openrouter/free", "openrouter/auto", "free", ""):
         model = "meta-llama/llama-3.2-3b-instruct:free"
-    # لیست تلاش: مدل اصلی → فال‌بک‌ها
     try_models = [model]
     if OPENROUTER_FALLBACK and OPENROUTER_FALLBACK not in try_models:
         try_models.append(OPENROUTER_FALLBACK)
-    # مدل‌های رایگان اضافی برای اطمینان
-    for m in ["google/gemma-2-9b-it:free", "qwen/qwen-2-7b-instruct:free", "meta-llama/llama-3.1-8b-instruct:free"]:
+    for m in ["google/gemma-2-9b-it:free", "qwen/qwen-2-7b-instruct:free", "meta-llama/llama-3.1-8b-instruct:free", "openai/gpt-4o-mini"]:
         if m not in try_models:
             try_models.append(m)
-    if not key:
-        fallbacks = [
-            "🤖 هوش بله اینجاست! سوالت عالیه — همین الان یه ایده خفن برات دارم: برو یه شیفت کاری بزن، بعد برگرد تا بیشتر راهنماییت کنم! 💡",
-            "😎 سوال باحالیه! به نظرم بهترین حرکت الان: گردونه شانس رو بچرخون، شانس امروزت بالاست! 🎡",
-            "🧠 از دید هوش مصنوعی: تو داری عالی پیش میری! یه کم رو مهارت‌هات سرمایه بذار — آینده‌ات روشنه! ✨",
-            "🚀 هوش بله میگه: اگه می‌خوای پولدار شی، بورس + شرکت‌ها ترکیب مرگباره! امتحان کن 📈",
-        ]
-        return random.choice(fallbacks)
-    for mdl in try_models:
-        try:
-            headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json", "HTTP-Referer": "https://bale.ai", "X-Title": "Life Simulator AI"}
-            body = {"model": mdl, "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}], "max_tokens": OPENROUTER_MAX_TOKENS, "temperature": OPENROUTER_TEMPERATURE}
-            r = requests.post(OPENROUTER_BASE_URL, headers=headers, json=body, timeout=OPENROUTER_TIMEOUT)
-            if r.status_code == 200:
-                j = r.json()
-                txt = (j.get("choices") or [{}])[0].get("message", {}).get("content", "")
-                if txt and txt.strip():
-                    return txt.strip()[:1100]
-            # لاگ خطا برای دیباگ ولی ادامه به مدل بعدی
-            try: print(f"AI {mdl} fail {r.status_code}: {r.text[:200]}")
-            except: pass
-        except Exception as e:
-            try: print(f"AI {mdl} err", e)
-            except: pass
-            continue
-    # همه مدل‌ها فیل → فال‌بک هوشمند آفلاین با کمی شخصی‌سازی
-    low = prompt.lower()
-    if any(w in low for w in ["پول", "money", "سکه", "درآمد"]):
-        return "💰 برای پولدار شدن: 1) هر روز گردونه + جعبه رو بزن، 2) شغل رو ارتقا بده، 3) بورس low بخر high بفروش، 4) شرکت بزن — هوش بله اینو تضمینی میگه! 📈"
-    if any(w in low for w in ["عشق", "ازدواج", "خانواده"]):
-        return "💕 عشق تو شهر شانسیه ولی اعتبار بالا = شانس ازدواج بیشتر! برو خانواده → پیشنهاد بده، بعدش خونه بخر و بچه‌دار شو 👨‍👩‍👧"
-    if any(w in low for w in ["هک", "hack"]):
-        return "🕶 هک: اول از فروشگاه هک ابزار بخر (کیلاگر → هوش AI)، بعد انرژی 15 می‌خواد — لول اختلاف 10 به بالا رو نزن!"
-    return "🤖 هوش بله فعلا سرش شلوغه ولی نکته طلایی: امروز کوییز + گردونه رو از دست نده — هم XP میده هم شانس سکه! 😉"
+    # 1) تلاش OpenRouter — فقط اگر قبلا 401 نگرفتیم
+    if key and not _openrouter_invalid:
+        for mdl in try_models:
+            try:
+                headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json", "HTTP-Referer": "https://bale.ai", "X-Title": "Life Simulator AI"}
+                body = {"model": mdl, "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}], "max_tokens": OPENROUTER_MAX_TOKENS, "temperature": OPENROUTER_TEMPERATURE}
+                r = requests.post(OPENROUTER_BASE_URL, headers=headers, json=body, timeout=OPENROUTER_TIMEOUT)
+                if r.status_code == 200:
+                    j = r.json()
+                    txt = (j.get("choices") or [{}])[0].get("message", {}).get("content", "")
+                    if txt and txt.strip():
+                        return txt.strip()[:1100]
+                if r.status_code == 401:
+                    _openrouter_invalid = True
+                    try: print(f"AI token invalid 401 for {mdl}: {r.text[:200]}")
+                    except: pass
+                    break  # توکن مشکل داره، بیخیال OpenRouter برو Pollinations
+                try: print(f"AI {mdl} fail {r.status_code}: {r.text[:200]}")
+                except: pass
+            except Exception as e:
+                try: print(f"AI {mdl} err", e)
+                except: pass
+                continue
+    # 2) فال‌بک رایگان Pollinations — بدون توکن، همیشه کار می‌کنه
+    try:
+        import urllib.parse
+        q = f"{system}\n\nسوال کاربر: {prompt}\nجواب کوتاه فارسی بده:"
+        url = "https://text.pollinations.ai/" + urllib.parse.quote(q[:1800])
+        r = requests.get(url, timeout=12, headers={"User-Agent": "LifeSim/1.0"})
+        if r.status_code == 200 and r.text and len(r.text.strip()) > 10:
+            txt = r.text.strip()
+            # pollinations گاهی prefix اضافه می‌کنه، تمیز کن
+            if len(txt) > 1200: txt = txt[:1200]
+            return txt
+    except Exception as e:
+        try: print("Pollinations err", e)
+        except: pass
+    # 3) فال‌بک آفلاین هوشمند — بر اساس سوال
+    low = (prompt or "").lower()
+    name_hint = ""
+    try:
+        # اگر prompt حاوی نام بود، نگه دار
+        pass
+    except: pass
+    if any(w in low for w in ["پول", "money", "سکه", "درآمد", "ثروت"]):
+        return "💰 پولدار شدن تو بله: 1) هر روز 🎡 گردونه + 📦 جعبه بزن، 2) شغلتو ارتقا بده (اضافه‌کاری یادت نره)، 3) بورس کف بخر سقف بفروش، 4) شرکت بزن و کارمند استخدام کن — این فرمول طلاییه! 📈"
+    if any(w in low for w in ["عشق", "ازدواج", "خانواده", "دختر", "پسر", "رابطه"]):
+        return "💕 عشق شانسیه ولی ترفند داره: اعتبارتو ببر بالا (کار + صدقه + ورزش)، بعد 👨‍👩‍👧 خانواده → پیشنهاد ازدواج، بعد خونه بخر و بچه‌دار شو — خوشبختی تضمینی! 😍"
+    if any(w in low for w in ["هک", "hack", "هکر"]):
+        return "🕶 هک: اول 🛒 فروشگاه هک → کیلاگر بخر (800💰)، بعد انرژی 15 لازمه. اختلاف لول با هدف زیر 10 باشه. ابزار قوی‌تر = قدرت بیشتر. لاگ هک رو چک کن!"
+    if any(w in low for w in ["لول", "xp", "سطح", "level"]):
+        return "⭐ لول‌آپ سریع: 🎯 ماموریت روزانه + 🎲 رویداد زندگی + 🧠 کوییز 1.0.9 + 📻 رادیو + 🗞 روزنامه = روزی 200+ XP! جمعه طلایی ×۲ هم هست."
+    if any(w in low for w in ["سلام", "چطوری", "خوبی", "hello", "hi"]):
+        return "سلام رفیق! 😎 من هوش بله‌ام — آماده‌ام هرچی بخوای راهنماییت کنم. بپرس: پول، عشق، هک، بورس یا داستان؟ 🚀"
+    return "🤖 گرفتم! نکته طلایی امروز: 🎡 گردونه + 📦 جعبه + 🧠 کوییز رو حتما بزن — هم پول میده هم XP. سوالتو دقیق‌تر بپرس تا بهتر راهنماییت کنم! 😉"
 
 def ai_chat_go(chat_id, uid):
     ensure_v109()
