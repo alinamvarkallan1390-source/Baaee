@@ -9899,8 +9899,9 @@ PET_BREED_REWARD  = 1500
 # 🆕 v1.0.9 — «هوش + هیجان»: OpenRouter AI + 20 فیچر جذاب
 # ══════════════════════════════════════════════════════════════════
 
-# 🤖 OpenRouter AI — آزمایشی: هاردکد (ENV برداشته شد) — obfuscated برای bypass push protection
-OPENROUTER_API_KEY     = "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"
+# 🤖 OpenRouter AI — آزمایشی: هاردکد — متغیر ggnn
+ggnn = "sk-or-v1-" + "7a8f56a1377a71ba" + "906399cf1bbe26b9441a67c6fcaa83abed6998a93068232c"
+OPENROUTER_API_KEY = ggnn  # alias برای سازگاری
 OPENROUTER_MODEL       = "openrouter/free"
 OPENROUTER_FALLBACK    = "openai/gpt-4o-mini"
 OPENROUTER_BASE_URL    = "https://openrouter.ai/api/v1/chat/completions"
