@@ -241,6 +241,23 @@ SEED_MARKETS = [
     ("petro", "⛽ سهام پترو",   3500),
     ("land",  "🏞 زمین",       45000),
     ("silver","🥈 نقره",       2500),
+    # 🆕 v1.0.9 فیکس: دارایی‌های بیشتر برای بورس (به سیوهای قدیمی هم خودکار اضافه می‌شوند)
+    ("euro",   "💶 یورو",          6500),
+    ("tether", "🪙 تتر",           6100),
+    ("ton",    "💠 تون‌کوین",      4200),
+    ("sol",    "◎ سولانا",         9000),
+    ("doge",   "🐕 دوج‌کوین",       300),
+    ("copper", "🟤 مس",            1800),
+    ("gas",    "🔥 گاز",           1200),
+    ("saffron","🌸 زعفران",       12000),
+    ("wheat",  "🌾 گندم",           900),
+    ("coffee", "☕ قهوه",          1600),
+    ("car",    "🚗 سهام خودرو",    2200),
+    ("bank",   "🏦 سهام بانک",     1500),
+    ("tech",   "💻 سهام فناوری",   7000),
+    ("pharma", "💊 سهام دارو",     2800),
+    ("build",  "🏢 سهام ساختمان",  5200),
+    ("diamond","💎 الماس",        80000),
 ]
 MARKET_BASE = {s: p for s, _, p in SEED_MARKETS}
 
@@ -680,7 +697,10 @@ MAYOR_SALARY = 1500    # حقوق روزانه شهردار (claim دستی)
 ELITE_JOBS = {"doctor": 1, "lawyer": 2, "police": 1, "teacher": 1, "nurse": 1,
               "engineer": 2, "trader": 2, "pilot": 3, "artist": 1,
               "captain": 2, "arch": 2, "broker": 2, "hackerw": 2, "judge": 3,
-              "producer": 2, "surgeon": 3, "f1": 3, "astro": 3, "ceo": 3}   # 🆕 v1.0.8: نخبه‌های لوکس
+              "producer": 2, "surgeon": 3, "f1": 3, "astro": 3, "ceo": 3,   # 🆕 v1.0.8: نخبه‌های لوکس
+              # 🆕 v1.0.9 فیکس: شغل‌های جدید پردرآمد
+              "pharma": 1, "dentist": 1, "dataeng": 2, "cyber": 2, "banker": 2, "director": 2,
+              "aieng": 2, "refinery": 3, "genetic": 3, "cryptok": 3, "minister": 3, "tycoon": 3, "spacex": 3}
 POLICE_PATROL_LIMIT = 3   # گشت روزانه
 POLICE_REWARD_RATE  = 0.5 # سهم پلیس از جریمه مجرم
 
@@ -799,6 +819,27 @@ SEED_JOBS = [
     ("f1",       "🏎 راننده فرمول‌یک", "comm", 9, 16, 26000),
     ("astro",    "🧑‍🚀 فضانورد",       "int",  9, 17, 28000),
     ("ceo",      "🏦 مدیرعامل هلدینگ", "mgmt", 9, 18, 30000),
+    # 🆕 v1.0.9 فیکس: بازار کار بزرگ‌تر — شغل‌های بیشتر با حقوق بالاتر (به سیوهای قدیمی هم خودکار اضافه می‌شوند)
+    ("courier",   "🛵 پیک موتوری",       None,   0, 1,   400),
+    ("barista",   "☕ باریستا",          "comm", 1, 1,   550),
+    ("mechanic",  "🔧 مکانیک",           "int",  2, 2,   850),
+    ("photog",    "📸 عکاس",             "crea", 2, 2,   900),
+    ("designer",  "🖌 طراح گرافیک",      "crea", 3, 3,  1400),
+    ("account",   "🧾 حسابدار",          "int",  3, 3,  1500),
+    ("streamer",  "🎥 استریمر",          "crea", 4, 4,  2100),
+    ("pharma",    "💊 داروساز",          "int",  5, 6,  4800),
+    ("dentist",   "🦷 دندانپزشک",        "int",  5, 6,  5200),
+    ("dataeng",   "🧠 مهندس داده",       "prog", 6, 8,  9000),
+    ("cyber",     "🛡 کارشناس امنیت",    "hack", 6, 9, 10000),
+    ("banker",    "🏦 مدیر شعبه بانک",    "mgmt", 7, 11, 13000),
+    ("director",  "🎬 کارگردان سینما",   "crea", 7, 11, 13500),
+    ("aieng",     "🤖 مهندس هوش مصنوعی", "prog", 8, 13, 19500),
+    ("refinery",  "🛢 مدیر پالایشگاه",    "mgmt", 8, 15, 24000),
+    ("genetic",   "🧬 دانشمند ژنتیک",    "int",  9, 17, 29000),
+    ("cryptok",   "₿ نهنگ کریپتو",       "int",  9, 18, 32000),
+    ("minister",  "🏛 وزیر اقتصاد",      "mgmt", 9, 19, 35000),
+    ("tycoon",    "💎 غول سرمایه",       "int", 10, 20, 40000),
+    ("spacex",    "🚀 مدیر شرکت فضایی",   "prog", 10, 22, 45000),
 ]
 
 SEED_ITEMS = [
@@ -1315,6 +1356,17 @@ class Database:
                 "foreign_until": "TEXT", "foreign_day": "TEXT", "foreign_pay": "INTEGER DEFAULT 0",
                 "duel_elo": "INTEGER DEFAULT 1000", "today_xp": "INTEGER DEFAULT 0", "today_xp_day": "TEXT",
                 "stmt_day": "TEXT", "stmt_count": "INTEGER DEFAULT 0", "grow_flags": "TEXT",
+                # 🐛 v1.0.9 فیکس: ستون‌های ۱.۰.۹ اینجا هم اضافه می‌شن تا بعد از «بازیابی بکاپ» یا سیو قدیمی
+                # گردونه/دکور/بانک زمان با خطای «no such column» ساکت نمونن و پول کاربر گم نشه!
+                "ai_chat_day": "TEXT", "ai_chat_count": "INTEGER DEFAULT 0",
+                "ai_story_day": "TEXT", "ai_story_count": "INTEGER DEFAULT 0",
+                "wheel_day": "TEXT", "wheel_spins": "INTEGER DEFAULT 0",
+                "quiz_day": "TEXT", "quiz_done": "INTEGER DEFAULT 0",
+                "collection_json": "TEXT", "decor_json": "TEXT",
+                "lucky_coins": "INTEGER DEFAULT 0", "streak_freezes": "INTEGER DEFAULT 0",
+                "reminders_json": "TEXT", "badges_json": "TEXT",
+                "time_bank_amt": "INTEGER DEFAULT 0", "time_bank_since": "TEXT",
+                "v109_flags": "TEXT", "flash_until": "TEXT",
             },
             # 🆕 v7: استعداد پت + گنجینه سکه اتحاد
             "pets": {"talent": "TEXT", "warned": "INTEGER DEFAULT 0", "autofeed": "INTEGER DEFAULT 0",
@@ -1330,15 +1382,34 @@ class Database:
             cols = {r[1] for r in self.fetchall(f"PRAGMA table_info({table})")}
             for col, ddl in cols_ddl.items():
                 if col not in cols:
-                    self.execute(f"ALTER TABLE {table} ADD COLUMN {col} {ddl}")
+                    try:
+                        self.execute(f"ALTER TABLE {table} ADD COLUMN {col} {ddl}")
+                    except Exception as _e:   # 🐛 یک ستون خراب نباید بقیه‌ی مهاجرت را متوقف کند
+                        log.warning(f"migrate {table}.{col}: {_e}")
+        # جدول‌های ۱.۰.۹ (حراجی/یادآور) — بعد از بازیابی بکاپ قدیمی هم ساخته شوند
+        try:
+            self.conn.executescript("""
+            CREATE TABLE IF NOT EXISTS v109_auctions(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                seller INTEGER, title TEXT, price INTEGER,
+                created_at TEXT, expires_at TEXT, buyer INTEGER DEFAULT 0
+            );
+            CREATE TABLE IF NOT EXISTS v109_reminders(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER, text TEXT, remind_at TEXT, done INTEGER DEFAULT 0
+            );
+            """)
+            self.conn.commit()
+        except Exception as _e:
+            log.warning(f"migrate v109 tables: {_e}")
 
     def _seed(self):
-        # شغل‌ها
+        # شغل‌ها (شغل‌های جدید به سیوهای قدیمی هم اضافه می‌شوند؛ حقوقی که ادمین دستی عوض کرده دست نمی‌خورد)
         for j in SEED_JOBS:
             self.execute("INSERT OR IGNORE INTO jobs(id,title,min_skill,min_skill_level,min_level,base_salary) VALUES(?,?,?,?,?,?)", j)
-        # آیتم‌ها
-        if not self.fetchone("SELECT id FROM items LIMIT 1"):
-            for it in SEED_ITEMS:
+        # آیتم‌ها — 🐛 قبلاً فقط وقتی جدول خالی بود سید می‌شد؛ حالا آیتم‌های جدید به سیوهای قدیمی هم اضافه می‌شن
+        for it in SEED_ITEMS:
+            if not self.fetchone("SELECT id FROM items WHERE name=?", (it[1],)):
                 self.execute(
                     "INSERT INTO items(emoji,name,category,price,effect_text,effect_json) VALUES(?,?,?,?,?,?)",
                     (it[0], it[1], it[2], it[3], it[4], json.dumps(it[5], ensure_ascii=False)),
@@ -2258,6 +2329,12 @@ def handle_state_text(chat_id, uid, text, state, data):
         return ai_story_handle(chat_id, uid, text)
     if state == "tb_dep":
         return time_bank_dep_handle(chat_id, uid, text)
+    if state == "mrk_qty":      # 🆕 v1.0.9: خرید عددی بازار
+        return market_qty_handle(chat_id, uid, text, data or {})
+    if state == "mrk_sqty":
+        return market_sell_qty_handle(chat_id, uid, text, data or {})
+    if state == "stk_qty":      # 🆕 v1.0.9: خرید/فروش عددی سهام شرکت‌ها
+        return stock_qty_handle(chat_id, uid, text, data or {})
     if state == "auc_title":
         if not (2 <= len(text) <= 40):
             api.send_message(chat_id, "⚠️ نام باید ۲ تا ۴۰ حرف باشه — دوباره بنویس:")
@@ -2475,7 +2552,32 @@ def panel_profile(chat_id, uid):
 
 # ───────── 💼 شغل ─────────
 
-def panel_job(chat_id, uid):
+JOB_TIERS = [   # 🆕 v1.0.9 فیکس: بازار کار صفحه‌بندی‌شده بر اساس حقوق (کمتر از سقف پیام بله)
+    ("🟢 ساده",     0,     2000),
+    ("🔵 حرفه‌ای",  2000,  8000),
+    ("🟣 نخبه",     8000,  20000),
+    ("👑 لوکس",     20000, 10**9),
+]
+
+
+def job_tier_of(salary):
+    for i, (_, lo, hi) in enumerate(JOB_TIERS):
+        if lo <= salary < hi:
+            return i
+    return len(JOB_TIERS) - 1
+
+
+def job_is_ok(p, j, skills):
+    """آیا کاربر شرایط استخدام این شغل را دارد؟ (مهارت + لول + مدرک)"""
+    ok = (not j["min_skill"] or skills.get(j["min_skill"], 0) >= j["min_skill_level"]) and \
+         (p["level"] or 1) >= j["min_level"]
+    edu_req = ELITE_JOBS.get(j["id"])
+    if edu_req and (p.get("edu") or 0) < edu_req:
+        ok = False
+    return ok
+
+
+def panel_job(chat_id, uid, tier=None):
     if not guard_character(chat_id, uid):
         return
     p = profile(uid)
@@ -2492,30 +2594,51 @@ def panel_job(chat_id, uid):
             used = db.fetchone("SELECT COUNT(*) c FROM logs WHERE actor=? AND action='police_patrol' AND created_at LIKE ?",
                                (uid, today() + "%"))["c"]
             rows.insert(0, [(f"🚓 گشت شبانه ({fn(POLICE_PATROL_LIMIT - used)}/{fn(POLICE_PATROL_LIMIT)} باقی)", "plc:go")])
+        job_level = int(p["job_level"] or 1)
+        if job_level < JOB_MAX_LEVEL:   # 🆕 v1.0.9: شرایط ارتقای بعدی همین‌جا دیده می‌شه
+            req_lvl, req_skill = job_promo_requirements(p, job)
+            promo_txt = f"\n📈 ارتقا به سطح {fn(job_level + 1)}: لول {fn(req_lvl)}+"
+            if job["min_skill"]:
+                promo_txt += f" | {SKILLS.get(job['min_skill'], '')} {fn(req_skill)}+ (الان {fn(get_skills(uid).get(job['min_skill'], 0))})"
+        else:
+            promo_txt = "\n👑 بالاترین سطح شغلی!"
         api.send_message(chat_id,
-                         f"💼 شغل فعلی: {job['title']} — سطح {fn(p['job_level'])}\n"
-                         f"💵 حقوق هر شیفت: حدود {fmt_money(int(job['base_salary'] * p['job_level'] * salary_mult(uid)))} تومان"
+                         f"💼 شغل فعلی: {job['title']} — سطح {fn(job_level)}/{fn(JOB_MAX_LEVEL)}\n"
+                         f"💵 حقوق هر شیفت: حدود {fmt_money(int(job['base_salary'] * job_level * salary_mult(uid)))} تومان"
+                         + promo_txt
                          + ("\n🚓 به‌عنوان پلیس می‌توانی مجرمان اخیر را دستگیر کنی و جایزه بگیری!" if p["job_id"] == "police" else ""),
                          inline_keyboard(rows))
     else:
         skills = get_skills(uid)
+        jobs = [dict(j) for j in db.fetchall("SELECT * FROM jobs ORDER BY base_salary ASC, min_level ASC")]
+        # 🆕 v1.0.9 فیکس: بازار کار بزرگ شد → صفحه‌بندی بر اساس حقوق؛ پیش‌فرض = بهترین صفحه‌ای که شغل آزاد داری
+        if tier is None:
+            eligible = [j for j in jobs if job_is_ok(p, j, skills)]
+            tier = job_tier_of(max(eligible, key=lambda j: j["base_salary"])["base_salary"]) if eligible else 0
+        tier = max(0, min(len(JOB_TIERS) - 1, int(tier)))
+        tname, lo, hi = JOB_TIERS[tier]
         rows = []
-        lines = ["💼 بازار کار — یکی رو انتخاب کن:\n"]
-        for j in db.fetchall("SELECT * FROM jobs"):
-            ok = (not j["min_skill"] or skills.get(j["min_skill"], 0) >= j["min_skill_level"]) and \
-                 p["level"] >= j["min_level"]
+        lines = [f"💼 بازار کار — {tname} (حقوق {fmt_money(lo)} تا {fmt_money(hi) if hi < 10**9 else '∞'}💰/شیفت)\n"]
+        n_ok = 0
+        for j in jobs:
+            if not (lo <= j["base_salary"] < hi):
+                continue
+            ok = job_is_ok(p, j, skills)
             edu_req = ELITE_JOBS.get(j["id"])   # 🆕 v6
-            if edu_req and (p.get("edu") or 0) < edu_req:
-                ok = False
             req = f"{SKILLS.get(j['min_skill'],'-')} {fn(j['min_skill_level'])}+ | لول {fn(j['min_level'])}+" if j["min_skill"] else "بدون شرط"
             if edu_req:
                 req += f" | 🎓 مدرک {fn(edu_req)}"
             mark = "✅" if ok else "🔒"
             lines.append(f"{mark} {j['title']} — 💵 {fmt_money(j['base_salary'])}/شیفت ({req})")
             if ok:
+                n_ok += 1
                 rows.append([(f"استخدام: {j['title']}", f"job:apply:{j['id']}")])
+        if not n_ok:
+            lines.append("\n🔒 هنوز شرایط شغل‌های این صفحه رو نداری — مهارت (📚)، لول و مدرک (🎓 شهر → تحصیل) بگیر.")
+        rows.append([(("▶️ " if i == tier else "") + t[0], f"job:list:{i}") for i, t in enumerate(JOB_TIERS)])
         rows.append([("🏗 کارگری روزمزد (بدون شغل هم می‌شی!)", "labor:go"), ("🚕 تاکسی با ماشینت", "taxi:go")])   # 🆕 v1.0.8
-        api.send_message(chat_id, "\n".join(lines) + "\n\n🎤 مشاغل حرفه‌ای/نخبه مصاحبه‌ی ۲سؤالی دارن!\n🔥 توجه: شادی زیر ۲۰ = خطر اخراج!", inline_keyboard(rows))
+        api.send_message(chat_id, "\n".join(lines) + f"\n\n📊 {fn(len(jobs))} شغل در شهر — صفحه‌ها رو با دکمه‌های پایین عوض کن"
+                         "\n🎤 مشاغل حرفه‌ای/نخبه مصاحبه‌ی ۲سؤالی دارن!\n🔥 توجه: شادی زیر ۲۰ = خطر اخراج!", inline_keyboard(rows))
 
 
 def job_apply(chat_id, uid, job_id):
@@ -2585,24 +2708,39 @@ def job_promo(chat_id, uid):
     if not job:                                          # 🐛 v1.0.8: شغل یتیم کرش نده
         set_profile(uid, job_id=None, job_level=1)
         return "⚠️ شغل قبلی‌ات دیگه تو بازار کار نیست — دوباره استخدام شو!"
-    if p["job_level"] >= 5:
-        return "👑 در بالاترین سطح شغلی هستی!"
+    job_level = int(p["job_level"] or 1)   # 🐛 v1.0.9: سیوهای قدیمی ممکنه NULL داشته باشن → کرش نکنه
+    if job_level >= JOB_MAX_LEVEL:
+        return f"👑 در بالاترین سطح شغلی ({fn(JOB_MAX_LEVEL)}/{fn(JOB_MAX_LEVEL)}) هستی!"
     skills = get_skills(uid)
-    need_lvl = p["level"] >= (p["job_level"] + 1) * 2
-    need_skill = not job["min_skill"] or skills.get(job["min_skill"], 0) >= job["min_skill_level"] + p["job_level"]
+    req_lvl, req_skill = job_promo_requirements(p, job)
+    need_lvl = (p["level"] or 1) >= req_lvl
+    need_skill = not job["min_skill"] or skills.get(job["min_skill"], 0) >= req_skill
     if need_lvl and need_skill:
-        set_profile(uid, job_level=p["job_level"] + 1)
+        set_profile(uid, job_level=job_level + 1)
         db.execute("UPDATE profiles SET reputation=MIN(100,reputation+1) WHERE user_id=?", (uid,))
-        log_action(uid, "job_promo", f"{p['job_id']} lvl {p['job_level']+1}")
-        return (f"📈 تبریک، ارتقا گرفتی! 🎉 سطح شغلی: {fn(p['job_level'] + 1)}/۵\n"
-                f"💵 حقوق جدید: حدود {fmt_money(int(job['base_salary'] * (p['job_level'] + 1) * max(0.5, salary_mult(uid))))} تومان/شیفت | 🏆 اعتبار +۱")
+        log_action(uid, "job_promo", f"{p['job_id']} lvl {job_level+1}")
+        return (f"📈 تبریک، ارتقا گرفتی! 🎉 سطح شغلی: {fn(job_level + 1)}/{fn(JOB_MAX_LEVEL)}\n"
+                f"💵 حقوق جدید: حدود {fmt_money(int(job['base_salary'] * (job_level + 1) * max(0.5, salary_mult(uid))))} تومان/شیفت | 🏆 اعتبار +۱")
     # 🐛 v1.0.8: گزارش شفافِ نیازها (قبلاً متن قاطی می‌شد و کاربر نمی‌فهمید چی کم داره)
-    out = (f"🔒 برای ارتقا به سطح {fn(p['job_level'] + 1)} باید:\n"
-           f"{'✅' if need_lvl else '❌'} لول شخصیت ≥ {fn((p['job_level'] + 1) * 2)} (الان تو: {fn(p['level'])})")
+    # 🐛 v1.0.9: شرط مهارت دیگه از سقف ۱۰ رد نمی‌شه (قبلاً ارتقای شغل‌های سطح‌بالا عملاً غیرممکن بود!)
+    out = (f"🔒 برای ارتقا به سطح {fn(job_level + 1)} باید:\n"
+           f"{'✅' if need_lvl else '❌'} لول شخصیت ≥ {fn(req_lvl)} (الان تو: {fn(p['level'])}) — با کار/تمرین XP بگیر")
     if job["min_skill"]:
         cur = skills.get(job["min_skill"], 0)
-        out += f"\n{'✅' if need_skill else '❌'} {SKILLS[job['min_skill']]} ≥ {fn(job['min_skill_level'] + p['job_level'])} (الان تو: {fn(cur)}) — از بخش 📚 مهارت‌ها تقویتش کن"
+        out += f"\n{'✅' if need_skill else '❌'} {SKILLS[job['min_skill']]} ≥ {fn(req_skill)} (الان تو: {fn(cur)}) — از بخش 📚 مهارت‌ها تقویتش کن"
     return out
+
+
+JOB_MAX_LEVEL = 5
+
+
+def job_promo_requirements(p, job):
+    """🆕 v1.0.9: شرایط ارتقای شغلی — همیشه قابل‌دستیابی:
+    لول شخصیت ≥ (سطح+۱)×۲ | مهارت ≥ min(۱۰, حداقل مهارت شغل + سطح)"""
+    job_level = int(p.get("job_level") or 1)
+    req_lvl = (job_level + 1) * 2
+    req_skill = min(10, int(job["min_skill_level"] or 0) + job_level) if job["min_skill"] else 0
+    return req_lvl, req_skill
 
 
 def job_quit(chat_id, uid):
@@ -3536,32 +3674,174 @@ def panel_market(chat_id, uid):
         lines.append(f"   💵 ارزش کل سبد: {fmt_money(total_val)}\n━━━━━━━━━━━")
     else:
         lines.append("📭 سبدت خالیه — پایین خرید کن!\n━━━━━━━━━━━")
+    pair = []
     for r in db.fetchall("SELECT * FROM markets"):
         price, prev = r["price"], r["prev_price"] or r["price"]
         arrow = "📈" if price >= prev else "📉"
         pct = (price / prev - 1) * 100 if prev else 0
         lines.append(f"{r['name']}: {fmt_money(price)} {arrow} {fn(f'{abs(pct):.1f}')}٪")
-        rows.append([(f"معامله {r['name']}", f"mrko:{r['symbol']}")])
+        pair.append((f"{r['name']}", f"mrko:{r['symbol']}"))
+        if len(pair) == 2:   # 🆕 v1.0.9: دارایی‌ها بیشتر شدن → دو دکمه در هر ردیف
+            rows.append(pair); pair = []
+    if pair:
+        rows.append(pair)
     rows.append([("💎 حراجی شهر", "v109:auction"), ("🖤 بازار سیاه", "v109:black")])  # 🆕 v1.0.9
     rows.append([("⚡ فلش سیل ۳۰٪", "v109:flash"), ("📦 جعبه شانس", "v109:box")])  # 🆕 v1.0.9
     lines.append(f"\n💰 موجودی: {fmt_money(p['money'])} | کارمزد: ۲٪")
+    lines.append("🔢 روی هر دارایی بزن و تعداد سهم/واحدی که می‌خوای رو به عدد بفرست")
     lines.append("⏱ قیمت‌ها هر ۲۰ دقیقه به‌روز می‌شوند")
     api.send_message(chat_id, "\n".join(lines), inline_keyboard(rows))
+
+
+def parse_qty(text):
+    """🆕 v1.0.9: عدد (صحیح یا اعشاری، فارسی یا لاتین) را از متن کاربر بیرون می‌کشد — «۲.۵ سهم» → 2.5"""
+    import re
+    t = parse_num(text or "").replace("٫", ".").replace("/", ".")
+    m = re.search(r"\d+(?:\.\d+)?", t)
+    if not m:
+        return None
+    try:
+        return float(m.group(0))
+    except Exception:
+        return None
+
+
+def fmt_units(u):
+    """نمایش تعداد واحد: اعداد صحیح بدون اعشار، بقیه تا ۲ رقم"""
+    u = float(u)
+    return fn(int(u)) if abs(u - int(u)) < 1e-9 else fn(f"{u:.2f}")
+
+
+def market_max_units(money, price, fee_rate):
+    """حداکثر واحدی که با این پول (با کارمزد) می‌شود خرید — با ۲ رقم اعشار"""
+    if price <= 0 or money <= 0:
+        return 0.0
+    import math
+    return max(0.0, math.floor((money - 1) / (price * (1 + fee_rate)) * 100) / 100)   # −۱ برای خطای گرد کردن
 
 
 def panel_market_trade(chat_id, uid, symbol):
     r = db.fetchone("SELECT * FROM markets WHERE symbol=?", (symbol,))
     if not r:
         api.send_message(chat_id, "❌ دارایی پیدا نشد."); return
-    held = db.fetchone("SELECT amount FROM portfolio WHERE user_id=? AND symbol=?", (uid, symbol))
-    held_txt = fn(round(held["amount"], 2)) if held and held["amount"] > 0 else "۰"
+    p = profile(uid) or {}
+    money = int(p.get("money") or 0)
+    held = db.fetchone("SELECT amount, avg_price FROM portfolio WHERE user_id=? AND symbol=?", (uid, symbol))
+    held_amt = float(held["amount"]) if held and held["amount"] > 0 else 0.0
+    fee_rate = trade_fee_for(uid)
+    max_u = market_max_units(money, r["price"], fee_rate)
+    prev = r["prev_price"] or r["price"]
+    pct = (r["price"] / prev - 1) * 100 if prev else 0
+    # 🆕 v1.0.9: خرید عددی — کاربر تعداد سهم/واحد را می‌نویسد
+    set_state(uid, "mrk_qty", {"symbol": symbol})
     rows = [
-        [("۱ هزار", f"mrkb:{symbol}:1000"), ("۵ هزار", f"mrkb:{symbol}:5000"), ("۲۰ هزار", f"mrkb:{symbol}:20000")],
-        [("💰 خرید با کل موجودی", f"mrkb:{symbol}:all"), (f"فروش همه ({held_txt} واحد)", f"mrks:{symbol}")],
+        [("۱ واحد", f"mrkq:{symbol}:1"), ("۵ واحد", f"mrkq:{symbol}:5"), ("۱۰ واحد", f"mrkq:{symbol}:10")],
+        [(f"💰 حداکثر ({fmt_units(max_u)} واحد)", f"mrkq:{symbol}:{max_u}")] if max_u > 0 else [],
+        [(f"💱 فروش همه ({fmt_units(held_amt)} واحد)", f"mrks:{symbol}"), ("🔢 فروش با تعداد", f"mrksq:{symbol}")] if held_amt > 0 else [],
+        [("🏪 برگشت به بازار", "eco:market"), ("❌ انصراف", "mrk:cancel")],
     ]
+    rows = [rw for rw in rows if rw]
+    txt = (f"{r['name']} — قیمت لحظه‌ای: {fmt_money(r['price'])} تومان ({'📈' if pct >= 0 else '📉'} {fn(f'{abs(pct):.1f}')}٪)\n"
+           f"━━━━━━━━━━━\n"
+           f"💰 پول تو: {fmt_money(money)}💰 | کارمزد: {fn(f'{fee_rate*100:.0f}')}٪\n"
+           + (f"🛒 با پولت حداکثر {fmt_units(max_u)} واحد می‌تونی بخری\n" if max_u > 0
+              else f"🛒 پولت فعلاً برای خرید کافی نیست (حداقل ۰.۰۱ واحد ≈ {fmt_money(max(100, int(r['price'] * 0.01 * (1 + fee_rate)) + 1))}💰)\n")
+           + (f"📦 داری: {fmt_units(held_amt)} واحد (میانگین خرید {fmt_money(int(held['avg_price']))})\n" if held_amt > 0 else "")
+           + f"\n🔢 چند واحد می‌خوای بخری؟ عدد بفرست (مثلاً 3 یا 0.5) — یا از دکمه‌ها انتخاب کن:")
+    api.send_message(chat_id, txt, inline_keyboard(rows))
+
+
+def market_buy_units(chat_id, uid, symbol, qty):
+    """🆕 v1.0.9: خرید بر اساس تعداد واحد — اگر پول کم بود می‌گوید چند واحد می‌تواند بخرد"""
+    r = db.fetchone("SELECT * FROM markets WHERE symbol=?", (symbol,))
+    if not r:
+        return "❌ دارایی پیدا نشد!"
+    try:
+        qty = float(qty)
+    except Exception:
+        return "⚠️ تعداد نامعتبر!"
+    if qty <= 0:
+        return "⚠️ تعداد باید بیشتر از صفر باشه!"
+    qty = round(qty, 2)
+    p = profile(uid)
+    fee_rate = trade_fee_for(uid)
+    cost = qty * r["price"]
+    fee = int(cost * fee_rate)
+    total = int(cost + 0.999) + fee
+    if total < 100:
+        return "💸 حداقل خرید ۱۰۰ تومانه! تعداد بیشتری بزن."
+    if total > p["money"]:
+        max_u = market_max_units(p["money"], r["price"], fee_rate)
+        msg = (f"💸 پول کافی نداری!\n"
+               f"🧾 {fmt_units(qty)} واحد {r['name']} = {fmt_money(total)}💰 (با کارمزد)\n"
+               f"💰 داری: {fmt_money(p['money'])}💰 | کمبود: {fmt_money(total - p['money'])}💰\n")
+        if max_u > 0:
+            msg += f"✅ با موجودیت می‌تونی حداکثر {fmt_units(max_u)} واحد بخری — عدد کمتر بفرست یا دکمه رو بزن 👇"
+            api.send_message(chat_id, msg, inline_keyboard([[(f"🛒 خرید {fmt_units(max_u)} واحد", f"mrkq:{symbol}:{max_u}")],
+                                                           [("❌ انصراف", "mrk:cancel")]]))
+        else:
+            msg += "❌ حتی برای ۰.۰۱ واحد هم کافی نیست — اول کار کن و پول جمع کن! 💪"
+            set_state(uid)
+            api.send_message(chat_id, msg)
+        return None
+    held = db.fetchone("SELECT amount, avg_price FROM portfolio WHERE user_id=? AND symbol=?", (uid, symbol))
+    if held and held["amount"] > 0:
+        new_amt = held["amount"] + qty
+        new_avg = (held["amount"] * held["avg_price"] + qty * r["price"]) / new_amt
+        db.execute("UPDATE portfolio SET amount=?, avg_price=? WHERE user_id=? AND symbol=?",
+                   (new_amt, new_avg, uid, symbol))
+    else:
+        db.execute("INSERT INTO portfolio(user_id,symbol,amount,avg_price) VALUES(?,?,?,?)",
+                   (uid, symbol, qty, r["price"]))
+    change_money(uid, -total, "trade", f"خرید {fmt_units(qty)} واحد {r['name']}")
+    db.execute("UPDATE profiles SET energy=MAX(0,energy-3) WHERE user_id=?", (uid,))
+    log_action(uid, "market_buy", f"{symbol} {total}")
+    set_state(uid)
+    if total >= 50000:
+        channel_news(f"🐋 معامله‌ی نهنگ! {p['name']} به ارزش {fmt_money(total)} تومان {r['name']} خرید!")
+    new_total = (held["amount"] if held and held["amount"] > 0 else 0) + qty
     api.send_message(chat_id,
-                     f"{r['name']} — قیمت لحظه‌ای: {fmt_money(r['price'])} تومان\nمبلغ خرید را انتخاب کن:",
-                     inline_keyboard(rows))
+                     f"✅ خرید {r['name']} انجام شد!\n"
+                     f"📦 +{fmt_units(qty)} واحد × {fmt_money(r['price'])} = {fmt_money(int(cost))}💰\n"
+                     f"💸 پرداخت: {fmt_money(total)}💰 (کارمزد {fmt_money(fee)})\n"
+                     f"📊 کل دارایی این نماد: {fmt_units(new_total)} واحد | 💰 مونده: {fmt_money(p['money'] - total)}💰",
+                     inline_keyboard([[("🛒 خرید بیشتر", f"mrko:{symbol}"), ("🏪 بازار", "eco:market")]]))
+    return None
+
+
+def market_qty_handle(chat_id, uid, text, data):
+    """ورودی متنی تعداد خرید (state=mrk_qty)"""
+    symbol = (data or {}).get("symbol")
+    qty = parse_qty(text)
+    if not symbol or qty is None:
+        # متن عدد نبود → از فرم خارج شو و بگذار پیام مثل همیشه پردازش شود
+        set_state(uid)
+        return False
+    res = market_buy_units(chat_id, uid, symbol, qty)
+    if res:
+        api.send_message(chat_id, res)
+    return True
+
+
+def market_sell_qty_ask(chat_id, uid, symbol):
+    r = db.fetchone("SELECT * FROM markets WHERE symbol=?", (symbol,))
+    held = db.fetchone("SELECT amount FROM portfolio WHERE user_id=? AND symbol=?", (uid, symbol))
+    if not r or not held or held["amount"] <= 0:
+        api.send_message(chat_id, "📭 چیزی از این دارایی نداری!"); return
+    set_state(uid, "mrk_sqty", {"symbol": symbol})
+    api.send_message(chat_id, f"💱 فروش {r['name']} — داری: {fmt_units(held['amount'])} واحد (هر واحد {fmt_money(r['price'])}💰)\n"
+                              f"🔢 چند واحد بفروشم؟ عدد بفرست — لغو: /cancel")
+
+
+def market_sell_qty_handle(chat_id, uid, text, data):
+    symbol = (data or {}).get("symbol")
+    qty = parse_qty(text)
+    if not symbol or qty is None:
+        set_state(uid)
+        return False
+    set_state(uid)
+    api.send_message(chat_id, market_sell(chat_id, uid, symbol, qty))
+    return True
 
 
 def trade_fee_for(uid):
@@ -3606,22 +3886,37 @@ def market_buy(chat_id, uid, symbol, amount_mode):
             f"💸 پرداخت: {fmt_money(amount)} (کارمزد {fmt_money(fee)})")
 
 
-def market_sell(chat_id, uid, symbol):
+def market_sell(chat_id, uid, symbol, qty=None):
     r = db.fetchone("SELECT * FROM markets WHERE symbol=?", (symbol,))
     held = db.fetchone("SELECT amount, avg_price FROM portfolio WHERE user_id=? AND symbol=?", (uid, symbol))
     if not r or not held or held["amount"] <= 0:
         return "📭 چیزی برای فروش نداری!"
-    gross = int(held["amount"] * r["price"])
+    have = float(held["amount"])
+    if qty is None or qty >= have - 1e-9:   # فروش همه
+        qty = have
+    qty = round(float(qty), 2)
+    if qty <= 0:
+        return "⚠️ تعداد باید بیشتر از صفر باشه!"
+    if qty > have + 1e-9:
+        return f"📭 فقط {fmt_units(have)} واحد داری!"
+    gross = int(qty * r["price"])
     fee = int(gross * trade_fee_for(uid))
     net = gross - fee
     pnl = (r["price"] / held["avg_price"] - 1) * 100 if held["avg_price"] else 0
-    db.execute("DELETE FROM portfolio WHERE user_id=? AND symbol=?", (uid, symbol))
-    change_money(uid, net, "trade", f"فروش {r['name']}")
+    left = have - qty
+    if left < 0.005:
+        db.execute("DELETE FROM portfolio WHERE user_id=? AND symbol=?", (uid, symbol))
+        left = 0
+    else:
+        db.execute("UPDATE portfolio SET amount=? WHERE user_id=? AND symbol=?", (left, uid, symbol))
+    change_money(uid, net, "trade", f"فروش {fmt_units(qty)} واحد {r['name']}")
     db.execute("UPDATE profiles SET energy=MAX(0,energy-3) WHERE user_id=?", (uid,))
     log_action(uid, "market_sell", f"{symbol} +{net} pnl={pnl:.1f}%")
     return (f"✅ فروش {r['name']} انجام شد!\n"
+            f"📦 {fmt_units(qty)} واحد × {fmt_money(r['price'])} = {fmt_money(gross)}💰\n"
             f"💰 دریافت: {fmt_money(net)} تومان (کارمزد {fmt_money(fee)})\n"
-            f"{'🟢 سود' if pnl >= 0 else '🔴 زیان'}: {fn(f'{pnl:+.1f}')}٪")
+            f"{'🟢 سود' if pnl >= 0 else '🔴 زیان'}: {fn(f'{pnl:+.1f}')}٪"
+            + (f"\n📊 باقی‌مانده: {fmt_units(left)} واحد" if left else ""))
 
 
 # ───── ⚔️ جنگ: حمله به بازیکن + باس روزانه ─────
@@ -3641,7 +3936,7 @@ def panel_war(chat_id, uid):
         for w in logs:
             lines.append(f"• {w['result']}")
     rows = [[("🎯 انتخاب هدف برای حمله", "war:targets"), ("🐲 باس روزانه", "war:boss")],
-            [("⚔️ آرنا هفتگی", "v109:arena"), ("🏆 لیگ آرنا", "v109:arena")],  # 🆕 v1.0.9
+            [("⚔️ آرنا هفتگی", "v109:arena"), ("🏆 رتبه‌بندی آرنا", "v109:arena_lb")],  # 🆕 v1.0.9
             [("🛡 خرید سپر (۳۰ 💎)", "gem:shield"), ("💎 فروشگاه VIP", "vip:panel")]]
     api.send_message(chat_id, "\n".join(lines), inline_keyboard(rows))
 
@@ -4140,6 +4435,11 @@ def world_engine():
                     channel_news(f"🏟 جنگ محله‌های هفته: {_dn} با {fn(int(_dt['s']))}⭐ پیروز شد! ساکنین فعالش +۱۵۰💰 گرفتن 🎉")
             except Exception as _e:
                 log.warning(f"district_war: {_e}")
+            # ⚔️ v1.0.9: جایزه‌ی هفتگی آرنا
+            try:
+                arena_weekly_payout()
+            except Exception as _e:
+                log.warning(f"arena_week: {_e}")
             db.execute("UPDATE profiles SET week_xp=0")        # 🆕 v1.0.6: ریست هفتگی XP
             # 🏆 v1.0.8: کسب‌وکار برتر هفته
             try:
@@ -5183,15 +5483,69 @@ def penalty_kick(chat_id, uid, corner):
 
 # ───── [3] 🧗 برج قهرمانان (PVE طبقاتی) ─────
 
+TOWER_ENEMIES = [("🧟 زامبی", 1.0), ("🤖 روبات", 1.1), ("👹 دیو", 1.2), ("🗿 غول", 0.9)]
+
+
+def tower_req(floor):
+    """🆕 v1.0.9: قدرت حریف طبقه‌ی داده‌شده — (کمینه، بیشینه، قدرتِ برد تضمینی)
+    حریف: طبقه×۲۵×ضریب(۰.۹ تا ۱.۲) + ۰ تا ۳۰ | قدرت تو ×(۰.۹ تا ۱.۲) → برد تضمینی وقتی ۰.۹×قدرت > بیشینه‌ی حریف"""
+    import math
+    lo = int(floor * 25 * 0.9)
+    hi = int(floor * 25 * 1.2 + 30)
+    safe = math.ceil(hi / 0.9) + 1
+    return lo, hi, safe
+
+
+def tower_status_text(uid, floor=None):
+    p = profile(uid) or {}
+    floor = floor or (p.get("tower_floor") or 1)
+    my = battle_power(uid)
+    lo, hi, safe = tower_req(floor)
+    # شانس تقریبی برد: قدرت تو ×U(0.9,1.2) در برابر حریف U(lo,hi) — شبکه‌ی ۲۵×۲۵
+    if my * 0.9 > hi:
+        chance = "۱۰۰٪ ✅"
+    elif my * 1.2 <= lo:
+        chance = "۰٪ ❌"
+    else:
+        wins = 0
+        for i in range(25):
+            mine = my * (0.9 + 0.3 * (i + 0.5) / 25)
+            for j in range(25):
+                if mine > lo + (hi - lo) * (j + 0.5) / 25:
+                    wins += 1
+        chance = f"حدود {fn(int(wins / 625 * 100))}٪"
+    return (f"🧗 طبقه‌ی فعلی: {fn(floor)}\n"
+            f"⚔️ قدرت تو: {fn(my)}\n"
+            f"👾 قدرت حریف این طبقه: {fn(lo)} تا {fn(hi)}\n"
+            f"🎯 قدرت لازم برای برد تضمینی: {fn(safe)}  (شانس فعلی: {chance})\n"
+            f"💰 جایزه‌ی این طبقه: {fmt_money(int(floor * 150 * HARD_TOWER))}💰 + {fn(20 + floor * 2)}⭐")
+
+
+def panel_tower(chat_id, uid):
+    """🆕 v1.0.9: پنل برج — قدرت لازم طبقه‌ی بعدی رو نشون می‌ده"""
+    if not guard_character(chat_id, uid):
+        return
+    p = profile(uid)
+    floor = p.get("tower_floor") or 1
+    lo2, hi2, safe2 = tower_req(floor + 1)
+    txt = ("🧗 برج قهرمانان\n━━━━━━━━━━━\n" + tower_status_text(uid, floor) +
+           f"\n\n⏭ طبقه‌ی بعد ({fn(floor + 1)}): حریف {fn(lo2)} تا {fn(hi2)} → قدرت لازم {fn(safe2)}\n"
+           f"━━━━━━━━━━━\n💪 قدرت = لول×۱۰ + مهارت‌ها×۴ + آیتم‌ها + ارتش/دیوار + پت + VIP + باشگاه\n"
+           f"⚡ هر مبارزه ۱۵ انرژی (داری: {fn(p.get('energy') or 0)}) | باخت = −۱۰❤️")
+    api.send_message(chat_id, txt, inline_keyboard([[("⚔️ مبارزه (−۱۵⚡)", "twr:fight")],
+                                                   [("💪 باشگاه (+۱۵٪ قدرت)", "gym:go"), ("🏆 رتبه‌بندی برج", "lb:tower")]]))
+
+
 def tower_fight(chat_id, uid):
     p = profile(uid)
     if p["energy"] < 15:
         return "🔋 ۱۵ انرژی لازم است!"
     floor = p.get("tower_floor") or 1
-    enemy_name, enemy_pwr = pick([("🧟 زامبی", 1.0), ("🤖 روبات", 1.1), ("👹 دیو", 1.2), ("🗿 غول", 0.9)])
+    enemy_name, enemy_pwr = pick(TOWER_ENEMIES)
     ep = floor * 25 * enemy_pwr + random.uniform(0, 30)
     db.execute("UPDATE profiles SET energy=MAX(0,energy-15) WHERE user_id=?", (uid,))
-    my = battle_power(uid) * random.uniform(0.9, 1.2)
+    bp = battle_power(uid)
+    my = bp * random.uniform(0.9, 1.2)
     if my > ep:
         reward = floor * 150
         change_money(uid, int(reward * HARD_TOWER), "tower", f"طبقه {floor} برج")  # ⛰ اقتصاد سخت
@@ -5199,12 +5553,17 @@ def tower_fight(chat_id, uid):
         db.execute("UPDATE profiles SET tower_floor=tower_floor+1 WHERE user_id=?", (uid,))
         if floor % 5 == 0:
             channel_news(f"🧗 رکورد برج!\n{profile(uid)['name']} طبقه {fn(floor)} را فتح کرد!")
-        return (f"🧗 طبقه {fn(floor)}: {enemy_name} شکست خورد!\n"
-                f"💰 +{fmt_money(reward)} تومان | ⭐ XP\nصعود به طبقه {fn(floor+1)}! 🚀")
+        lo, hi, safe = tower_req(floor + 1)   # 🆕 v1.0.9: قدرت لازم طبقه‌ی بعد
+        return (f"🧗 طبقه {fn(floor)}: {enemy_name} شکست خورد! (قدرت تو {fn(int(my))} در برابر {fn(int(ep))})\n"
+                f"💰 +{fmt_money(int(reward * HARD_TOWER))} تومان | ⭐ +{fn(20 + floor * 2)} XP\nصعود به طبقه {fn(floor+1)}! 🚀\n"
+                f"━━━━━━━━━━━\n⏭ طبقه‌ی بعد ({fn(floor + 1)}): حریف {fn(lo)} تا {fn(hi)} قدرت → برای برد تضمینی {fn(safe)} لازمه (قدرت تو: {fn(bp)})")
     db.execute("UPDATE profiles SET health=MAX(0,health-10) WHERE user_id=?", (uid,))
     gain_xp(uid, 8)
-    return (f"🧗 طبقه {fn(floor)}: {enemy_name} گذاشتت زمین! 😵\n"
-            f"❤️ -۱۰ سلامتی — قوی شو (ارتش، پت، VIP) و برگرد!")
+    lo, hi, safe = tower_req(floor)
+    return (f"🧗 طبقه {fn(floor)}: {enemy_name} گذاشتت زمین! 😵 (قدرت تو {fn(int(my))} در برابر {fn(int(ep))})\n"
+            f"❤️ -۱۰ سلامتی | ⭐ +۸ XP\n"
+            f"━━━━━━━━━━━\n🎯 این طبقه حریف {fn(lo)} تا {fn(hi)} قدرت داره → برای برد تضمینی {fn(safe)} لازمه (قدرت تو: {fn(bp)})\n"
+            f"💪 قوی شو: لول/مهارت بالا ببر، ارتش و دیوار بساز، پت بگیر، باشگاه برو!")
 
 
 # ───── [4] 🔮 طالع روز ─────
@@ -6937,13 +7296,17 @@ def family_trip(chat_id, uid):
 def panel_leaderboard_tabs(chat_id, uid, mode="money"):
     medals = ["🥇", "🥈", "🥉"]
     tabs = [("💰", "lb:money"), ("💎", "lb:net"), ("💪", "lb:war"), ("🤝", "lb:guild"),
-            ("🧗", "lb:tower"), ("🐾", "lb:pet"), ("🏅", "lb:wxp"), ("🕶", "lb:elo"), ("🤝", "lb:ref")]   # 🚀 F1
-    rows = [[tuple(x) for x in tabs[:4]], [tuple(x) for x in tabs[4:]],
+            ("🧗", "lb:tower"), ("🐾", "lb:pet"), ("🏅", "lb:wxp"), ("🕶", "lb:elo"), ("🔗", "lb:ref"),
+            ("⚔️ آرنا", "lb:arena")]   # 🚀 F1 + 🆕 v1.0.9 آرنا
+    rows = [[tuple(x) for x in tabs[:5]], [tuple(x) for x in tabs[5:]],
             [("📅 فصل ۳۰ روزه", "sea:view"), ("🏅 جایزه هفتگی لیگ", "lg:claim")],   # 🆕 v1.0.4
             [("⚡ مسیر گاد — Endgame", "gp:view")]]   # 🆕 v1.0.5
     lines = []
     lines.append(f"🌟 گاد امروز: {_god_name(god_of_day())}\n👑 گاد هفته: {_god_name(god_of_week())}\n")
-    if mode == "war":
+    if mode == "arena":   # 🆕 v1.0.9: رتبه‌بندی آرنا
+        lines.append(arena_leaderboard_text(uid, True))
+        rows.insert(0, [("⚔️ ورود به آرنا", "v109:arena_fight"), ("🌐 کل دوران", "v109:arena_lb_all")])
+    elif mode == "war":
         lines.append("💪 قدرتمندترین جنگجویان (قدرت فعلی):\n")
         allu = db.fetchall("SELECT user_id, name FROM profiles ORDER BY level DESC LIMIT 40")
         scored = sorted(((battle_power(r["user_id"]), r["name"]) for r in allu), reverse=True)[:10]
@@ -7913,7 +8276,7 @@ def gl_admin_cb(chat_id, uid, data, cb_id):
 def restore_db_bytes(uid, payload, fname="backup.db"):
     """بایت‌های فایل .db را گرفته و امن جایگزین دیتابیس فعلی می‌کند.
     خروجی: (True, تعداد کاربران) یا (False, متن خطا)"""
-    global db
+    global db, _v109_migrated
     if not payload or len(payload) < 100:
         return False, "❌ فایل خالیه یا خیلی کوچیکه! همون فایل life_simulator.db رو بده 💾"
     if not payload.startswith(b"SQLite format 3"):
@@ -7943,6 +8306,13 @@ def restore_db_bytes(uid, payload, fname="backup.db"):
         except Exception: pass
     os.replace(tmp, DB_PATH)
     db = Database(DB_PATH)
+    # 🐛 فیکس: بعد از بازیابی یک بکاپ قدیمی، مهاجرت ۱.۰.۹ دوباره اجرا شود
+    # (قبلاً فلگ «یک‌بار اجرا» مانع می‌شد و گردونه/دکور/بانک زمان با «no such column» می‌مردند)
+    try:
+        _v109_migrated = False
+        ensure_v109()
+    except Exception as _e:
+        log.warning(f"v109 migrate after restore: {_e}")
     try:
         log_action(uid, "db_restore", f"{fname} users={cnt}")
     except Exception:
@@ -8985,7 +9355,82 @@ def panel_company_manage(chat_id, uid, cid):
     _ad_txt = "📣 کمپین تبلیغاتی فعال ✅" if _ad_on else f"📣 کمپین تبلیغاتی ({fmt_money(company_ad_cost(c))}💰 → +۱۵٪ درآمد ۲۴ساعت)"
     rows.append([(_ad_txt, f"com:ad:{cid}")])   # 🆕 v1.0.7
     rows.append([("✏️ تغییر نام شرکت", f"com:ren:{cid}")])
+    rows.append([(f"🏷 فروش شرکت (≈ {fmt_money(company_sale_price(c))}💰)", f"com:sell:{cid}")])   # 🆕 v1.0.9
     api.send_message(chat_id, lines, inline_keyboard(rows))
+
+
+# ───── 🏷 فروش شرکت (🆕 v1.0.9) ─────
+COMPANY_SELL_RATE = 0.65   # چند درصد ارزش دفتری شرکت موقع فروش نقد می‌شود
+
+
+def company_sale_price(c):
+    """قیمت فروش شرکت = ۶۵٪ ارزش دفتری (سرمایه × ضریب سطح) + موجودی صندوق (بدهی صندوق کم می‌شود)"""
+    t = COMPANY_TYPES.get(c["type"])
+    if not t:
+        return 0
+    lvl = max(1, c.get("level") or 1)
+    book = int(t[2] * (1 + (lvl - 1) * 0.8) * COMPANY_SELL_RATE)
+    return max(0, book + int(c.get("balance") or 0))
+
+
+def company_sell_split(c, uid):
+    """تقسیم پول فروش: اول سهامدارهای بیرونی به قیمت روز بازخرید می‌شوند، باقی‌مانده مال صاحب شرکت.
+    خروجی: (قیمت کل، سهم صاحب، لیست [(user_id, qty, refund)])"""
+    price = company_sale_price(c)
+    sp = int(c.get("stock_price") or 100)
+    holders = db.fetchall("SELECT user_id, qty FROM company_shares WHERE company_id=? AND qty>0 AND user_id<>?", (c["id"], uid))
+    total_ref = sum(int((h["qty"] or 0) * sp) for h in holders)
+    ratio = 1.0 if total_ref <= price or total_ref == 0 else price / total_ref
+    refunds = [(h["user_id"], int(h["qty"] or 0), int((h["qty"] or 0) * sp * ratio)) for h in holders]
+    owner = max(0, price - sum(r[2] for r in refunds))
+    return price, owner, refunds
+
+
+def company_sell_ask(chat_id, uid, cid):
+    crow = db.fetchone("SELECT * FROM companies WHERE id=? AND user_id=?", (cid, uid))
+    if not crow:
+        api.send_message(chat_id, "❌ شرکت پیدا نشد!"); return
+    c = dict(crow)
+    t = COMPANY_TYPES.get(c["type"], ("🏢", "شرکت"))
+    price, owner_gets, refunds = company_sell_split(c, uid)
+    bal = int(c.get("balance") or 0)
+    txt = (f"🏷 فروش {t[0]} «{c['name']}» ({LEVEL_NAMES.get(c.get('level') or 1, '')})\n━━━━━━━━━━━\n"
+           f"💵 پیشنهاد خریدار: {fmt_money(price)}💰\n"
+           f"   ↳ {fn(int(COMPANY_SELL_RATE * 100))}٪ ارزش دفتری + صندوق ({'−' if bal < 0 else '+'}{fmt_money(abs(bal))}💰)\n")
+    if refunds:
+        txt += (f"📊 {fn(sum(r[1] for r in refunds))} سهم شناور دست {fn(len(refunds))} نفره — از پول فروش به قیمت روز بازخرید می‌شه "
+                f"(−{fmt_money(price - owner_gets)}💰)\n")
+    txt += (f"💰 سهم تو: {fmt_money(owner_gets)}💰\n"
+            "⚠️ بعد از فروش، شرکت از بورس حذف می‌شه و کارمنداش مرخص می‌شن. قابل برگشت نیست!\n\nمطمئنی؟")
+    api.send_message(chat_id, txt, inline_keyboard([[("✅ بله، بفروش", f"com:sellok:{cid}")],
+                                                   [("❌ نه، نگهش می‌دارم", f"com:m:{cid}")]]))
+
+
+def company_sell_do(chat_id, uid, cid):
+    crow = db.fetchone("SELECT * FROM companies WHERE id=? AND user_id=?", (cid, uid))
+    if not crow:
+        return "❌ شرکت پیدا نشد (شاید قبلاً فروخته شده)!"
+    c = dict(crow)
+    t = COMPANY_TYPES.get(c["type"], ("🏢", "شرکت"))
+    p = profile(uid) or {}
+    price, owner_gets, refunds = company_sell_split(c, uid)
+    # بازخرید سهام سهامدارها به قیمت روز — از پول فروش (نه از هوا، تا با اکانت دوم پول‌سازی نشه)
+    for huid, qty, refund in refunds:
+        if refund > 0:
+            change_money(huid, refund, "stock", f"بازخرید سهام {c['name']} (فروش شرکت)")
+            try:
+                api.send_message(huid, f"📊 شرکت «{c['name']}» فروخته شد؛ {fn(qty)} سهمت به قیمت روز بازخرید شد: +{fmt_money(refund)}💰")
+            except Exception:
+                pass
+    db.execute("DELETE FROM company_shares WHERE company_id=?", (cid,))
+    db.execute("DELETE FROM companies WHERE id=?", (cid,))
+    if owner_gets > 0:
+        change_money(uid, owner_gets, "company_sell", f"فروش شرکت {c['name']}")
+    log_action(uid, "company_sell", f"{c['name']} @{price} owner={owner_gets}")
+    channel_news(f"🏷 {p.get('name', '?')} شرکت «{c['name']}» ({t[0]} {t[1]}) رو به {fmt_money(price)}💰 فروخت! 💼")
+    return (f"✅ شرکت «{c['name']}» به {fmt_money(price)}💰 فروخته شد!\n💰 سهم تو: +{fmt_money(owner_gets)}💰 به حسابت واریز شد."
+            + (f"\n📊 سهام {fn(len(refunds))} سهامدار به قیمت روز بازخرید شد (−{fmt_money(price - owner_gets)}💰)." if refunds else "")
+            + "\n\n🏢 با این پول می‌تونی شرکت بزرگ‌تری بزنی!")
 
 
 def company_hire(chat_id, uid, cid, role):
@@ -9216,12 +9661,48 @@ def stock_pick_amount(chat_id, uid, cid, side):
     if not c:
         api.send_message(chat_id, "❌"); return
     have = db.fetchone("SELECT qty FROM company_shares WHERE user_id=? AND company_id=?", (uid, cid))
+    have_q = int((have["qty"] if have else 0) or 0)
     price = c["stock_price"] or 100
+    p = profile(uid) or {}
+    money = int(p.get("money") or 0)
+    max_buy = int(money // (price * 1.01)) if price > 0 else 0
     rows = [[(f"{fn(n)} سهم ({fmt_money(price * n)}💰)", f"stk:{'bb' if side == 'b' else 'ss'}:{cid}:{n}") for n in (1, 5, 10)]]
-    txt = f"📊 «{c['name']}» — هر سهم {fmt_money(price)}💰\n"
+    txt = f"📊 «{c['name']}» — هر سهم {fmt_money(price)}💰 (کارمزد ۱٪)\n"
     if side == "s":
-        txt += f"💼 سهام تو: {fn((have['qty'] if have else 0) or 0)}\n"
-    api.send_message(chat_id, txt + "چند سهم؟", inline_keyboard(rows))
+        txt += f"💼 سهام تو: {fn(have_q)}\n"
+        if have_q > 0:
+            rows.append([(f"🔴 فروش همه ({fn(have_q)} سهم)", f"stk:ss:{cid}:{have_q}")])
+    else:
+        txt += f"💰 پول تو: {fmt_money(money)}💰 → حداکثر {fn(max_buy)} سهم می‌تونی بخری\n"
+        if max_buy > 0:
+            rows.append([(f"🟢 خرید حداکثر ({fn(max_buy)} سهم)", f"stk:bb:{cid}:{max_buy}")])
+    # 🆕 v1.0.9: تعداد دلخواه با تایپ عدد
+    set_state(uid, "stk_qty", {"cid": int(cid), "side": side})
+    rows.append([("❌ انصراف", "mrk:cancel")])
+    api.send_message(chat_id, txt + "🔢 چند سهم؟ عدد بفرست یا از دکمه‌ها انتخاب کن:", inline_keyboard(rows))
+
+
+def stock_qty_handle(chat_id, uid, text, data):
+    """🆕 v1.0.9: ورودی متنی تعداد سهام شرکت (state=stk_qty)"""
+    cid = (data or {}).get("cid")
+    side = (data or {}).get("side") or "b"
+    qty = parse_qty(text)
+    if not cid or qty is None:
+        set_state(uid)
+        return False
+    n = int(qty)
+    if n <= 0:
+        api.send_message(chat_id, "⚠️ تعداد سهم باید حداقل ۱ باشه — دوباره عدد بفرست:"); return True
+    if side == "s":
+        set_state(uid)
+        api.send_message(chat_id, stock_sell(chat_id, uid, int(cid), n))
+        return True
+    res = stock_buy(chat_id, uid, int(cid), n)
+    if res is None:      # پول کم بود و پیام «حداکثر N سهم» با دکمه رفت → فرم باز می‌مونه تا عدد کمتر بفرسته
+        return True
+    set_state(uid)
+    api.send_message(chat_id, res)
+    return True
 
 
 def stock_buy(chat_id, uid, cid, n):
@@ -9236,7 +9717,15 @@ def stock_buy(chat_id, uid, cid, n):
     fee = max(1, int(cost * 0.01))
     p = profile(uid)
     if p["money"] < cost + fee:
-        return f"💸 {fmt_money(cost + fee)}💰 لازمه (قیمت + کارمزد ۱٪)!"
+        # 🆕 v1.0.9: بگو چند سهم با پولش می‌تونه بخره
+        max_buy = int(p["money"] // (price * 1.01)) if price > 0 else 0
+        msg = (f"💸 پول کافی نداری!\n🧾 {fn(n)} سهم = {fmt_money(cost + fee)}💰 (قیمت + کارمزد ۱٪)\n"
+               f"💰 داری: {fmt_money(p['money'])}💰 | کمبود: {fmt_money(cost + fee - p['money'])}💰\n")
+        if max_buy > 0:
+            msg += f"✅ با موجودیت حداکثر {fn(max_buy)} سهم می‌تونی بخری 👇"
+            api.send_message(chat_id, msg, inline_keyboard([[(f"🟢 خرید {fn(max_buy)} سهم", f"stk:bb:{cid}:{max_buy}")]]))
+            return None
+        return msg + "❌ حتی برای ۱ سهم هم کافی نیست — اول پول جمع کن!"
     change_money(uid, -(cost + fee), "stock", f"خرید {n} سهم {c['name']}")
     treasury_feed(fee, "کارمزد بورس")
     owner_gain = int(cost * 0.9)   # ۹۰٪ به صاحب شرکت، ۱۰٪ از چرخه حذف (ضد تورم)
@@ -9251,9 +9740,9 @@ def stock_buy(chat_id, uid, cid, n):
 def stock_sell(chat_id, uid, cid, n):
     c = db.fetchone("SELECT * FROM companies WHERE id=?", (cid,))
     have = db.fetchone("SELECT qty FROM company_shares WHERE user_id=? AND company_id=?", (uid, cid))
-    if not c or not have or (have["qty"] or 0) < n:
-        return "🔴 به این اندازه سهم نداری!"
     n = max(1, int(n))
+    if not c or not have or (have["qty"] or 0) < n:
+        return f"🔴 به این اندازه سهم نداری! (داری: {fn((have['qty'] if have else 0) or 0)} سهم)"
     price = c["stock_price"] or 100
     gross = price * n
     fee = max(1, int(gross * 0.01))
@@ -10037,7 +10526,8 @@ def ensure_v109():
     global _v109_migrated
     if _v109_migrated:
         return
-    _v109_migrated = True
+    if db is None:
+        return
     try:
         # پروفایل: ستون‌های جدید
         plan = {
@@ -10070,6 +10560,7 @@ def ensure_v109():
             )
         """)
         db.conn.commit()
+        _v109_migrated = True   # 🐛 فقط بعد از موفقیت فلگ می‌خورد — اگر خطا داد دفعه‌ی بعد دوباره تلاش می‌کنیم
     except Exception as e:
         try: print("v109 migrate warn:", e)
         except: pass
@@ -10280,15 +10771,28 @@ def wheel_go(chat_id, uid):
             extra = ""
         api.send_message(chat_id, f"🎡 گردونه چرخید!\n+{fmt_money(gain)}💰 +10⭐ XP{extra}", inline_keyboard([[("📦 جعبه شانس", "v109:box")]]))
 
+def flash_active(p):
+    """⚡ آیا فلش سیل ۳۰٪ کاربر فعال است؟ (🐛 v1.0.9: قبلاً تخفیف هیچ‌جا اعمال نمی‌شد)"""
+    try:
+        return bool(p and p.get("flash_until") and datetime.fromisoformat(p["flash_until"]) > datetime.now())
+    except Exception:
+        return False
+
+
+def flash_price(p, price):
+    return int(price * (1 - FLASH_SALE_DISCOUNT)) if flash_active(p) else int(price)
+
+
 # ── 2️⃣ جعبه شانس ──
 def box_go(chat_id, uid):
     ensure_v109()
     if not guard_character(chat_id, uid): return
     p = profile(uid)
-    if (p.get("money") or 0) < BOX_OPEN_COST:
-        api.send_message(chat_id, f"📦 هر جعبه {fmt_money(BOX_OPEN_COST)}💰 — پولت کمه!")
+    cost = flash_price(p, BOX_OPEN_COST)
+    if (p.get("money") or 0) < cost:
+        api.send_message(chat_id, f"📦 هر جعبه {fmt_money(cost)}💰 — پولت کمه! (داری: {fmt_money(p.get('money') or 0)}💰)")
         return
-    change_money(uid, -BOX_OPEN_COST, "box", "جعبه شانس")
+    change_money(uid, -cost, "box", "جعبه شانس" + (" (فلش سیل)" if cost < BOX_OPEN_COST else ""))
     log_action(uid, "box", "")
     if random.random() < BOX_RARE_CHANCE:
         gain = random.randint(2500, 6000)
@@ -10362,10 +10866,11 @@ def auction_buy(chat_id, uid, aid):
 def black_market_go(chat_id, uid):
     ensure_v109()
     if not guard_character(chat_id, uid): return
-    txt = "🖤 بازار سیاه — فقط 6 ساعت می‌مونه!\n"
+    p = profile(uid) or {}
+    txt = "🖤 بازار سیاه — فقط 6 ساعت می‌مونه!\n" + ("⚡ فلش سیل فعاله: ۳۰٪ تخفیف!\n" if flash_active(p) else "")
     kb = []
     for iid, name, price in BLACK_MARKET_ITEMS:
-        txt += f"• {name} — {fmt_money(price)}💰\n"
+        txt += f"• {name} — {fmt_money(flash_price(p, price))}💰\n"
         kb.append([(f"🛒 {name}", f"v109:bm_buy:{iid}")])
     kb.append([("🔄 رفرش (900💰)", "v109:bm_refresh")])
     api.send_message(chat_id, txt, inline_keyboard(kb))
@@ -10375,11 +10880,15 @@ def black_market_buy(chat_id, uid, iid):
     if not it: return
     _, name, price = it
     p = profile(uid)
+    price = flash_price(p, price)   # ⚡ تخفیف فلش سیل
     if (p.get("money") or 0) < price:
-        api.send_message(chat_id, "💸 پول کمه!"); return
+        api.send_message(chat_id, f"💸 پول کمه! {name} {fmt_money(price)}💰ــ داری: {fmt_money(p.get('money') or 0)}💰"); return
     change_money(uid, -price, "black_market", name)
     if iid == "hack_boost":
-        db.execute("UPDATE profiles SET focus_until=datetime('now','+2 hours') WHERE user_id=?", (uid,))
+        from datetime import timedelta
+        # 🐛 فیکس: datetime('now') در SQLite به وقت UTC است و با datetime.now() سرور نمی‌خواند → باف فوراً منقضی می‌شد
+        db.execute("UPDATE profiles SET focus_until=? WHERE user_id=?",
+                   ((datetime.now() + timedelta(hours=2)).isoformat(timespec="seconds"), uid))
         api.send_message(chat_id, f"✅ {name} خریدی! 2 ساعت XP×2 فعال شد 🧪")
     elif iid == "energy_drink":
         db.execute("UPDATE profiles SET energy=MIN(100,energy+35) WHERE user_id=?", (uid,))
@@ -10390,38 +10899,135 @@ def black_market_buy(chat_id, uid, iid):
     log_action(uid, "bm_buy", iid)
 
 # ── 5️⃣ آرنا هفتگی ──
+def arena_rank_name(wins):
+    """🐛 v1.0.9 فیکس: قبلاً حلقه‌ی رتبه هیچ‌کاری نمی‌کرد و همه «تازه‌وارد» بودند"""
+    name = ARENA_RANKS[0][0]
+    for n, need in ARENA_RANKS:
+        if wins >= need:
+            name = n
+    return name
+
+
+def arena_week_start():
+    from datetime import timedelta
+    now = datetime.now()
+    return (now - timedelta(days=now.weekday(), hours=now.hour, minutes=now.minute, seconds=now.second))
+
+
+def arena_week_wins(uid):
+    return logs_since(uid, "arena_win", arena_week_start())
+
+
+def arena_top(limit=10, weekly=True):
+    """برترین‌های آرنا: [(user_id, name, wins)] — هفتگی یا کل"""
+    if weekly:
+        rows = db.fetchall("""SELECT l.actor uid, p.name, COUNT(*) c FROM logs l
+                              JOIN profiles p ON p.user_id=l.actor
+                              WHERE l.action='arena_win' AND l.created_at>=?
+                              GROUP BY l.actor ORDER BY c DESC, MAX(l.id) ASC LIMIT ?""",
+                           (arena_week_start().isoformat(timespec="seconds"), limit))
+    else:
+        rows = db.fetchall("""SELECT l.actor uid, p.name, COUNT(*) c FROM logs l
+                              JOIN profiles p ON p.user_id=l.actor
+                              WHERE l.action='arena_win' GROUP BY l.actor ORDER BY c DESC LIMIT ?""", (limit,))
+    return [(r["uid"], r["name"], r["c"]) for r in rows]
+
+
+def arena_leaderboard_text(uid, weekly=True):
+    medals = ["🥇", "🥈", "🥉"]
+    top = arena_top(10, weekly)
+    lines = [("🏆 رتبه‌بندی آرنا — این هفته (جایزه‌ها اول هر هفته واریز می‌شه):" if weekly else "🏆 رتبه‌بندی آرنا — کل دوران:"), ""]
+    if not top:
+        lines.append("هنوز کسی این هفته تو آرنا نبرده — اولین قهرمان باش! ⚔️")
+    for i, (tu, nm, c) in enumerate(top):
+        me = " ← تو" if tu == uid else ""
+        lines.append(f"{medals[i] if i < 3 else fn(i + 1) + '.'} {nm} — {fn(c)} برد {arena_rank_name(log_count(tu, 'arena_win'))}{me}")
+    my_w = arena_week_wins(uid) if weekly else log_count(uid, "arena_win")
+    pos = next((i + 1 for i, t in enumerate(top) if t[0] == uid), None)
+    lines.append(f"\n👤 تو: {fn(my_w)} برد" + (f" | رتبه {fn(pos)}" if pos else " | خارج از ۱۰ نفر اول"))
+    lines.append(f"🎁 جوایز هفتگی: 🥇 {fmt_money(ARENA_PRIZE_TOP)}💰 | 🥈 {fmt_money(int(ARENA_PRIZE_TOP * 0.5))}💰 | 🥉 {fmt_money(int(ARENA_PRIZE_TOP * 0.25))}💰")
+    return "\n".join(lines)
+
+
+def arena_leaderboard(chat_id, uid, weekly=True):
+    ensure_v109()
+    if not guard_character(chat_id, uid): return
+    kb = [[("⚔️ ورود به آرنا", "v109:arena_fight")],
+          [("📅 این هفته", "v109:arena_lb"), ("🌐 کل دوران", "v109:arena_lb_all")],
+          [("⚔️ پنل آرنا", "v109:arena"), ("🏆 همه‌ی رتبه‌بندی‌ها", "lb:arena")]]
+    api.send_message(chat_id, arena_leaderboard_text(uid, weekly), inline_keyboard(kb))
+
+
 def arena_go(chat_id, uid):
     ensure_v109()
     if not guard_character(chat_id, uid): return
     p = profile(uid)
     wins = log_count(uid, "arena_win")
-    rank = "🥉 تازه‌وارد"
-    for n, r in ARENA_RANKS:
-        if wins >= r[1] if isinstance(r, tuple) else wins >= r:
-            pass
-    # ساده: برد رندوم
-    txt = f"⚔️ آرنا هفتگی — بردها: {fn(wins)}\nهزینه ورود: {fmt_money(ARENA_ENTER_COST)}💰\nجایزه نفر اول هفته: {fmt_money(ARENA_PRIZE_TOP)}💰"
-    api.send_message(chat_id, txt, inline_keyboard([[("⚔️ ورود به آرنا", "v109:arena_fight")], [("🏆 رتبه‌بندی", "menu:leaderboard")]]))
+    week_wins = arena_week_wins(uid)
+    rank = arena_rank_name(wins)
+    nxt = next(((n, need) for n, need in ARENA_RANKS if wins < need), None)
+    chance = 0.48 + min(0.25, (p.get("level") or 1) * 0.015)
+    txt = (f"⚔️ آرنا هفتگی\n━━━━━━━━━━━\n"
+           f"🎖 درجه‌ی تو: {rank}" + (f" (تا {nxt[0]}: {fn(nxt[1] - wins)} برد دیگه)" if nxt else " — بالاترین درجه! 👑") + "\n"
+           f"🏆 بردها: این هفته {fn(week_wins)} | کل {fn(wins)}\n"
+           f"🎯 شانس برد تو (بر اساس لول): {fn(int(chance * 100))}٪\n"
+           f"💸 هزینه ورود: {fmt_money(ARENA_ENTER_COST)}💰 + ۱۵⚡ | جایزه برد: ۱٬۲۰۰ تا ۲٬۸۰۰💰 +۲۰⭐\n"
+           f"🥇 جایزه نفر اول هفته: {fmt_money(ARENA_PRIZE_TOP)}💰 (اول هر هفته خودکار واریز می‌شه)\n"
+           f"💰 پول تو: {fmt_money(p.get('money') or 0)}💰 | ⚡ {fn(p.get('energy') or 0)}")
+    # 🐛 فیکس: دکمه‌ی رتبه‌بندی قبلاً به «menu:leaderboard» می‌رفت که هیچ هندلری نداشت و هیچی باز نمی‌شد!
+    api.send_message(chat_id, txt, inline_keyboard([[("⚔️ ورود به آرنا", "v109:arena_fight")],
+                                                   [("🏆 رتبه‌بندی آرنا", "v109:arena_lb")]]))
+
 
 def arena_fight(chat_id, uid):
+    ensure_v109()
+    if not guard_character(chat_id, uid): return
     p = profile(uid)
     if (p.get("money") or 0) < ARENA_ENTER_COST:
-        api.send_message(chat_id, "💸 پول کمه!"); return
+        api.send_message(chat_id, f"💸 هزینه ورود {fmt_money(ARENA_ENTER_COST)}💰 است — داری: {fmt_money(p.get('money') or 0)}💰"); return
     if (p.get("energy") or 0) < 15:
-        api.send_message(chat_id, "⚡ انرژی کمه!"); return
+        api.send_message(chat_id, "⚡ ۱۵ انرژی لازمه — یه کم استراحت کن!"); return
     change_money(uid, -ARENA_ENTER_COST, "arena", "ورود آرنا")
     db.execute("UPDATE profiles SET energy=MAX(0,energy-15) WHERE user_id=?", (uid,))
+    log_action(uid, "arena_fight", "")
     # شانس برد بر اساس لول
     chance = 0.48 + min(0.25, (p.get("level") or 1)*0.015)
+    kb = inline_keyboard([[("⚔️ دوباره", "v109:arena_fight"), ("🏆 رتبه‌بندی", "v109:arena_lb")]])
     if random.random() < chance:
         gain = random.randint(1200, 2800)
         change_money(uid, gain, "arena_win", "برد آرنا")
         gain_xp(uid, 20)
         log_action(uid, "arena_win", "")
-        api.send_message(chat_id, f"⚔️ بردی! +{fmt_money(gain)}💰 +20⭐ XP")
+        wins = log_count(uid, "arena_win")
+        api.send_message(chat_id, f"⚔️ بردی! +{fmt_money(gain)}💰 +20⭐ XP\n"
+                                  f"🏆 بردهای این هفته: {fn(arena_week_wins(uid))} | درجه: {arena_rank_name(wins)}", kb)
     else:
         gain_xp(uid, 8)
-        api.send_message(chat_id, "💥 باختی ولی +8⭐ XP گرفتی! دوباره امتحان کن")
+        api.send_message(chat_id, "💥 باختی ولی +8⭐ XP گرفتی! دوباره امتحان کن", kb)
+
+
+def arena_weekly_payout():
+    """🆕 v1.0.9: پرداخت جایزه‌ی هفتگی آرنا به ۳ نفر اول هفته‌ی گذشته (قبلاً وعده داده می‌شد ولی هیچ‌وقت پرداخت نمی‌شد!)"""
+    from datetime import timedelta
+    wk_start = arena_week_start()
+    prev_start = wk_start - timedelta(days=7)
+    rows = db.fetchall("""SELECT l.actor uid, p.name, COUNT(*) c FROM logs l
+                          JOIN profiles p ON p.user_id=l.actor
+                          WHERE l.action='arena_win' AND l.created_at>=? AND l.created_at<?
+                          GROUP BY l.actor ORDER BY c DESC LIMIT 3""",
+                       (prev_start.isoformat(timespec="seconds"), wk_start.isoformat(timespec="seconds")))
+    if not rows:
+        return
+    prizes = [ARENA_PRIZE_TOP, int(ARENA_PRIZE_TOP * 0.5), int(ARENA_PRIZE_TOP * 0.25)]
+    lines = ["⚔️ قهرمان‌های آرنای هفته‌ی گذشته:"]
+    for i, r in enumerate(rows):
+        change_money(r["uid"], prizes[i], "arena_prize", f"جایزه هفتگی آرنا رتبه {i + 1}")
+        try:
+            api.send_message(r["uid"], f"⚔️🏆 تو آرنای هفته‌ی گذشته با {fn(r['c'])} برد نفر {fn(i + 1)} شدی! +{fmt_money(prizes[i])}💰 جایزه!")
+        except Exception:
+            pass
+        lines.append(f"{['🥇', '🥈', '🥉'][i]} {r['name']} — {fn(r['c'])} برد (+{fmt_money(prizes[i])}💰)")
+    channel_news("\n".join(lines) + "\n\nاین هفته تو قهرمان شو! ⚔️")
 
 # ── 6️⃣ رادیو ──
 def radio_go(chat_id, uid):
@@ -10472,30 +11078,50 @@ def collection_claim(chat_id, uid):
 # ── 9️⃣ دکور ──
 def decor_go(chat_id, uid):
     ensure_v109()
+    if not guard_character(chat_id, uid): return
     p = profile(uid)
     owned = jl(p.get("decor_json") or "[]", [])
-    txt = "🏠 دکور خانه — شادی بیشتر:\n"
+    if not isinstance(owned, list):
+        owned = []
+    txt = f"🏠 دکور خانه — شادی بیشتر (داری: {fmt_money(p.get('money') or 0)}💰):\n"
     kb = []
+    row = []
     for did, name, price, happy in HOME_DECORS:
-        has = "✅" if did in owned else f"{fmt_money(price)}💰"
+        has = "✅ خریدی" if did in owned else f"{fmt_money(price)}💰"
         txt += f"{'✅' if did in owned else '⬜'} {name} (+{fn(happy)}😊) — {has}\n"
         if did not in owned:
-            kb.append([(f"🛒 {name}", f"v109:decor_buy:{did}")])
-    kb.append([("🏠 مرکز", "menu:main")])
+            row.append((f"🛒 {name}", f"v109:decor_buy:{did}"))
+            if len(row) == 2:
+                kb.append(row); row = []
+    if row:
+        kb.append(row)
+    if len(owned) >= len(HOME_DECORS):
+        txt += "\n🏆 همه‌ی دکورها رو داری — خونه‌ات کامل شده!"
+    kb.append([("🏠 خانه", "home:view"), ("🏠 مرکز", "menu:main")])
     api.send_message(chat_id, txt, inline_keyboard(kb))
 
 def decor_buy(chat_id, uid, did):
+    ensure_v109()
+    if not guard_character(chat_id, uid): return
     it = next((x for x in HOME_DECORS if x[0]==did), None)
-    if not it: return
+    if not it:
+        api.send_message(chat_id, "❌ این دکور پیدا نشد!"); return
     _, name, price, happy = it
     p = profile(uid)
     owned = jl(p.get("decor_json") or "[]", [])
-    if did in owned: api.send_message(chat_id, "قبلا خریدی!"); return
-    if (p.get("money") or 0) < price: api.send_message(chat_id, "💸 پول کمه!"); return
-    change_money(uid, -price, "decor", name)
+    if not isinstance(owned, list):
+        owned = []
+    if did in owned: api.send_message(chat_id, f"✅ {name} رو قبلاً خریدی!"); return
+    if (p.get("money") or 0) < price:
+        api.send_message(chat_id, f"💸 پول کمه! {name} {fmt_money(price)}💰ــ داری: {fmt_money(p.get('money') or 0)}💰"); return
     owned.append(did)
+    # 🐛 فیکس: اول دکور ثبت می‌شود بعد پول کم می‌شود (اگر ستون/دیتابیس مشکل داشت، پول کاربر بی‌خودی کم نشود)
     db.execute("UPDATE profiles SET decor_json=?, happiness=MIN(100,happiness+?) WHERE user_id=?", (jd(owned), happy, uid))
-    api.send_message(chat_id, f"✅ {name} خریدی! +{fn(happy)}😊")
+    change_money(uid, -price, "decor", name)
+    log_action(uid, "decor_buy", did)
+    left = [x for x in HOME_DECORS if x[0] not in owned]
+    api.send_message(chat_id, f"✅ {name} خریدی! +{fn(happy)}😊" + (f"\n🛋 {fn(len(left))} دکور دیگه مونده" if left else "\n🏆 خونه‌ات کامل شد!"),
+                     inline_keyboard([[("🛋 دکورهای دیگه", "v109:decor")]]))
 
 # ── 🔟 پرستیژ ──
 def prestige_go(chat_id, uid):
@@ -10533,7 +11159,8 @@ def quiz_go(chat_id, uid):
         kb.append([(o, f"v109:quiz_ans:{i}")])
     api.send_message(chat_id, f"🧠 کوییز روزانه:\n{q}", inline_keyboard(kb))
 
-def quiz_answer(chat_id, uid, idx):
+# 🐛 v1.0.9 فیکس: اسم این تابع با کوییز روزانه‌ی v6 (quiz_answer) یکی بود و آن را از کار می‌انداخت
+def quiz109_answer(chat_id, uid, idx):
     st, data = get_state(uid)
     if st != "v109_quiz": api.send_message(chat_id, "کوییزی فعال نیست"); return
     ans = data.get("ans")
@@ -10550,43 +11177,79 @@ def quiz_answer(chat_id, uid, idx):
         api.send_message(chat_id, f"❌ اشتباه بود! جواب درست گزینه {fn(int(ans)+1)} بود — +5⭐ XP")
 
 # ── 13️⃣ بانک زمان ──
-def time_bank_go(chat_id, uid):
-    ensure_v109()
-    p = profile(uid)
+def time_bank_profit(p):
+    """سود روزشمار فعلی سپرده‌ی بانک زمان: (اصل، سود، روزها)"""
     amt = int(p.get("time_bank_amt") or 0)
-    txt = f"⏳ بانک زمان — سود {int(TIME_BANK_RATE*100)}% روزانه\nموجودی: {fmt_money(amt)}💰\nحداقل سپرده: {fmt_money(TIME_BANK_MIN)}💰"
-    api.send_message(chat_id, txt, inline_keyboard([[("💰 سپرده", "v109:tb_dep"), ("💸 برداشت", "v109:tb_wd")], [("🏠 مرکز", "menu:main")]]))
-
-def time_bank_dep(chat_id, uid):
-    set_state(uid, "tb_dep", {})
-    api.send_message(chat_id, f"💰 چقدر می‌خوای بذاری بانک زمان؟ (حداقل {fmt_money(TIME_BANK_MIN)}💰)\nعدد بفرست — لغو: /cancel")
-
-def time_bank_dep_handle(chat_id, uid, txt):
-    try: amt = int(parse_num(txt))
-    except: api.send_message(chat_id, "عدد بفرست"); return True
-    if amt < TIME_BANK_MIN: api.send_message(chat_id, f"حداقل {fmt_money(TIME_BANK_MIN)}💰"); return True
-    p = profile(uid)
-    if (p.get("money") or 0) < amt: api.send_message(chat_id, "پول کمه!"); set_state(uid); return True
-    change_money(uid, -amt, "time_bank_dep", "سپرده زمان")
-    db.execute("UPDATE profiles SET time_bank_amt=COALESCE(time_bank_amt,0)+?, time_bank_since=? WHERE user_id=?", (amt, now_iso(), uid))
-    set_state(uid)
-    api.send_message(chat_id, f"✅ {fmt_money(amt)}💰 رفت بانک زمان — هر روز {int(TIME_BANK_RATE*100)}% سود!")
-    return True
-
-def time_bank_wd(chat_id, uid):
-    p = profile(uid)
-    amt = int(p.get("time_bank_amt") or 0)
-    if amt <= 0: api.send_message(chat_id, "چیزی نداری!"); return
-    # محاسبه سود روزشمار
+    if amt <= 0:
+        return 0, 0, 0
     try:
         since = datetime.fromisoformat(p.get("time_bank_since") or now_iso())
         days = max(0, (datetime.now() - since).days)
-    except: days = 0
-    profit = int(amt * TIME_BANK_RATE * days)
+    except Exception:
+        days = 0
+    return amt, int(amt * TIME_BANK_RATE * days), days
+
+
+def time_bank_go(chat_id, uid):
+    ensure_v109()
+    if not guard_character(chat_id, uid): return
+    p = profile(uid)
+    amt, profit, days = time_bank_profit(p)
+    txt = (f"⏳ بانک زمان — سود {fn(int(TIME_BANK_RATE*100))}٪ روزشمار (ساده)\n"
+           f"💰 سپرده‌ی تو: {fmt_money(amt)}💰\n")
+    if amt > 0:
+        txt += (f"📈 سود تا الان: +{fmt_money(profit)}💰 ({fn(days)} روز)\n"
+                f"💸 قابل برداشت همین حالا: {fmt_money(amt + profit)}💰\n"
+                f"⏰ سود بعدی فردا همین ساعت اضافه می‌شه\n")
+    txt += (f"حداقل سپرده: {fmt_money(TIME_BANK_MIN)}💰 | هر وقت بخوای اصل + سود رو کامل پس می‌گیری ✅\n"
+            f"💵 پول نقد تو: {fmt_money(p.get('money') or 0)}💰")
+    kb = [[("💰 سپرده‌گذاری", "v109:tb_dep")] + ([("💸 برداشت اصل + سود", "v109:tb_wd")] if amt > 0 else []),
+          [("🏦 بانک", "bnk:menu"), ("🏠 مرکز", "menu:main")]]
+    api.send_message(chat_id, txt, inline_keyboard(kb))
+
+def time_bank_dep(chat_id, uid):
+    if not guard_character(chat_id, uid): return
+    p = profile(uid) or {}
+    set_state(uid, "tb_dep", {})
+    api.send_message(chat_id, f"💰 چقدر می‌خوای بذاری بانک زمان؟ (حداقل {fmt_money(TIME_BANK_MIN)}💰ــ داری: {fmt_money(p.get('money') or 0)}💰)\n"
+                              f"عدد بفرست — لغو: /cancel")
+
+def time_bank_dep_handle(chat_id, uid, txt):
+    try: amt = int(float(parse_num(txt)))
+    except Exception: api.send_message(chat_id, "⚠️ فقط عدد بفرست (مثلاً 5000) — لغو: /cancel"); return True
+    if amt < TIME_BANK_MIN: api.send_message(chat_id, f"⚠️ حداقل سپرده {fmt_money(TIME_BANK_MIN)}💰 است — عدد بزرگ‌تر بفرست:"); return True
+    p = profile(uid)
+    if not p:
+        set_state(uid); return True
+    if (p.get("money") or 0) < amt:
+        api.send_message(chat_id, f"💸 پول کافی نداری! داری: {fmt_money(p.get('money') or 0)}💰 — عدد کمتر بفرست یا /cancel")
+        return True
+    # 🐛 فیکس: سود سپرده‌ی قبلی قبل از ریست تاریخ، به اصل اضافه می‌شود (قبلاً با هر سپرده‌ی جدید سود قبلی می‌پرید)
+    old_amt, old_profit, _ = time_bank_profit(p)
+    # 🐛 فیکس: اول رکورد سپرده ثبت می‌شود، بعد پول کم می‌شود — اگر دیتابیس مشکل داشت پول کاربر گم نمی‌شود
+    db.execute("UPDATE profiles SET time_bank_amt=?, time_bank_since=? WHERE user_id=?",
+               (old_amt + old_profit + amt, now_iso(), uid))
+    change_money(uid, -amt, "time_bank_dep", "سپرده بانک زمان")
+    set_state(uid)
+    log_action(uid, "time_bank_dep", str(amt))
+    extra = f"\n📈 سود سپرده‌ی قبلی (+{fmt_money(old_profit)}💰) هم به اصل اضافه شد." if old_profit > 0 else ""
+    api.send_message(chat_id, f"✅ {fmt_money(amt)}💰 رفت بانک زمان — هر روز {fn(int(TIME_BANK_RATE*100))}٪ سود!{extra}\n"
+                              f"💰 کل سپرده: {fmt_money(old_amt + old_profit + amt)}💰",
+                     inline_keyboard([[("⏳ بانک زمان", "v109:timebank")]]))
+    return True
+
+def time_bank_wd(chat_id, uid):
+    if not guard_character(chat_id, uid): return
+    p = profile(uid)
+    amt, profit, days = time_bank_profit(p)
+    if amt <= 0: api.send_message(chat_id, "📭 سپرده‌ای تو بانک زمان نداری!", inline_keyboard([[("💰 سپرده‌گذاری", "v109:tb_dep")]])); return
     total = amt + profit
+    # 🐛 فیکس: اول پول به حساب برمی‌گردد، بعد سپرده صفر می‌شود (هیچ‌وقت پول کاربر گم نشود)
+    change_money(uid, total, "time_bank_wd", f"برداشت بانک زمان (سود {profit})")
     db.execute("UPDATE profiles SET time_bank_amt=0, time_bank_since=NULL WHERE user_id=?", (uid,))
-    change_money(uid, total, "time_bank_wd", f"برداشت بانک زمان سود {profit}")
-    api.send_message(chat_id, f"💸 برداشت: {fmt_money(amt)}💰 اصل + {fmt_money(profit)}💰 سود ({fn(days)} روز) = {fmt_money(total)}💰")
+    log_action(uid, "time_bank_wd", f"{amt}+{profit}")
+    api.send_message(chat_id, f"💸 برداشت انجام شد!\n{fmt_money(amt)}💰 اصل + {fmt_money(profit)}💰 سود ({fn(days)} روز) = {fmt_money(total)}💰 به حسابت برگشت ✅",
+                     inline_keyboard([[("⏳ بانک زمان", "v109:timebank"), ("🏦 بانک", "bnk:menu")]]))
 
 # ── 14️⃣ فریز استریک ──
 def streak_freeze_go(chat_id, uid):
@@ -10682,11 +11345,22 @@ def flash_go(chat_id, uid):
         if until and datetime.fromisoformat(until) > datetime.now(): active = True
     except: pass
     if not active:
-        # فعال‌سازی رندوم 30% تخفیف
-        db.execute("UPDATE profiles SET flash_until=datetime('now','+2 hours') WHERE user_id=?", (uid,))
-        api.send_message(chat_id, "⚡ فلش سیل فعال شد! 2 ساعت 30% تخفیف تو بازار سیاه و جعبه! 🛒")
+        # فعال‌سازی 30% تخفیف — روزی یک‌بار (🐛 قبلاً هر ۲ ساعت دوباره قابل فعال‌سازی بود و تاریخ UTC ذخیره می‌شد)
+        flags = jl(p.get("v109_flags") or "{}", {})
+        if not isinstance(flags, dict):
+            flags = {}
+        if flags.get("flash_day") == today():
+            api.send_message(chat_id, "⚡ فلش سیل امروز رو استفاده کردی — فردا دوباره فعال می‌شه! 🛒"); return
+        from datetime import timedelta
+        until_dt = (datetime.now() + timedelta(seconds=FLASH_SALE_DURATION)).isoformat(timespec="seconds")
+        flags["flash_day"] = today()
+        db.execute("UPDATE profiles SET flash_until=?, v109_flags=? WHERE user_id=?", (until_dt, jd(flags), uid))
+        log_action(uid, "flash_sale", "")
+        api.send_message(chat_id, f"⚡ فلش سیل فعال شد! تا ساعت {until_dt[11:16]} ۳۰٪ تخفیف تو 🖤 بازار سیاه و 📦 جعبه شانس! 🛒",
+                         inline_keyboard([[("🖤 بازار سیاه", "v109:black"), ("📦 جعبه شانس", "v109:box")]]))
     else:
-        api.send_message(chat_id, f"⚡ فلش سیل فعاله تا {until[:16]} — برو خرید کن!")
+        api.send_message(chat_id, f"⚡ فلش سیل فعاله تا ساعت {until[11:16]} — برو خرید کن!",
+                         inline_keyboard([[("🖤 بازار سیاه", "v109:black"), ("📦 جعبه شانس", "v109:box")]]))
 
 # ── 19️⃣ VC ──
 def vc_go(chat_id, uid):
@@ -10713,7 +11387,7 @@ def vc_invest(chat_id, uid, amt):
 def streamer_go(chat_id, uid):
     ensure_v109()
     txt = "🎥 لیگ استریمرها — با دعوت دوست امتیاز بگیر و جایزه هفتگی ببر!\n"
-    api.send_message(chat_id, txt, inline_keyboard([[("🔗 کد دعوتم", "v109:mycode"), ("🏆 رتبه‌بندی", "menu:leaderboard")]]))
+    api.send_message(chat_id, txt, inline_keyboard([[("🔗 کد دعوتم", "v109:mycode"), ("🏆 رتبه‌بندی دعوت", "lb:ref")]]))   # 🐛 v1.0.9: قبلاً به کال‌بک بی‌هندلر می‌رفت
 
 # ── پنل اصلی 1.0.9 ──
 def panel_v109(chat_id, uid):
@@ -10804,7 +11478,7 @@ def handle_v109_callback(chat_id, uid, data, cb_id, message_id):
         log_action(uid, "ai_chat_q", q)
         api.answer_callback(cb_id, "🤖")
         api.send_message(chat_id, "🤖 دارم فکر می‌کنم...")
-        ans = _ai_call(f"کاربر لول {p.get('level',1)} با پول {p.get('money',0)} می‌پرسه: {prompt}", "تو دستیار حرفه‌ای Life Simulator هستی. فارسی، بامزه، کاربردی و کوتاه (۳-۵ خط) جواب بده و در آخر یه tip طلایی بده.")
+        ans = _ai_call(f"کاربر لول {p.get('level',1)} با پول {p.get('money',0)} می‌پرسه: {prompt}", "تو دستیار حرفه‌ای Life Simulator هستی. فارسی، بامزه، کاربردی و کوتاه (۳-۵ خط) جواب بده و در آخر یه tip طلایی بده.") or "🤖 الان جواب آماده نشد؛ چند لحظه بعد دوباره بپرس!"
         gain_xp(uid, 6)
         if random.random() < 0.12:
             db.execute("UPDATE profiles SET lucky_coins=COALESCE(lucky_coins,0)+1 WHERE user_id=?", (uid,))
@@ -10828,6 +11502,8 @@ def handle_v109_callback(chat_id, uid, data, cb_id, message_id):
         black_market_go(chat_id, uid); api.answer_callback(cb_id, "🔄")
     elif cmd == "arena": arena_go(chat_id, uid); api.answer_callback(cb_id, "⚔️")
     elif cmd == "arena_fight": arena_fight(chat_id, uid); api.answer_callback(cb_id, "")
+    elif cmd == "arena_lb": arena_leaderboard(chat_id, uid, True); api.answer_callback(cb_id, "🏆")
+    elif cmd == "arena_lb_all": arena_leaderboard(chat_id, uid, False); api.answer_callback(cb_id, "🏆")
     elif cmd == "radio": radio_go(chat_id, uid); api.answer_callback(cb_id, "📻")
     elif cmd == "newspaper": newspaper_go(chat_id, uid); api.answer_callback(cb_id, "🗞")
     elif cmd == "collection": collection_go(chat_id, uid); api.answer_callback(cb_id, "")
@@ -10837,7 +11513,7 @@ def handle_v109_callback(chat_id, uid, data, cb_id, message_id):
     elif cmd == "prestige": prestige_go(chat_id, uid); api.answer_callback(cb_id, "")
     elif cmd == "prestige_do": prestige_do(chat_id, uid); api.answer_callback(cb_id, "")
     elif cmd == "quiz": quiz_go(chat_id, uid); api.answer_callback(cb_id, "")
-    elif cmd.startswith("quiz_ans:"): quiz_answer(chat_id, uid, cmd.split(":")[1]); api.answer_callback(cb_id, "")
+    elif cmd.startswith("quiz_ans:"): quiz109_answer(chat_id, uid, cmd.split(":")[1]); api.answer_callback(cb_id, "")
     elif cmd == "timebank": time_bank_go(chat_id, uid); api.answer_callback(cb_id, "")
     elif cmd == "tb_dep": time_bank_dep(chat_id, uid); api.answer_callback(cb_id, "")
     elif cmd == "tb_wd": time_bank_wd(chat_id, uid); api.answer_callback(cb_id, "")
@@ -11821,7 +12497,9 @@ def frn_claim(chat_id, uid):
 
 
 # ───── 🔐 گاوصندوق امن بانکی ─────
-def panel_vault(chat_id, uid):
+# 🐛 v1.0.9 فیکس: اسم این تابع با «گاوصندوق منابع» (panel_vault امپراتوری) یکی بود و روی آن می‌نشست
+#    → دکمه‌ی «🧰 گاوصندوق منابع» گاوصندوق بانکی را باز می‌کرد!
+def panel_safe(chat_id, uid):
     if not guard_character(chat_id, uid):
         return
     p = profile(uid)
@@ -12119,6 +12797,10 @@ def handle_callback(cb):
         api.answer_callback(cb_id)
         api.send_message(chat_id, f"🏠 منوی اصلی:\n⚡ {TEAM_NAME}", MAIN_KB)
         return
+    if data == "menu:leaderboard":   # 🐛 v1.0.9 فیکس: این کال‌بک هندلر نداشت → «رتبه‌بندی» هیچی نشون نمی‌داد
+        api.answer_callback(cb_id, "🏆")
+        panel_leaderboard_tabs(chat_id, uid, "arena")
+        return
 
     # ── ساخت کاراکتر ──
     if data == "rd:skip":                          # 🆕 v1.0.8: رد شدن از مرحله‌ی کد
@@ -12237,8 +12919,23 @@ def handle_callback(cb):
         return
     if data.startswith("mrks:"):
         api.answer_callback(cb_id, "💰")
+        set_state(uid)
         api.send_message(chat_id, market_sell(chat_id, uid, data.split(":")[1]))
         return
+    if data.startswith("mrkq:"):   # 🆕 v1.0.9: خرید با تعداد واحد
+        _, sym, q = data.split(":")
+        api.answer_callback(cb_id, "🛒")
+        res = market_buy_units(chat_id, uid, sym, q)
+        if res:
+            api.send_message(chat_id, res)
+        return
+    if data.startswith("mrksq:"):   # 🆕 v1.0.9: فروش با تعداد
+        api.answer_callback(cb_id)
+        market_sell_qty_ask(chat_id, uid, data.split(":")[1]); return
+    if data == "mrk:cancel":
+        set_state(uid); api.answer_callback(cb_id, "❌"); api.send_message(chat_id, "❌ معامله لغو شد.", MAIN_KB); return
+    if data == "eco:market":
+        set_state(uid); api.answer_callback(cb_id); panel_market(chat_id, uid); return
 
     # ── جنگ ──
     if data == "war:targets":
@@ -12363,6 +13060,11 @@ def handle_callback(cb):
         _, _, cid, amt = data.split(":")
         api.answer_callback(cb_id, "💰")
         api.send_message(chat_id, company_deposit(chat_id, uid, int(cid), int(amt))); return
+    if data.startswith("com:sell:"):   # 🆕 v1.0.9: فروش شرکت
+        api.answer_callback(cb_id, "🏷"); company_sell_ask(chat_id, uid, int(data.split(":")[2])); return
+    if data.startswith("com:sellok:"):
+        api.answer_callback(cb_id, "✅")
+        api.send_message(chat_id, company_sell_do(chat_id, uid, int(data.split(":")[2]))); return
     if data.startswith("com:ren:"):
         api.answer_callback(cb_id)
         set_state(uid, "com_ren", {"id": int(data.split(":")[2])})
@@ -12389,11 +13091,16 @@ def handle_callback(cb):
     if data.startswith("stk:bb:"):
         _, _, cid, n = data.split(":")
         api.answer_callback(cb_id, "🟢")
-        api.send_message(chat_id, stock_buy(chat_id, uid, int(cid), int(n))); return
+        set_state(uid)
+        _res = stock_buy(chat_id, uid, int(cid), int(float(n)))
+        if _res:
+            api.send_message(chat_id, _res)
+        return
     if data.startswith("stk:ss:"):
         _, _, cid, n = data.split(":")
         api.answer_callback(cb_id, "🔴")
-        api.send_message(chat_id, stock_sell(chat_id, uid, int(cid), int(n))); return
+        set_state(uid)
+        api.send_message(chat_id, stock_sell(chat_id, uid, int(cid), int(float(n)))); return
     if data.startswith("stk:b:"):
         api.answer_callback(cb_id); stock_pick_amount(chat_id, uid, int(data.split(":")[2]), "b"); return
     if data.startswith("stk:s:"):
@@ -12493,7 +13200,7 @@ def handle_callback(cb):
     if data == "frn:claim":
         api.answer_callback(cb_id, "💼"); api.send_message(chat_id, frn_claim(chat_id, uid)); return
     if data == "bnk:vault":
-        api.answer_callback(cb_id); panel_vault(chat_id, uid); return
+        api.answer_callback(cb_id); panel_safe(chat_id, uid); return
     if data.startswith("bnk:vdep:"):
         api.answer_callback(cb_id, "🔐"); api.send_message(chat_id, vault_dep(chat_id, uid, data.split(":")[2])); return
     if data == "bnk:vwd:all":
@@ -12532,6 +13239,9 @@ def handle_callback(cb):
     if data == "home:shop":
         api.answer_callback(cb_id)
         panel_shop(chat_id, uid, "house"); return
+    if data == "home:view":   # 🆕 v1.0.9: برگشت به پنل خانه
+        api.answer_callback(cb_id, "🏠")
+        panel_home(chat_id, uid); return
 
     # ── 🆕 v1.0.4: مصاحبه‌ی استخدامی ──
     if data.startswith("ji:"):
@@ -12686,6 +13396,8 @@ def handle_callback(cb):
         return
 
     # ── بانک ──
+    if data == "bnk:menu":   # 🆕 v1.0.9: برگشت به پنل بانک از زیرمنوها
+        api.answer_callback(cb_id, "🏦"); panel_bank(chat_id, uid); return
     if data.startswith("bnk:dep:"):
         mode = data.split(":")[2]
         api.answer_callback(cb_id, "🏦")
@@ -12726,9 +13438,13 @@ def handle_callback(cb):
     if data.startswith("pnl:k:"):
         api.answer_callback(cb_id, "⚽")
         api.send_message(chat_id, penalty_kick(chat_id, uid, int(data.split(":")[2]))); return
-    if data == "fun:twr":
+    if data == "fun:twr":   # 🆕 v1.0.9: اول پنل برج با قدرت لازم، بعد مبارزه
         api.answer_callback(cb_id, "🧗")
-        api.send_message(chat_id, tower_fight(chat_id, uid)); return
+        panel_tower(chat_id, uid); return
+    if data == "twr:fight":
+        api.answer_callback(cb_id, "⚔️")
+        api.send_message(chat_id, tower_fight(chat_id, uid),
+                         inline_keyboard([[("⚔️ دوباره (−۱۵⚡)", "twr:fight"), ("🧗 پنل برج", "fun:twr")]])); return
     if data == "fun:fort":
         api.answer_callback(cb_id, "🔮")
         api.send_message(chat_id, fortune_roll(chat_id, uid)); return
@@ -12991,7 +13707,7 @@ def handle_callback(cb):
     if data.startswith("lb:"):
         api.answer_callback(cb_id, "🏆")
         mode_map = {"lb:money": "money", "lb:war": "war", "lb:guild": "guild", "lb:tower": "tower", "lb:pet": "pet",
-                    "lb:net": "net", "lb:wxp": "wxp", "lb:elo": "elo", "lb:ref": "ref"}
+                    "lb:net": "net", "lb:wxp": "wxp", "lb:elo": "elo", "lb:ref": "ref", "lb:arena": "arena"}
         panel_leaderboard_tabs(chat_id, uid, mode_map.get(data, "money")); return
 
     # ── بازی ──
@@ -13011,6 +13727,12 @@ def handle_callback(cb):
     elif data == "game:fun":
         ans(); do_fun(chat_id, uid)
 
+    elif data.startswith("job:list:"):   # 🆕 v1.0.9: صفحه‌های بازار کار
+        ans()
+        try:
+            panel_job(chat_id, uid, int(data.split(":")[2]))
+        except Exception:
+            panel_job(chat_id, uid)
     elif data.startswith("job:apply:"):
         result = job_apply(chat_id, uid, data.split(":")[2])
         ans(result[:180])
