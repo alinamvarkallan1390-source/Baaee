@@ -124,6 +124,7 @@ TEAM_NAME = "تیم XR"
 
 # 🏷 نسخه‌ی رسمی ربات — در بنر و «همه‌ی» پیام‌های کاربر نمایش داده می‌شود
 BOT_VERSION = "۱.۰.۹"
+BUILD_TAG   = "fix-2026-09-20"   # 🛠 برچسب بیلد (نسخه عوض نمی‌شود) — برای اینکه ادمین مطمئن شود کد جدید روی هاست اجرا شده
 # 🖋 پانوشتی که خودکار به دمِ هر پیام کاربر اضافه می‌شود (داخل کلاس BaleAPI)
 DEV_FOOTER  = f"\n\n👨‍💻 توسعه: XR Team | نسخه {BOT_VERSION} ⚡"
 
@@ -7566,7 +7567,7 @@ def cmd_admin(chat_id, uid):
         log_action(uid, "admin_denied")
         api.send_message(chat_id, "⛔ دسترسی نداری.")
         return
-    api.send_message(chat_id, f"🔐 پنل مدیریت Life Simulator AI ⚡\n👨‍💻 {TEAM_NAME}\nیک بخش را انتخاب کن:", ADMIN_KB)
+    api.send_message(chat_id, f"🔐 پنل مدیریت Life Simulator AI ⚡\n👨‍💻 {TEAM_NAME} | 🛠 بیلد: {BUILD_TAG}\nیک بخش را انتخاب کن:", ADMIN_KB)
 
 
 def admin_router(chat_id, uid, text):
@@ -14935,9 +14936,15 @@ def main():
 
     db = Database(DB_PATH)
     log.info(f"💾 دیتابیس آماده شد: {DB_PATH}")
+    log.info(f"🛠 بیلد کد: {BUILD_TAG}")
     try:
         ensure_v109()
-        log.info("✨ v1.0.9 migration OK — 20 فیچر + OpenRouter")
+        _cols = {r[1] for r in db.fetchall("PRAGMA table_info(profiles)")}
+        _missing = [c for c in ("wheel_day", "lucky_coins", "streak_freezes", "ai_chat_day", "collection_json") if c not in _cols]
+        if _missing:
+            log.warning(f"⚠️ ستون‌های ۱.۰.۹ هنوز کم است {_missing} — خود-ترمیمی هنگام اولین استفاده اجرا می‌شود")
+        else:
+            log.info("✨ v1.0.9 migration OK — ستون‌های پروفایل کامل است")
     except Exception as e:
         log.warning(f"⚠️ v1.0.9 migrate: {e}")
 
