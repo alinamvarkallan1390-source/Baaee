@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 ╔══════════════════════════════════════════════════════════════════╗
-║           🤖 Life Simulator AI — ربات بازی روبیکا 🤖             ║
+║                Life Simulator — ربات بازی روبیکا                ║
 ║     بازی متنی شبیه‌ساز زندگی برای پیام‌رسان روبیکا (Rubika)      ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║  راه‌اندازی (گوشی / Pydroid):                                     ║
@@ -15,7 +15,7 @@
 ║                                                                  ║
 ║  API رسمی: https://botapi.rubika.ir/v3/{token}/{method}          ║
 ║  ساختار فایل (ماژولار در قالب یک فایل):                          ║
-║    [1] تنظیمات و ثابت‌ها        [6] موتور داستانی (AI)          ║
+║    [1] تنظیمات و ثابت‌ها        [6] موتور داستانی               ║
 ║    [2] کلاینت Rubika Bot API    [7] هندلرهای بازی (منوها)        ║
 ║    [3] لایه دیتابیس (SQLite)    [8] پنل ادمین                     ║
 ║    [4] مدل‌ها و منطق بازی       [9] دیسپچر آپدیت‌ها              ║
@@ -224,7 +224,7 @@ TICK_SEC = 6 * 3600  # هر تیک امپراتوری = ۶ ساعت
 HACK_ATK = [("keylogger", "🐛 کیلاگر",      1, 800),
             ("botnet",    "🌐 بات‌نت",       3, 2500),
             ("exploit",   "💣 اکسپلویت",     5, 6000),
-            ("aihack",    "🤖 هک AI",        8, 15000)]
+            ("sentinel",  "🛰 نفوذگر پیشرفته", 8, 15000)]
 HACK_DEF = [("antivirus", "🛡 آنتی‌ویروس",   1, 700),
             ("firewall",  "🔥 فایروال",      3, 2200),
             ("quantum",   "🔐 رمزنگار",      5, 6500),
@@ -565,7 +565,7 @@ COURSES = [
     ("mkt",   "📣 بازاریابی",        "comm", 2500, 3),
     ("proj",  "📊 مدیریت پروژه",     "mgmt", 3000, 3),
     ("crea",  "🎨 کارگاه خلاقیت",    "crea", 2000, 3),
-    ("ai",    "🤖 هوش مصنوعی",       "prog", 3200, 3),
+    ("data",  "📊 تحلیل داده",       "prog", 3200, 3),
 ]
 
 # 🐕 مدرسه پت
@@ -1400,6 +1400,12 @@ class Database:
             for col, ddl in cols_ddl.items():
                 if col not in cols:
                     self.execute(f"ALTER TABLE {table} ADD COLUMN {col} {ddl}")
+        # کلیدهای فنی قدیمی حفظ‌نشدنی بودند؛ داده‌های خریداری‌شده را به شناسه‌ی جدید منتقل کن.
+        try:
+            self.execute("UPDATE hack_gear SET tool_id='sentinel' WHERE tool_id='aihack'")
+            self.execute("UPDATE logs SET action='course_data' WHERE action='course_ai'")
+        except sqlite3.Error as _e:
+            log.warning(f"legacy label migration: {_e}")
 
     def _seed(self):
         # شغل‌ها
@@ -1423,7 +1429,7 @@ class Database:
         self.execute("INSERT OR IGNORE INTO settings(key,value) VALUES('income_rate','1.0')")
         if not self.fetchone("SELECT id FROM announcements LIMIT 1"):
             self.execute("INSERT INTO announcements(text,created_at) VALUES(?,?)",
-                         ("به «Life Simulator AI» خوش اومدی! 🎉 هر روز یک زندگی جدید.", now_iso()))
+                         ("به «Life Simulator» خوش اومدی! 🎉 هر روز یک زندگی جدید.", now_iso()))
 
 
 db = None  # در main() مقداردهی می‌شود
@@ -1803,7 +1809,7 @@ def family_line(uid):
     return ""
 
 # ══════════════════════════════════════════════════════════════════
-# [6] موتور داستانی (AI) — تولید رویداد، داستان و رفتار NPC
+# [6] موتور داستانی — تولید رویداد، داستان و رفتار NPC
 # ══════════════════════════════════════════════════════════════════
 
 STORY_OPENERS = [
@@ -1993,7 +1999,7 @@ DYNAMIC_SCENARIOS = [
 
 
 def generate_story(uid) -> str:
-    """یک خط داستانی تصادفی (AI-ish) برای حال‌وهوای بازی"""
+    """یک خط داستانی تصادفی از متن‌های بازی برای ایجاد حال‌وهوا."""
     p = profile(uid)
     npcs = {n["npc_id"]: n for n in get_npcs(uid)}
     line = pick(STORY_OPENERS).replace("{city}", p["city"])
@@ -2097,12 +2103,12 @@ def guard_character(chat_id, uid) -> bool:
 def cmd_start(chat_id, uid, ref=None):
     if has_character(uid):
         api.send_message(chat_id,
-                         f"🌞 دوباره سلام {profile(uid)['name']}!\nبه زندگیت در Life Simulator AI ادامه بده! 👇\n⚡ {TEAM_NAME}",
+                         f"🌞 دوباره سلام {profile(uid)['name']}!\nبه زندگیت در Life Simulator ادامه بده! 👇\n⚡ {TEAM_NAME}",
                          MAIN_KB)
         return
     invite_txt = "\n\n🔗 (با دعوت یک دوست اومدی — بهش جایزه می‌رسه! 🎁)" if ref else ""
     api.send_message(chat_id, (
-        "🎮 به «Life Simulator AI» خوش اومدی!\n\n"
+        "🎮 به «Life Simulator» خوش اومدی!\n\n"
         "اینجا یک زندگی مجازی می‌سازی: کار می‌کنی، 🏠 خانه و 🚗 ماشین می‌خری، "
         "دوست و رقیب پیدا می‌کنی و با هر انتخاب، سرنوشتت عوض می‌شه!\n\n"
         "✍️ قدم اول: اسم کاراکترت رو بنویس (مثلا: آرمان)" + invite_txt + f"\n\n⚡ {TEAM_NAME}"
@@ -2871,7 +2877,7 @@ def channel_news(text):
     ch = get_setting("channel", CHANNEL_DEFAULT)
     if not ch:
         return False
-    res = api.call("sendMessage", chat_id=ch, text=f"📡 «Life Simulator AI»\n\n{text}")
+    res = api.call("sendMessage", chat_id=ch, text=f"📡 «Life Simulator»\n\n{text}")
     if not res:
         log.warning(f"📡 ارسال به کانال ناموفق بود ({ch}) — آیا ربات ادمین کانال است؟")
     return bool(res)
@@ -3927,7 +3933,7 @@ def post_leaderboard_channel():
     lines = ["🏆 جدول قدرت شهر!\n"]
     for i, r in enumerate(top):
         lines.append(f"{medals[i]} {r['name']} — {fmt_money(r['money'])} تومان (لول {fn(r['level'])})")
-    lines.append("\n🎮 تو هم بیا توی Life Simulator AI و اسمتو بالا ببر!")
+    lines.append("\n🎮 تو هم بیا توی Life Simulator و اسمتو بالا ببر!")
     return channel_news("\n".join(lines))
 
 
@@ -6837,7 +6843,7 @@ def cmd_admin(chat_id, uid):
         log_action(uid, "admin_denied")
         api.send_message(chat_id, "⛔ دسترسی نداری.")
         return
-    api.send_message(chat_id, f"🔐 پنل مدیریت Life Simulator AI ⚡\n👨‍💻 {TEAM_NAME}\nیک بخش را انتخاب کن:", ADMIN_KB)
+    api.send_message(chat_id, f"🔐 پنل مدیریت Life Simulator ⚡\n👨‍💻 {TEAM_NAME}\nیک بخش را انتخاب کن:", ADMIN_KB)
 
 
 def admin_router(chat_id, uid, text):
@@ -7144,7 +7150,7 @@ def handle_admin_state(chat_id, uid, text, state, data):
         set_setting("channel", ch)
         log_action(uid, "admin_set_channel", ch)
         set_state(uid)
-        ok = channel_news("🛰 کانال اخبار «Life Simulator AI» متصل شد! از اینجا خبرهای جنگ، بازار و VIP رو دنبال کنید. 🎮")
+        ok = channel_news("🛰 کانال اخبار «Life Simulator» متصل شد! از اینجا خبرهای جنگ، بازار و VIP رو دنبال کنید. 🎮")
         api.send_message(chat_id,
                          ("✅ کانال تنظیم شد و پست تست هم رفت!" if ok else
                           "⚠️ ذخیره شد ولی ارسال تست ناموفق بود — مطمئن شو ربات ادمین کانال است و آیدی درست است (@username یا -100...)"),
@@ -10283,7 +10289,7 @@ def handle_update(update):
 
 BANNER = """
 ╔══════════════════════════════════════════╗
-║  🤖  Life Simulator AI برای روبیکا  🤖   ║
+║         Life Simulator برای روبیکا       ║
 ║   بازی متنی شبیه‌ساز زندگی — نسخه ۱.۰.۵    ║
 ║        ⚡ ساخته‌ی تیم XR ⚡                ║
 ╚══════════════════════════════════════════╝
