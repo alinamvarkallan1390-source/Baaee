@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 ╔══════════════════════════════════════════════════════════════════╗
-║              🤖 Life Simulator AI — ربات بازی بله 🤖              ║
+║              Life Simulator — ربات بازی بله                   ║
 ║        بازی متنی شبیه‌ساز زندگی برای پیام‌رسان بله (Bale)         ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║  راه‌اندازی (گوشی / Pydroid):                                     ║
@@ -14,7 +14,7 @@
 ║  روی سرور: متغیرهای BALE_BOT_TOKEN و BALE_ADMIN_IDS هم کار می‌کنند║
 ║                                                                  ║
 ║  ساختار فایل (ماژولار در قالب یک فایل):                          ║
-║    [1] تنظیمات و ثابت‌ها        [6] موتور داستانی (AI)          ║
+║    [1] تنظیمات و ثابت‌ها        [6] موتور داستانی                   ║
 ║    [2] کلاینت Bale Bot API      [7] هندلرهای بازی (منوها)        ║
 ║    [3] لایه دیتابیس (SQLite)    [8] پنل ادمین                     ║
 ║    [4] مدل‌ها و منطق بازی       [9] دیسپچر آپدیت‌ها              ║
@@ -29,7 +29,7 @@ import random
 import logging
 import sqlite3
 import threading
-from datetime import datetime
+from datetime import datetime, timedelta
 from collections import defaultdict
 
 try:
@@ -123,8 +123,8 @@ CHANNEL_DEFAULT = ""                        # ← مثل: "@mynewschannel" یا 
 TEAM_NAME = "تیم XR"
 
 # 🏷 نسخه‌ی رسمی ربات — در بنر و «همه‌ی» پیام‌های کاربر نمایش داده می‌شود
-BOT_VERSION = "۱.۱.۰"
-BUILD_TAG   = "v110-god-2026-09-25"   # 🛠 برچسب بیلد (نسخه عوض نمی‌شود) — برای اینکه ادمین مطمئن شود کد جدید روی هاست اجرا شده
+BOT_VERSION = "۱.۲.۰"
+BUILD_TAG   = "v120-battle-pass-fc-ads-2026-10-08"   # 🛠 برچسب بیلد برای تشخیص نسخه‌ی فعال روی هاست
 # 🖋 پانوشتی که خودکار به دمِ هر پیام کاربر اضافه می‌شود (داخل کلاس BaleAPI)
 DEV_FOOTER  = f"\n\n👨‍💻 توسعه: XR Team | نسخه {BOT_VERSION} ⚡"
 
@@ -281,7 +281,7 @@ TICK_SEC = 6 * 3600  # هر تیک امپراتوری = ۶ ساعت
 HACK_ATK = [("keylogger", "🐛 کیلاگر",      1, 800),
             ("botnet",    "🌐 بات‌نت",       3, 2500),
             ("exploit",   "💣 اکسپلویت",     5, 6000),
-            ("aihack",    "🤖 هک AI",        8, 15000)]
+            ("sentinel",  "🛰 نفوذگر پیشرفته",        8, 15000)]
 HACK_DEF = [("antivirus", "🛡 آنتی‌ویروس",   1, 700),
             ("firewall",  "🔥 فایروال",      3, 2200),
             ("quantum",   "🔐 رمزنگار",      5, 6500),
@@ -622,7 +622,7 @@ COURSES = [
     ("mkt",   "📣 بازاریابی",        "comm", 2500, 3),
     ("proj",  "📊 مدیریت پروژه",     "mgmt", 3000, 3),
     ("crea",  "🎨 کارگاه خلاقیت",    "crea", 2000, 3),
-    ("ai",    "🤖 هوش مصنوعی",       "prog", 3200, 3),
+    ("data",  "📊 تحلیل داده",       "prog", 3200, 3),
 ]
 
 # 🐕 مدرسه پت
@@ -701,7 +701,7 @@ ELITE_JOBS = {"doctor": 1, "lawyer": 2, "police": 1, "teacher": 1, "nurse": 1,
               "producer": 2, "surgeon": 3, "f1": 3, "astro": 3, "ceo": 3,   # 🆕 v1.0.8: نخبه‌های لوکس
               # 🆕 v1.0.9 فیکس: شغل‌های جدید پردرآمد
               "pharma": 1, "dentist": 1, "dataeng": 2, "cyber": 2, "banker": 2, "director": 2,
-              "aieng": 2, "refinery": 3, "genetic": 3, "cryptok": 3, "minister": 3, "tycoon": 3, "spacex": 3}
+              "analytics": 2, "refinery": 3, "genetic": 3, "cryptok": 3, "minister": 3, "tycoon": 3, "spacex": 3}
 POLICE_PATROL_LIMIT = 3   # گشت روزانه
 POLICE_REWARD_RATE  = 0.5 # سهم پلیس از جریمه مجرم
 
@@ -834,7 +834,7 @@ SEED_JOBS = [
     ("cyber",     "🛡 کارشناس امنیت",    "hack", 6, 9, 10000),
     ("banker",    "🏦 مدیر شعبه بانک",    "mgmt", 7, 11, 13000),
     ("director",  "🎬 کارگردان سینما",   "crea", 7, 11, 13500),
-    ("aieng",     "🤖 مهندس هوش مصنوعی", "prog", 8, 13, 19500),
+    ("analytics", "📊 تحلیل‌گر ارشد داده", "prog", 8, 13, 19500),
     ("refinery",  "🛢 مدیر پالایشگاه",    "mgmt", 8, 15, 24000),
     ("genetic",   "🧬 دانشمند ژنتیک",    "int",  9, 17, 29000),
     ("cryptok",   "₿ نهنگ کریپتو",       "int",  9, 18, 32000),
@@ -1023,8 +1023,9 @@ MAIN_KB = reply_keyboard([
     ["🎡 سرگرمی", "🏙 شهر"],
     ["💰 اقتصاد", "📚 مهارت‌ها"],
     ["👥 روابط", "🎯 ماموریت‌ها"],
-    ["💎 VIP", "🤖 دستیار هوش"],
-    ["🏆 رتبه‌بندی", "⚙ تنظیمات"],
+    ["💎 VIP", "🎟 بتل‌پس"],
+    ["⚽ لیگ ستاره‌ها", "🏆 رتبه‌بندی"],
+    ["⚙ تنظیمات"],
     ["🔥 ویژه‌های ۱.۱.۰"],          # 🆕 v1.1.0: هابِ ۳۰ فیچر گاد
     ["📣 کانال و گروه"],
 ])
@@ -1038,7 +1039,7 @@ ADMIN_KB = reply_keyboard([
     ["🌍 رویداد جهانی", "💾 بکاپ دیتابیس"],
     ["💸 جایزه همگانی", "⚡ ساعت گاد"],
     ["🔒 جوین اجباری", "🔗 لینک‌های بازی"],
-    ["🤖 تنظیمات هوش", "🎗 اعطای نشان قدمت"],
+    ["🎟 مدیریت بتل‌پس", "📣 جایگاه تبلیغ"],
     ["♻️ بازیابی بکاپ", "🚪 خروج از پنل ادمین"],
 ])
 
@@ -1057,9 +1058,7 @@ class Database:
         self._init_schema()
         self._seed()
 
-    # 🩹 v1.0.9 فیکس: «خود-ترمیمی» اسکیما — اگر سیو قدیمی/بکاپ برگردانده‌شده ستون یا جدول جدیدی را نداشت
-    # (خطای «no such column/table»)، همان لحظه مهاجرت اجرا و کوئری تکرار می‌شود؛ دیگر هیچ بخشی (گردونه،
-    # هوش، حراجی، بازار سیاه، فریز...) بی‌صدا از کار نمی‌افتد و نیازی به ری‌استارت ربات نیست.
+    # 🩹 خودترمیمی اسکیما: اگر سیو قدیمی یا بکاپ ستون/جدول تازه‌ای نداشت، مهاجرت اجرا و کوئری تکرار می‌شود.
     _HEAL_MARKERS = ("no such column", "no such table", "has no column named")
     _healing = False
     _heal_last = {}
@@ -1353,6 +1352,60 @@ class Database:
                 code TEXT PRIMARY KEY, old_uid INTEGER, new_uid INTEGER DEFAULT 0,
                 data TEXT, used INTEGER DEFAULT 0, created_at TEXT
             );
+            CREATE TABLE IF NOT EXISTS battle_pass(
+                user_id INTEGER NOT NULL, season_id TEXT NOT NULL,
+                xp INTEGER DEFAULT 0, premium INTEGER DEFAULT 0,
+                claimed_json TEXT DEFAULT '[]', activity_day TEXT,
+                activity_xp INTEGER DEFAULT 0, updated_at TEXT,
+                PRIMARY KEY(user_id, season_id)
+            );
+            CREATE TABLE IF NOT EXISTS battle_pass_missions(
+                user_id INTEGER NOT NULL, season_id TEXT NOT NULL,
+                period TEXT NOT NULL, period_key TEXT NOT NULL, mission_key TEXT NOT NULL,
+                progress INTEGER DEFAULT 0, claimed INTEGER DEFAULT 0,
+                PRIMARY KEY(user_id, season_id, period, period_key, mission_key)
+            );
+            CREATE TABLE IF NOT EXISTS fc_teams(
+                user_id INTEGER PRIMARY KEY, team_name TEXT NOT NULL,
+                coins INTEGER DEFAULT 1500, formation TEXT DEFAULT '4-3-3',
+                captain_id INTEGER, wins INTEGER DEFAULT 0, draws INTEGER DEFAULT 0,
+                losses INTEGER DEFAULT 0, created_at TEXT
+            );
+            CREATE TABLE IF NOT EXISTS fc_players(
+                id INTEGER PRIMARY KEY AUTOINCREMENT, owner_id INTEGER NOT NULL,
+                name TEXT NOT NULL, position TEXT NOT NULL,
+                overall INTEGER DEFAULT 60, level INTEGER DEFAULT 1,
+                rarity TEXT DEFAULT 'معمولی', origin TEXT DEFAULT 'starter',
+                created_at TEXT
+            );
+            CREATE TABLE IF NOT EXISTS fc_listings(
+                id INTEGER PRIMARY KEY AUTOINCREMENT, seller_id INTEGER NOT NULL,
+                player_id INTEGER NOT NULL, price INTEGER NOT NULL,
+                created_at TEXT NOT NULL, expires_at TEXT,
+                status TEXT DEFAULT 'active', buyer_id INTEGER
+            );
+            CREATE UNIQUE INDEX IF NOT EXISTS fc_one_active_listing
+                ON fc_listings(player_id) WHERE status='active';
+            CREATE TABLE IF NOT EXISTS fc_matches(
+                id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL,
+                season_id TEXT NOT NULL, opponent_name TEXT NOT NULL,
+                opponent_power INTEGER NOT NULL, team_power INTEGER NOT NULL,
+                result TEXT NOT NULL, score_for INTEGER NOT NULL,
+                score_against INTEGER NOT NULL, coin_reward INTEGER NOT NULL,
+                played_at TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS fc_matches_user_season
+                ON fc_matches(user_id, season_id, played_at);
+            CREATE TABLE IF NOT EXISTS fc_transfers(
+                id INTEGER PRIMARY KEY AUTOINCREMENT, buyer_id INTEGER NOT NULL,
+                seller_id INTEGER NOT NULL, player_id INTEGER NOT NULL,
+                price INTEGER NOT NULL, fee INTEGER NOT NULL, created_at TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS fc_coin_ledger(
+                id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL,
+                amount INTEGER NOT NULL, reason TEXT NOT NULL,
+                details TEXT, created_at TEXT NOT NULL
+            );
             """)
             self.conn.commit()
         self._migrate()
@@ -1417,10 +1470,7 @@ class Database:
                 "foreign_until": "TEXT", "foreign_day": "TEXT", "foreign_pay": "INTEGER DEFAULT 0",
                 "duel_elo": "INTEGER DEFAULT 1000", "today_xp": "INTEGER DEFAULT 0", "today_xp_day": "TEXT",
                 "stmt_day": "TEXT", "stmt_count": "INTEGER DEFAULT 0", "grow_flags": "TEXT",
-                # 🐛 v1.0.9 فیکس: ستون‌های ۱.۰.۹ اینجا هم اضافه می‌شن تا بعد از «بازیابی بکاپ» یا سیو قدیمی
-                # گردونه/دکور/بانک زمان با خطای «no such column» ساکت نمونن و پول کاربر گم نشه!
-                "ai_chat_day": "TEXT", "ai_chat_count": "INTEGER DEFAULT 0",
-                "ai_story_day": "TEXT", "ai_story_count": "INTEGER DEFAULT 0",
+                # ستون‌های تازه برای سیوهای قدیمی/بازیابی‌شده نیز خودکار افزوده می‌شوند.
                 "wheel_day": "TEXT", "wheel_spins": "INTEGER DEFAULT 0",
                 "quiz_day": "TEXT", "quiz_done": "INTEGER DEFAULT 0",
                 "collection_json": "TEXT", "decor_json": "TEXT",
@@ -1454,6 +1504,18 @@ class Database:
                         self.conn.commit()
                     except Exception as _e:   # 🐛 یک ستون خراب نباید بقیه‌ی مهاجرت را متوقف کند
                         log.warning(f"migrate {table}.{col}: {_e}")
+        # نام‌های داخلیِ قدیمی که صرفاً به سرویس حذف‌شده اشاره می‌کردند؛ نگه‌داری داده‌های کاربران.
+        try:
+            self.conn.execute("UPDATE hack_gear SET tool_id='sentinel' WHERE tool_id='aihack'")
+            self.conn.execute("UPDATE logs SET action='course_data' WHERE action='course_ai'")
+            self.conn.execute("UPDATE profiles SET job_id='analytics' WHERE job_id='aieng'")
+            if self.conn.execute("SELECT 1 FROM jobs WHERE id='analytics'").fetchone():
+                self.conn.execute("DELETE FROM jobs WHERE id='aieng'")
+            else:
+                self.conn.execute("UPDATE jobs SET id='analytics', title='📊 تحلیل‌گر ارشد داده' WHERE id='aieng'")
+            self.conn.commit()
+        except sqlite3.Error as _e:
+            log.warning(f"legacy label migration: {_e}")
 
     def _seed(self):
         # شغل‌ها (شغل‌های جدید به سیوهای قدیمی هم اضافه می‌شوند؛ حقوقی که ادمین دستی عوض کرده دست نمی‌خورد)
@@ -1477,7 +1539,7 @@ class Database:
         self.execute("INSERT OR IGNORE INTO settings(key,value) VALUES('income_rate','1.0')")
         if not self.fetchone("SELECT id FROM announcements LIMIT 1"):
             self.execute("INSERT INTO announcements(text,created_at) VALUES(?,?)",
-                         ("به «Life Simulator AI» خوش اومدی! 🎉 هر روز یک زندگی جدید.", now_iso()))
+                         ("به «Life Simulator» خوش اومدی! 🎉 هر روز یک زندگی جدید.", now_iso()))
 
 
 db = None  # در main() مقداردهی می‌شود
@@ -1560,6 +1622,12 @@ def set_state(uid, state=None, data=None):
 def log_action(actor, action, details=""):
     db.execute("INSERT INTO logs(actor,action,details,created_at) VALUES(?,?,?,?)",
                (actor, action, details, now_iso()))
+    tracker = globals().get("battle_pass_track_action")
+    if tracker:
+        try:
+            tracker(actor, action)
+        except Exception as _bp_error:
+            log.warning(f"battle-pass activity tracking skipped: {_bp_error}")
 
 def get_setting(key, default=""):
     r = db.fetchone("SELECT value FROM settings WHERE key=?", (key,))
@@ -1868,7 +1936,7 @@ def family_line(uid):
 
 
 # ══════════════════════════════════════════════════════════════════
-# [6] موتور داستانی (AI) — تولید رویداد، داستان و رفتار NPC
+# [6] موتور داستانی — تولید رویداد، داستان و رفتار NPC
 # ══════════════════════════════════════════════════════════════════
 
 STORY_OPENERS = [
@@ -2058,7 +2126,7 @@ DYNAMIC_SCENARIOS = [
 
 
 def generate_story(uid) -> str:
-    """یک خط داستانی تصادفی (AI-ish) برای حال‌وهوای بازی"""
+    """یک خط داستانی تصادفی از متن‌های بازی برای ایجاد حال‌وهوا."""
     p = profile(uid)
     npcs = {n["npc_id"]: n for n in get_npcs(uid)}
     line = pick(STORY_OPENERS).replace("{city}", p["city"])
@@ -2162,12 +2230,12 @@ def guard_character(chat_id, uid) -> bool:
 def cmd_start(chat_id, uid, ref=None):
     if has_character(uid):
         api.send_message(chat_id,
-                         f"🌞 دوباره سلام {profile(uid)['name']}!\nبه زندگیت در Life Simulator AI ادامه بده! 👇\n⚡ {TEAM_NAME}",
+                         f"🌞 دوباره سلام {profile(uid)['name']}!\nبه زندگیت در Life Simulator ادامه بده! 👇\n⚡ {TEAM_NAME}",
                          MAIN_KB)
         return
     invite_txt = "\n\n🔗 (با دعوت یک دوست اومدی — بهش جایزه می‌رسه! 🎁)" if ref else ""
     api.send_message(chat_id, (
-        "🎮 به «Life Simulator AI» خوش اومدی!\n\n"
+        "🎮 به «Life Simulator» خوش اومدی!\n\n"
         "اینجا یک زندگی مجازی می‌سازی: کار می‌کنی، 🏠 خانه و 🚗 ماشین می‌خری، "
         "دوست و رقیب پیدا می‌کنی و با هر انتخاب، سرنوشتت عوض می‌شه!\n\n"
         "✍️ قدم اول: اسم کاراکترت رو بنویس (مثلا: آرمان)" + invite_txt + f"\n\n⚡ {TEAM_NAME}"
@@ -2375,10 +2443,6 @@ def handle_state_text(chat_id, uid, text, state, data):
         return True
 
     # ─── 🆕 v1.0.9: هوش و فیچرها ───
-    if state == "ai_chat":
-        return ai_chat_handle(chat_id, uid, text)
-    if state == "ai_story":
-        return ai_story_handle(chat_id, uid, text)
     if state == "tb_dep":
         return time_bank_dep_handle(chat_id, uid, text)
     if state == "mrk_qty":      # 🆕 v1.0.9: خرید عددی بازار
@@ -2396,6 +2460,9 @@ def handle_state_text(chat_id, uid, text, state, data):
         return auction_sell_price(chat_id, uid, d.get("title") or "کالای حراجی", text, d.get("kind"), d.get("ref"))
     if state == "rem_add":
         return reminder_add_handle(chat_id, uid, text)
+
+    if handle_new_feature_state(chat_id, uid, text, state, data or {}):
+        return True
 
     if state.startswith("adm_"):
         return handle_admin_state(chat_id, uid, text, state, data)
@@ -2464,6 +2531,8 @@ def panel_game(chat_id, uid):
         [("🎉 تفریح (+شادی)", "game:fun"), ("🔥 جایزه روزانه", "daily:claim")],
         [("🎯 مأموریت سری روزانه (💰+⭐)", "dq:view")],   # 🆕 v1.0.7
         [("📜 مأموریت داستانی (چندمرحله‌ای)", "sq:view")],   # 🆕 v1.0.5
+        [("🎟 بتل‌پس", "bp:home"), ("⚽ لیگ ستاره‌ها", "fc:home")],
+        [ad_slot_button("main")],
     ]
     p = profile(uid)
     if not grow_has(p, "wel"):                          # 🚀 F2: بسته خیرمقدم (۲۴ ساعت اول)
@@ -2872,6 +2941,8 @@ def panel_economy(chat_id, uid):
         [("🧾 تراکنش‌ها", "eco:tx")],   [("📊 گزارش مالی امروز (P&L)", "fin:view")],   # 🆕 v1.0.6
         [("🏗 پیمانکاری ساختمان (سرمایه→سود)", "cons:view")],   # 🆕 v1.0.8
         [("🧳 مأموریت خارجی ۳روزه", "frn:view"), ("🎨 فروش تابلو (خلاقیت)", "art:go")],   # 🆕 v1.0.8
+        [("⚽ لیگ ستاره‌ها", "fc:home"), ("🎟 بتل‌پس", "bp:home")],
+        [ad_slot_button("economy")],
     ]
     api.send_message(chat_id,
                      ui_card("💰 دفترچه‌ی اقتصاد",
@@ -2988,7 +3059,8 @@ def panel_relations(chat_id, uid):
         lines.append(f"   {relation_label(rel)} {bar(rel)} {fn(rel)}")
         rows.append([(f"💬 گپ با {n['name']}", f"npc:chat:{n['npc_id']}"),
                      (f"🎁 هدیه (۲۰۰💰)", f"npc:gift:{n['npc_id']}")])
-    rows.append([("🎥 لیگ استریمرها (دعوت = جایزه)", "v109:streamer"), ("🤖 چت با هوش", "v109:ai")])  # 🆕 v1.0.9
+    rows.append([("🎥 لیگ استریمرها (دعوت = جایزه)", "v109:streamer"), ("⚽ لیگ ستاره‌ها", "fc:home")])
+    rows.append([ad_slot_button("social")])
     api.send_message(chat_id, "\n".join(lines), inline_keyboard(rows))
 
 
@@ -3032,7 +3104,7 @@ def panel_missions(chat_id, uid):
     ensure_missions(uid)
     rows = db.fetchall("SELECT * FROM missions WHERE user_id=? AND day=?", (uid, today()))
     lines = ["🎯 ماموریت‌های امروز:\n"]
-    btns = []
+    btns = [[("🎟 بتل‌پس و مأموریت‌های فصل", "bp:home")]]
     for m in rows:
         reward = jl(m["reward"], {})
         r_txt = "، ".join((f"{fmt_money(v)}💰" if k == "money" else f"{fn(v)} {'⭐' if k=='xp' else '😊'}")
@@ -3046,6 +3118,7 @@ def panel_missions(chat_id, uid):
             status = f"⏳ {fn(m['progress'])}/{fn(m['target'])}"
         lines.append(f"{m['title']}\n   {status} | جایزه: {r_txt}")
     btns.append([("📅 ماموریت‌های هفتگی (جایزه 💎)", "wms:view")])        # 🆕 v6
+    btns.append([ad_slot_button("main")])
     api.send_message(chat_id, "\n".join(lines), inline_keyboard(btns) if btns else None)
 
 
@@ -3120,7 +3193,7 @@ def channel_news(text):
     ch = get_setting("channel", CHANNEL_DEFAULT)
     if not ch:
         return False
-    res = api.call("sendMessage", chat_id=ch, text=f"📡 «Life Simulator AI»\n\n{text}")
+    res = api.call("sendMessage", chat_id=ch, text=f"📡 «Life Simulator»\n\n{text}")
     if not res:
         log.warning(f"📡 ارسال به کانال ناموفق بود ({ch}) — آیا ربات ادمین کانال است؟")
     return bool(res)
@@ -3744,6 +3817,7 @@ def panel_market(chat_id, uid):
         rows.append(pair)
     rows.append([("💎 حراجی شهر", "v109:auction"), ("🖤 بازار سیاه", "v109:black")])  # 🆕 v1.0.9
     rows.append([("⚡ فلش سیل ۳۰٪", "v109:flash"), ("📦 جعبه شانس", "v109:box")])  # 🆕 v1.0.9
+    rows.append([("⚽ بازار بازیکن", "fc:market"), ad_slot_button("market")])
     lines.append(f"\n💰 موجودی: {fmt_money(p['money'])} | کارمزد: ۲٪")
     lines.append("🔢 روی هر دارایی بزن و تعداد سهم/واحدی که می‌خوای رو به عدد بفرست")
     lines.append("⏱ قیمت‌ها هر ۲۰ دقیقه به‌روز می‌شوند")
@@ -4130,6 +4204,7 @@ def panel_vip(chat_id, uid):
     card = get_setting("owner_card", OWNER_CARD_NUM)
     rows = [[(pack[1] + f" — {fmt_money(pack[3])} تومان", f"ord:new:{pack[0]}")] for pack in GEM_PACKS]
     rows.append([("🎁 خرج سکه‌ها (قدرت‌ها)", "vip:spend")])
+    rows.append([("🎟 بتل‌پس Premium", "bp:home"), ad_slot_button("vip")])
     api.send_message(chat_id,
                      f"💎 فروشگاه VIP\n━━━━━━━━━━━\n"
                      f"💎 موجودی سکه: {fn(p.get('gems') or 0)}{' | 👑 شما VIP هستید' if p.get('vip') else ''}\n\n"
@@ -4205,40 +4280,69 @@ def gem_spin(chat_id, uid):
 
 # ───── 💳 سیستم سفارش سکه (کارت‌به‌کارت + تایید ادمین) ─────
 
-def order_new(chat_id, uid, pack_id):
-    pack = next((p for p in GEM_PACKS if p[0] == pack_id), None)
-    if not pack:
-        return "❌ بسته پیدا نشد!"
-    old = db.fetchone("SELECT id FROM orders WHERE user_id=? AND status='pending'", (uid,))
-    if old:
-        db.execute("UPDATE orders SET status='cancelled' WHERE id=?", (old["id"],))
-    cur = db.execute(
-        "INSERT INTO orders(user_id,pack,gems,price_toman,status,created_at) VALUES(?,?,?,?,'pending',?)",
-        (uid, pack[0], pack[2], pack[3], now_iso()))
-    oid = cur.lastrowid
+def send_order_invoice(chat_id, oid, pack_title, price):
     card = get_setting("owner_card", OWNER_CARD_NUM)
-    log_action(uid, "order_new", f"#{oid} {pack[0]}")
     api.send_message(chat_id,
                      f"🧾 فاکتور خرید #{fn(oid)}\n━━━━━━━━━━━\n"
-                     f"📦 {pack[1]}\n💵 مبلغ: {fmt_money(pack[3])} تومان\n\n"
+                     f"📦 {pack_title}\n💵 مبلغ: {fmt_money(price)} تومان\n\n"
                      f"۱️⃣ مبلغ را به کارت زیر واریز کن:\n💳 {card}\n"
-                     f"۲️⃣ بعد از واریز، «پرداخت کردم» را بزن تا فیشت بررسی و سکه‌ها شارژ شود.",
+                     "۲️⃣ بعد از واریز، «پرداخت کردم» را بزن تا فیش توسط ادمین بررسی شود.",
                      inline_keyboard([[("✅ پرداخت کردم", f"ord:paid:{oid}")],
                                       [("❌ انصراف", f"ord:cancel:{oid}")]]))
+
+
+def order_new(chat_id, uid, pack_id):
+    is_battle_pass = pack_id == "bp-premium"
+    if is_battle_pass:
+        sid = battle_pass_season_info()[0]
+        bp = battle_pass_ensure(uid, sid)
+        if bp["premium"]:
+            return "👑 Premium همین فصل برایت فعال است؛ نیازی به سفارش دوباره نیست."
+        order_pack = BP_ORDER_PREFIX + sid
+        pack_title = battle_pass_order_pack_title(order_pack)
+        gems, price = 0, battle_pass_order_price()
+        existing = db.fetchone("""SELECT * FROM orders WHERE user_id=? AND pack=?
+                                  AND status IN ('pending','awaiting') ORDER BY id DESC LIMIT 1""",
+                               (uid, order_pack))
+        if existing:
+            if existing["status"] == "pending":
+                send_order_invoice(chat_id, existing["id"], pack_title, existing["price_toman"])
+                return None
+            return f"⏳ سفارش بتل‌پس #{fn(existing['id'])} در انتظار بررسی ادمین است؛ سفارش دیگری لازم نیست."
+    else:
+        pack = next((p for p in GEM_PACKS if p[0] == pack_id), None)
+        if not pack:
+            return "❌ بسته پیدا نشد!"
+        order_pack, pack_title, gems, price = pack[0], pack[1], pack[2], pack[3]
+    old = db.fetchone("SELECT id FROM orders WHERE user_id=? AND status='pending'", (uid,))
+    if old:
+        db.execute("UPDATE orders SET status='cancelled' WHERE id=? AND status='pending'", (old["id"],))
+    cur = db.execute(
+        "INSERT INTO orders(user_id,pack,gems,price_toman,status,created_at) VALUES(?,?,?,?,'pending',?)",
+        (uid, order_pack, gems, price, now_iso()))
+    oid = cur.lastrowid
+    log_action(uid, "order_new", f"#{oid} {order_pack}")
+    send_order_invoice(chat_id, oid, pack_title, price)
     return None
+
 
 def order_paid(chat_id, uid, oid):
     o = db.fetchone("SELECT * FROM orders WHERE id=? AND user_id=?", (oid, uid))
     if not o or o["status"] != "pending":
         return "⚠️ سفارش معتبر نیست."
-    db.execute("UPDATE orders SET status='awaiting' WHERE id=?", (oid,))
-    pack = next((p for p in GEM_PACKS if p[0] == o["pack"]), (None, o["pack"]))
+    updated = db.execute("UPDATE orders SET status='awaiting' WHERE id=? AND user_id=? AND status='pending'",
+                         (oid, uid))
+    if not updated.rowcount:
+        return "⚠️ سفارش قبلاً ثبت شده یا دیگر قابل پرداخت نیست."
+    pack_title = battle_pass_order_pack_title(o["pack"])
     notify_admins(
-        f"💰 سفارش سکه جدید!\n━━━━━━━━━━━\n🆔 فاکتور: #{oid}\n👤 خریدار: {profile(uid)['name']} ({uid})\n"
-        f"📦 {pack[1]} | 💵 {fmt_money(o['price_toman'])} تومان\n"
+        f"💰 سفارش جدید!\n━━━━━━━━━━━\n🆔 فاکتور: #{oid}\n👤 خریدار: {(profile(uid) or {}).get('name','کاربر')} ({uid})\n"
+        f"📦 {pack_title} | 💵 {fmt_money(o['price_toman'])} تومان\n"
         f"⚠️ لطفاً واریز را چک و تأیید/رد کن:",
         inline_keyboard([[("✅ تایید واریز", f"ord:ok:{oid}"), ("❌ رد سفارش", f"ord:no:{oid}")]]))
     log_action(uid, "order_paid", f"#{oid}")
+    if battle_pass_is_order(o["pack"]):
+        return "✅ درخواست پرداخت بتل‌پس ثبت شد؛ پس از بررسی و تأیید ادمین، Premium همین فصل فعال می‌شود."
     return "✅ ثبت شد! بعد از تأیید واریز توسط مدیریت، سکه‌ها به حسابت میاد. 💎"
 
 def order_cancel(chat_id, uid, oid):
@@ -4295,23 +4399,73 @@ def admin_order_decide(chat_id, admin_id, oid, approve):
     o = db.fetchone("SELECT * FROM orders WHERE id=?", (oid,))
     if not o or o["status"] != "awaiting":
         return "⚠️ این سفارش قبلاً رسیدگی شده."
-    if approve:
-        db.execute("UPDATE orders SET status='ok', processed_by=?, processed_at=? WHERE id=?",
-                   (admin_id, now_iso(), oid))
-        add_gems(o["user_id"], o["gems"])
-        p = profile(o["user_id"])
+    if not approve:
+        updated = db.execute("UPDATE orders SET status='rejected', processed_by=?, processed_at=? WHERE id=? AND status='awaiting'",
+                             (admin_id, now_iso(), oid))
+        if not updated.rowcount:
+            return "⚠️ این سفارش قبلاً رسیدگی شده."
         api.send_message(o["user_id"],
-                         f"🎉 واریزت تأیید شد! 💎 {fn(o['gems'])} سکه طلا به حسابت اضافه شد.\n"
-                         f"💎 موجودی: {fn(p.get('gems') or 0)} سکه — از پنل «💎 VIP» خرجشان کن!")
-        channel_news(f"💎 {p['name']} بسته‌ی {fn(o['gems'])} سکه طلا خرید! از حمایتت ممنونیم 🙏")
-        log_action(admin_id, "order_approve", f"#{oid} user={o['user_id']} price={o['price_toman']}")
-        return f"✅ سفارش #{oid} تأیید و {fn(o['gems'])} سکه شارژ شد."
-    db.execute("UPDATE orders SET status='rejected', processed_by=?, processed_at=? WHERE id=?",
-               (admin_id, now_iso(), oid))
+                         f"⚠️ متأسفانه واریز سفارش #{fn(oid)} تأیید نشد. اگر اشکالی رخ داده به مدیریت پیام بده.")
+        log_action(admin_id, "order_reject", f"#{oid}")
+        return f"❌ سفارش #{oid} رد شد."
+
+    if not profile(o["user_id"]):
+        return "❌ پروفایل خریدار پیدا نشد؛ سفارش را بررسی کن و در صورت نیاز رد کن."
+
+    if battle_pass_is_order(o["pack"]):
+        season_id = o["pack"][len(BP_ORDER_PREFIX):]
+        if season_id != battle_pass_season_info()[0]:
+            return "⏳ فصل این سفارش تمام شده؛ وضعیت را بررسی و در صورت نیاز سفارش را رد کن."
+        bp = battle_pass_ensure(o["user_id"], season_id)
+        if bp["premium"]:
+            return "👑 Premium این فصل از قبل فعال است؛ سفارش را دوباره تأیید نکن."
+        with db.lock:
+            conn = db.conn
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                updated = conn.execute("UPDATE orders SET status='ok', processed_by=?, processed_at=? WHERE id=? AND status='awaiting'",
+                                       (admin_id, now_iso(), oid))
+                if not updated.rowcount:
+                    conn.rollback()
+                    return "⚠️ این سفارش قبلاً رسیدگی شده."
+                granted = conn.execute("UPDATE battle_pass SET premium=1,updated_at=? WHERE user_id=? AND season_id=?",
+                                       (now_iso(), o["user_id"], season_id))
+                if not granted.rowcount:
+                    conn.rollback()
+                    return "❌ فصل بتل‌پس پیدا نشد؛ سفارش تغییر نکرد."
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+        api.send_message(o["user_id"], f"🎉 سفارش تأیید شد! بتل‌پس Premium فصل {season_id} برایت فعال شد.")
+        log_action(admin_id, "order_approve", f"#{oid} user={o['user_id']} premium_pass={season_id}")
+        return f"✅ سفارش #{oid} تأیید و Premium بتل‌پس فعال شد."
+
+    with db.lock:
+        conn = db.conn
+        conn.execute("BEGIN IMMEDIATE")
+        try:
+            updated = conn.execute("UPDATE orders SET status='ok', processed_by=?, processed_at=? WHERE id=? AND status='awaiting'",
+                                   (admin_id, now_iso(), oid))
+            if not updated.rowcount:
+                conn.rollback()
+                return "⚠️ این سفارش قبلاً رسیدگی شده."
+            credited = conn.execute("UPDATE profiles SET gems=MAX(0,COALESCE(gems,0)+?) WHERE user_id=?",
+                                    (int(o["gems"] or 0), o["user_id"]))
+            if not credited.rowcount:
+                conn.rollback()
+                return "❌ پروفایل خریدار پیدا نشد؛ سفارش تغییر نکرد."
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+    p = profile(o["user_id"]) or {"name": "کاربر", "gems": 0}
     api.send_message(o["user_id"],
-                     f"⚠️ متأسفانه واریز سفارش #{fn(oid)} تأیید نشد. اگر اشکالی رخ داده به مدیریت پیام بده.")
-    log_action(admin_id, "order_reject", f"#{oid}")
-    return f"❌ سفارش #{oid} رد شد."
+                     f"🎉 واریزت تأیید شد! 💎 {fn(o['gems'])} سکه طلا به حسابت اضافه شد.\n"
+                     f"💎 موجودی: {fn(p.get('gems') or 0)} سکه — از پنل «💎 VIP» خرجشان کن!")
+    channel_news(f"💎 {p['name']} بسته‌ی {fn(o['gems'])} سکه طلا خرید! از حمایتت ممنونیم 🙏")
+    log_action(admin_id, "order_approve", f"#{oid} user={o['user_id']} price={o['price_toman']}")
+    return f"✅ سفارش #{oid} تأیید و {fn(o['gems'])} سکه شارژ شد."
 
 
 # ───── پنل‌های ادمین جدید ─────
@@ -4325,12 +4479,12 @@ def panel_admin_revenue(chat_id):
     if ok_rows:
         lines.append("📦 به تفکیک بسته:")
         for r in ok_rows:
-            lines.append(f"• {r['pack']}: {fn(r['c'])} فروش — {fmt_money(r['t'])} تومان")
+            lines.append(f"• {battle_pass_order_pack_title(r['pack'])}: {fn(r['c'])} فروش — {fmt_money(r['t'])} تومان")
     lines.append(f"\n⏳ سفارش‌های در انتظار تأیید: {fn(len(pending))}")
     lines.append(f"\n💳 کارت دریافت فعلی: {get_setting('owner_card', OWNER_CARD_NUM)}")
     rows = [[("💳 تغییر شماره کارت دریافت", "card:set")]]
     for o in pending[:8]:
-        rows.append([(f"⏳ #{o['id']} — {fmt_money(o['price_toman'])} ({o['pack']})", f"ord:view:{o['id']}")])
+        rows.append([(f"⏳ #{o['id']} — {fmt_money(o['price_toman'])} ({battle_pass_order_pack_title(o['pack'])})", f"ord:view:{o['id']}")])
     api.send_message(chat_id, "\n".join(lines), inline_keyboard(rows))
 
 
@@ -4341,7 +4495,7 @@ def admin_order_view(chat_id, oid):
     p = profile(o["user_id"])
     api.send_message(chat_id,
                      f"🧾 سفارش #{oid}\n👤 {p['name'] if p else o['user_id']} (ID: {o['user_id']})\n"
-                     f"📦 {o['pack']} | 💎 {fn(o['gems'])} | 💵 {fmt_money(o['price_toman'])} تومان\n"
+                     f"📦 {battle_pass_order_pack_title(o['pack'])} | 💎 {fn(o['gems'])} | 💵 {fmt_money(o['price_toman'])} تومان\n"
                      f"🗓 {o['created_at']} | وضعیت: {o['status']}",
                      inline_keyboard([[("✅ تایید واریز", f"ord:ok:{oid}"), ("❌ رد", f"ord:no:{oid}")]])
                      if o["status"] == "awaiting" else None)
@@ -4390,7 +4544,7 @@ def post_leaderboard_channel():
     lines = ["🏆 جدول قدرت شهر!\n"]
     for i, r in enumerate(top):
         lines.append(f"{medals[i]} {r['name']} — {fmt_money(r['money'])} تومان (لول {fn(r['level'])})")
-    lines.append("\n🎮 تو هم بیا توی Life Simulator AI و اسمتو بالا ببر!")
+    lines.append("\n🎮 تو هم بیا توی Life Simulator و اسمتو بالا ببر!")
     return channel_news("\n".join(lines))
 
 
@@ -5950,6 +6104,7 @@ def streak_claim(chat_id, uid):
         channel_news(f"🔥 استریک {profile(uid)['name']} به {fn(streak)} روز رسید!")
     db.execute("UPDATE profiles SET streak=?, last_streak=?, happiness=MIN(100,happiness+5) WHERE user_id=?", (streak, today(), uid))
     mission_progress(uid, "life")
+    log_action(uid, "streak_claim", str(streak))
     return (f"🔥 جایزه روزانه (روز {fn(streak)} از زنجیره): +{fmt_money(reward)} تومان!{bonus_txt}\n"
             f"⚠️ فردا نیایی زنجیره‌ات می‌شکنه و از اول شروع می‌کنی! 📈")
 
@@ -6140,7 +6295,7 @@ def panel_fun(chat_id, uid):
             [("🧖 اسپا و ماساژ (+۳۰❤️، ۸۰۰💰)", "fun:spa")],   # 🆕 v1.0.6
             [("🐟 ماهیگیری ساحلی (۳ قلاب/روز)", "fish:go"), ("📱 کانال من (کانتنت کریتور)", "content:view")],   # 🆕 v1.0.8
             [("🎡 گردونه شانس (رایگان!)", "v109:wheel"), ("📦 جعبه شانس (۵۰۰💰)", "v109:box")],  # 🆕 v1.0.9
-            [("🧠 کوییز 1.0.9 (۳۵۰💰)", "v109:quiz"), ("🍀 سکه شانس", "v109:lucky")],  # 🆕 v1.0.9
+            [("🧠 کوییز روزانه (۳۵۰💰)", "v109:quiz"), ("🍀 سکه شانس", "v109:lucky")],  # 🆕 v1.0.9
             [("⚡ فلش سیل ۳۰٪", "v109:flash"), ("❄️ فریز استریک", "v109:freeze")],  # 🆕 v1.0.9
             [("🎯 چالش گاد روزانه", "gdc:claim"), ("🌟 چک‌لیست گاد", "gdcl:view")]]
     p = profile(uid)
@@ -6171,7 +6326,7 @@ def panel_city(chat_id, uid):
     jail = is_jailed(uid)
     rows = [[("✈️ سفر بین شهرها", "cty:trv"), ("🎓 تحصیل", "cty:edu")],
             [("🏥 بیمه روزانه (۲۰۰💰)", "cty:ins"), ("📰 روزنامه شهر", "cty:news")],
-            [("📻 رادیو بله (۴۰⭐)", "v109:radio"), ("🗞 روزنامه هوش", "v109:newspaper")],  # 🆕 v1.0.9
+            [("📻 رادیو بله (۴۰⭐)", "v109:radio"), ("🗞 روزنامه روزانه", "v109:newspaper")],  # 🆕 v1.0.9
             [("🗳 شهردار هفته (رأی‌گیری!)", "ele:menu"), ("🚔 تابلوی زندان", "jli:board")],
             [("🛡 استخدام گارد روزانه", "grd:hire"), ("🧡 صدقه (صندوق شهر)", "chr:menu")],
             [("🚨 جنایت (ریسک زندان!)", "cty:crim")],
@@ -6180,6 +6335,7 @@ def panel_city(chat_id, uid):
             [("🗺 نقشه مناطق شهر (بوف محله!)", "cty:dist")]]   # 🆕 v1.0.4
     if jail:
         rows.append([(f"🔓 وثیقه آزادی ({fmt_money(BAIL_COST)}💰)", "cty:bail")])
+    rows.append([ad_slot_button("city")])
     ins = "✅ داری" if is_insured(uid) else "❌ نداری"
     api.send_message(chat_id,
                      ui_card("🏙 اداره‌ی شهر",
@@ -7592,7 +7748,7 @@ def cmd_admin(chat_id, uid):
         log_action(uid, "admin_denied")
         api.send_message(chat_id, "⛔ دسترسی نداری.")
         return
-    api.send_message(chat_id, f"🔐 پنل مدیریت Life Simulator AI ⚡\n👨‍💻 {TEAM_NAME} | 🛠 بیلد: {BUILD_TAG}\nیک بخش را انتخاب کن:", ADMIN_KB)
+    api.send_message(chat_id, f"🔐 پنل مدیریت Life Simulator ⚡\n👨‍💻 {TEAM_NAME} | 🛠 بیلد: {BUILD_TAG}\nیک بخش را انتخاب کن:", ADMIN_KB)
 
 
 def admin_router(chat_id, uid, text):
@@ -7644,8 +7800,11 @@ def admin_router(chat_id, uid, text):
     if text == "🔗 لینک‌های بازی":
         panel_admin_social(chat_id)
         return True
-    if text == "🤖 تنظیمات هوش":
-        panel_admin_ai(chat_id)
+    if text == "🎟 مدیریت بتل‌پس":
+        panel_admin_battle_pass(chat_id)
+        return True
+    if text == "📣 جایگاه تبلیغ":
+        panel_admin_ad_slots(chat_id)
         return True
     if text == "🎗 اعطای نشان قدمت":
         set_state(uid, "adm_sen_id")
@@ -7802,31 +7961,7 @@ def admin_badge_toggle(chat_id, actor, target_id, bid):
     admin_badge_menu(chat_id, target_id)
 
 
-# ── 🤖 تنظیمات هوش (v1.0.9): پرامپت سیستم، کلید، مدل، روشن/خاموش، تست ──
-def panel_admin_ai(chat_id):
-    prompt = (get_setting("ai_system_prompt", "") or "").strip()
-    key = (get_setting("ai_api_key", "") or "").strip()
-    model = (get_setting("ai_model", "") or "").strip()
-    online = ai_enabled()
-    key_src = ("پنل ادمین (" + key[:8] + "…)") if key else ("ثابت فایل" if OPENROUTER_API_KEY else "ندارد")
-    try:
-        today_n = db.fetchone("SELECT COUNT(*) c FROM logs WHERE action IN ('ai_chat','ai_chat_q','ai_story') AND created_at LIKE ?",
-                              (today() + "%",))["c"]
-    except Exception:
-        today_n = 0
-    txt = (f"🤖 تنظیمات هوش مصنوعی\n━━━━━━━━━━━\n"
-           f"📝 پرامپت سیستم: {'✏️ سفارشی' if prompt else '🧩 پیش‌فرض'}\n"
-           f"«{(prompt or AI_DEFAULT_SYSTEM_PROMPT)[:350]}»\n━━━━━━━━━━━\n"
-           f"🔑 کلید OpenRouter: {key_src}{' ⛔ (۴۰۱ — نامعتبر)' if _openrouter_invalid else ''}\n"
-           f"🧠 مدل: {model or ai_model_name() or 'پیش‌فرض'}\n"
-           f"🌐 سرویس آنلاین: {'روشن ✅' if online else 'خاموش ⛔ (فقط پاسخ آفلاین)'}\n"
-           f"📊 امروز: {fn(today_n)} درخواست هوش")
-    rows = [
-        [("✏️ ویرایش پرامپت", "adm:ai_prompt"), ("♻️ پرامپت پیش‌فرض", "adm:ai_prompt_reset")],
-        [("🔑 تنظیم کلید API", "adm:ai_key"), ("🧠 تنظیم مدل", "adm:ai_model")],
-        [("🌐 " + ("خاموش‌کردن آنلاین" if online else "روشن‌کردن آنلاین"), "adm:ai_toggle"), ("🧪 تست هوش", "adm:ai_test")],
-    ]
-    api.send_message(chat_id, txt, inline_keyboard(rows))
+
 
 
 def admin_toggle_ban(chat_id, actor, target_id):
@@ -7845,6 +7980,15 @@ def admin_delete_user(chat_id, actor, target_id):
     db.execute("DELETE FROM npcs WHERE user_id=?", (target_id,))
     db.execute("DELETE FROM missions WHERE user_id=?", (target_id,))
     db.execute("DELETE FROM inventory WHERE user_id=?", (target_id,))
+    db.execute("DELETE FROM orders WHERE user_id=?", (target_id,))
+    db.execute("DELETE FROM battle_pass_missions WHERE user_id=?", (target_id,))
+    db.execute("DELETE FROM battle_pass WHERE user_id=?", (target_id,))
+    db.execute("DELETE FROM fc_listings WHERE seller_id=? OR buyer_id=?", (target_id, target_id))
+    db.execute("DELETE FROM fc_transfers WHERE buyer_id=? OR seller_id=?", (target_id, target_id))
+    db.execute("DELETE FROM fc_matches WHERE user_id=?", (target_id,))
+    db.execute("DELETE FROM fc_coin_ledger WHERE user_id=?", (target_id,))
+    db.execute("DELETE FROM fc_players WHERE owner_id=?", (target_id,))
+    db.execute("DELETE FROM fc_teams WHERE user_id=?", (target_id,))
     log_action(actor, "delete_user", str(target_id))
     api.send_message(chat_id, f"🗑 کاربر {fn(target_id)} به‌طور کامل حذف شد.", ADMIN_KB)
 
@@ -7919,7 +8063,6 @@ def panel_admin_events(chat_id):
 # ── فرم‌های متنی ادمین (state machine) ──
 
 def handle_admin_state(chat_id, uid, text, state, data):
-    global _openrouter_invalid
     if not is_admin(uid):
         set_state(uid)
         return True
@@ -7955,48 +8098,6 @@ def handle_admin_state(chat_id, uid, text, state, data):
         api.send_message(chat_id, "✅ کاربر پیدا شد.", ADMIN_KB)
         admin_seniority_menu(chat_id, target)
         return True
-
-    if state == "adm_ai_prompt":                                      # 🆕 v1.0.9: پرامپت هوش
-        t = text.strip()
-        if len(t) < 10:
-            api.send_message(chat_id, "⚠️ پرامپت خیلی کوتاهه (حداقل ۱۰ حرف). دوباره بنویس:")
-            return True
-        set_setting("ai_system_prompt", t[:1500])
-        set_state(uid)
-        log_action(uid, "ai_prompt_set", t[:60])
-        api.send_message(chat_id, f"✅ پرامپت هوش ذخیره شد ({fn(len(t[:1500]))} حرف). از همین الان همه‌ی پاسخ‌ها با این شخصیت می‌آن.", ADMIN_KB)
-        panel_admin_ai(chat_id)
-        return True
-
-    if state == "adm_ai_key":
-        t = text.strip()
-        if t in ("حذف", "پاک", "reset", "-"):
-            set_setting("ai_api_key", "")
-            _openrouter_invalid = False
-            set_state(uid)
-            api.send_message(chat_id, "♻️ کلید پنل حذف شد — کلید ثابت فایل استفاده می‌شه.", ADMIN_KB)
-            panel_admin_ai(chat_id); return True
-        if len(t) < 20 or " " in t:
-            api.send_message(chat_id, "⚠️ این شبیه کلید نیست. کلید OpenRouter رو کامل بفرست (لغو: /cancel):")
-            return True
-        set_setting("ai_api_key", t)
-        _openrouter_invalid = False
-        set_state(uid)
-        log_action(uid, "ai_key_set", t[:10])
-        api.send_message(chat_id, "✅ کلید ذخیره شد. با «🧪 تست هوش» چکش کن.", ADMIN_KB)
-        panel_admin_ai(chat_id); return True
-
-    if state == "adm_ai_model":
-        t = text.strip()
-        if t in ("حذف", "پاک", "reset", "-"):
-            t = ""
-        elif " " in t or len(t) > 80:
-            api.send_message(chat_id, "⚠️ نام مدل معتبر نیست (بدون فاصله، مثل openai/gpt-4o-mini):")
-            return True
-        set_setting("ai_model", t)
-        set_state(uid)
-        api.send_message(chat_id, "✅ مدل ذخیره شد." if t else "♻️ مدل به پیش‌فرض برگشت.", ADMIN_KB)
-        panel_admin_ai(chat_id); return True
 
     if state == "adm_game_channel":
         set_setting("game_channel", text.strip() if text.startswith("http") else _norm_chat(text))
@@ -8077,7 +8178,7 @@ def handle_admin_state(chat_id, uid, text, state, data):
         set_setting("channel", ch)
         log_action(uid, "admin_set_channel", ch)
         set_state(uid)
-        ok = channel_news("🛰 کانال اخبار «Life Simulator AI» متصل شد! از اینجا خبرهای جنگ، بازار و VIP رو دنبال کنید. 🎮")
+        ok = channel_news("🛰 کانال اخبار «Life Simulator» متصل شد! از اینجا خبرهای جنگ، بازار و VIP رو دنبال کنید. 🎮")
         api.send_message(chat_id,
                          ("✅ کانال تنظیم شد و پست تست هم رفت!" if ok else
                           "⚠️ ذخیره شد ولی ارسال تست ناموفق بود — مطمئن شو ربات ادمین کانال است و آیدی درست است (@username یا -100...)"),
@@ -8218,6 +8319,12 @@ def admin_callback(chat_id, uid, data, cb_id, message_id):
     def ans(t=None):
         api.answer_callback(cb_id, t)
 
+    if data == "adm:adpanel":
+        panel_admin_ad_slots(chat_id); ans(); return True
+    if data.startswith(("adm:adedit:", "adm:adclear:", "adm:adnolink:")):
+        return handle_admin_ad_callback(chat_id, uid, data, cb_id)
+    if data in ("adm:bpuser", "adm:bpprice") or data.startswith("adm:bpgrant:"):
+        return handle_battle_pass_admin_callback(chat_id, uid, data, cb_id)
     if data == "adm:usearch":
         set_state(uid, "adm_search")
         api.send_message(chat_id, "🔍 نام یا آیدی کاربر را بنویس:")
@@ -8257,46 +8364,6 @@ def admin_callback(chat_id, uid, data, cb_id, message_id):
         admin_badge_toggle(chat_id, uid, int(t), b); ans("🏅"); return True
     if data.startswith("adm:badge:"):
         admin_badge_menu(chat_id, int(data.split(":")[2])); ans(); return True
-    if data == "adm:ai_prompt":                                        # 🆕 v1.0.9: تنظیمات هوش
-        set_state(uid, "adm_ai_prompt")
-        api.send_message(chat_id, "✏️ پرامپت سیستم جدید هوش رو بنویس (شخصیت، لحن، قوانین پاسخ...). حداکثر ۱۵۰۰ حرف.\n"
-                                  "این متن به همه‌ی پاسخ‌های چت، سوال‌های سریع و داستان‌ساز اضافه می‌شه.\n(لغو: /cancel)",
-                         reply_keyboard([["لغو ❌"]]))
-        ans(); return True
-    if data == "adm:ai_prompt_reset":
-        set_setting("ai_system_prompt", "")
-        log_action(uid, "ai_prompt_reset")
-        api.send_message(chat_id, "♻️ پرامپت هوش به پیش‌فرض برگشت.", ADMIN_KB); panel_admin_ai(chat_id); ans("♻️"); return True
-    if data == "adm:ai_key":
-        set_state(uid, "adm_ai_key")
-        api.send_message(chat_id, "🔑 کلید OpenRouter جدید رو بفرست (با sk-or- شروع می‌شه).\nبرای برگشت به کلید ثابت فایل بنویس: حذف\n(لغو: /cancel)",
-                         reply_keyboard([["لغو ❌"]]))
-        ans(); return True
-    if data == "adm:ai_model":
-        set_state(uid, "adm_ai_model")
-        api.send_message(chat_id, "🧠 نام مدل OpenRouter رو بفرست (مثل meta-llama/llama-3.2-3b-instruct:free یا openai/gpt-4o-mini).\n"
-                                  "برای پیش‌فرض بنویس: حذف\n(لغو: /cancel)", reply_keyboard([["لغو ❌"]]))
-        ans(); return True
-    if data == "adm:ai_toggle":
-        new_v = "0" if ai_enabled() else "1"
-        set_setting("ai_online", new_v)
-        log_action(uid, "ai_toggle", new_v)
-        panel_admin_ai(chat_id); ans("✅"); return True
-    if data == "adm:ai_test":
-        ans("🧪")
-        api.send_message(chat_id, "🧪 دارم هوش رو تست می‌کنم (حداکثر ۳۰ ثانیه)...")
-        def _test():
-            t0 = time.time()
-            res = _ai_call("سلام! خودت رو در یک جمله معرفی کن.", offline_fallback=False)
-            dt = fn(int(time.time() - t0))
-            if res:
-                api.send_message(chat_id, f"✅ هوش آنلاین جواب داد ({dt} ثانیه):\n{res[:600]}", ADMIN_KB)
-            else:
-                why = "کلید نامعتبر (۴۰۱)" if _openrouter_invalid else ("سرویس آنلاین خاموش است" if not ai_enabled() else "به OpenRouter/Pollinations دسترسی نیست (اینترنت هاست/فیلتر/اعتبار)")
-                api.send_message(chat_id, f"❌ هیچ سرویس آنلاینی جواب نداد ({dt} ثانیه) — علت احتمالی: {why}\n"
-                                          f"کاربرها در این حالت پاسخ آفلاین (راهنمای آماده) می‌گیرند.", ADMIN_KB)
-        _ai_background(_test, chat_id)
-        return True
     if data.startswith("adm:money:"):
         target = int(data.split(":")[2])
         set_state(uid, "adm_money", {"target": target})
@@ -10700,23 +10767,8 @@ PET_BREED_DAYS    = 3
 PET_BREED_REWARD  = 1500
 
 # ══════════════════════════════════════════════════════════════════
-# 🆕 v1.0.9 — «هوش + هیجان»: OpenRouter AI + 20 فیچر جذاب
+# 🆕 v1.0.9 — 20 قابلیت سرگرمی و اقتصاد
 # ══════════════════════════════════════════════════════════════════
-
-# 🤖 OpenRouter AI — آزمایشی: هاردکد — متغیر ggnn
-ggnn = "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"
-OPENROUTER_API_KEY = ggnn  # alias برای سازگاری
-OPENROUTER_MODEL       = "openrouter/free"
-OPENROUTER_FALLBACK    = "openai/gpt-4o-mini"
-OPENROUTER_BASE_URL    = "https://openrouter.ai/api/v1/chat/completions"
-OPENROUTER_TIMEOUT     = 25
-OPENROUTER_MAX_TOKENS  = 1100
-OPENROUTER_TEMPERATURE = 0.82
-AI_CHAT_COOLDOWN       = 15      # ثانیه بین هر سوال — بهتر شد
-AI_CHAT_DAILY_LIMIT    = 20      # سقف روزانه بیشتر
-AI_CHAT_COST           = 0       # 🆕 آزمایشی رایگان!
-AI_STORY_COST          = 0       # 🆕 آزمایشی رایگان!
-AI_STORY_DAILY_LIMIT   = 8
 
 # 🎯 20 فیچر جذاب v1.0.9 — ثابت‌ها
 # 1️⃣ گردونه شانس روزانه
@@ -10793,7 +10845,7 @@ SECRET_QUEST_REWARD = (1800, 20)  # (پول, XP)
 DAILY_QUIZ_REWARD = 350
 DAILY_QUIZ_QUESTIONS = [
     ("🧠 پایتخت ایران کجاست؟", ["اصفهان", "تهران", "شیراز", "تبریز"], 1),
-    ("📚 کدام زبان برای هوش مصنوعی محبوب‌تره؟", ["HTML", "Python", "Word", "Excel"], 1),
+    ("📚 کدام زبان برای پردازش داده پرکاربردتره؟", ["HTML", "Python", "Word", "Excel"], 1),
     ("⚡ واحد انرژی چیست؟", ["ژول", "کیلو", "متر", "لیتر"], 0),
     ("🎯 کدام عدد اول است؟", ["9", "7", "15", "21"], 1),
     ("🌍 بزرگترین اقیانوس؟", ["اطلس", "هند", "آرام", "منجمد شمالی"], 2),
@@ -10833,7 +10885,6 @@ LUCKY_COIN_SHOP = [("🍀 بسته شانس کوچک", 5, 700), ("💎 بسته 
 LUCKY_COIN_SOURCES = ("🔥 جایزه روزانه (هر روز +۱، هر ۷ روز +۳)\n"
                       "🎡 گردونه روزانه (+۱ هر چرخش، جکپات +۵)\n"
                       "🧠 کوییز ۱.۰.۹ (جواب درست +۱)\n"
-                      "🤖 چت با هوش (۱۵٪ شانس هر سوال)\n"
                       "⚔️ برد تو آرنا (+۱)\n"
                       "🖤 بازار سیاه (بسته‌ی ۳تایی)")
 COLLECTION_SOURCES = ("🎡 گردونه روزانه (هر چرخش یک کارت تصادفی)\n"
@@ -10848,7 +10899,7 @@ REMINDER_MAX = 5
 
 # 17️⃣ مدال‌ها
 BADGE_LIST = [
-    ("ai_friend", "🤖 دوست هوش", "با هوش مصنوعی 10 بار حرف بزن"),
+    ("fc_champion", "⚽ قهرمان لیگ", "۱۰ برد در لیگ ستاره‌ها"),
     ("wheel_king", "🎡 سلطان گردونه", "20 بار گردونه (یا جکپات)"),
     ("collector", "🗂 کلکسیونر", "کلکسیون را تکمیل کن"),
     ("quiz_master", "🧠 نابغه کوییز", "10 کوییز درست"),
@@ -10876,7 +10927,7 @@ def golden_friday():
 # ───── 🎫 کد دعوت/بازیابی در ثبت‌نام و تنظیمات ─────
 
 # ══════════════════════════════════════════════════════
-# 🆕 v1.0.9 — ماژول اجرایی: OpenRouter AI + 20 فیچر
+# 🆕 v1.0.9 — ماژول اجرایی: 20 قابلیت سرگرمی
 # ══════════════════════════════════════════════════════
 
 _v109_migrated = False
@@ -10895,516 +10946,6 @@ def ensure_v109():
     except Exception as e:
         try: print("v109 migrate warn:", e)
         except: pass
-
-# ── 🤖 OpenRouter helper (با فال‌بک Pollinations رایگان) ──
-_openrouter_invalid = False
-# 📚 دانشِ کاملِ بازی — همیشه به پرامپتِ سیستمِ هوش اضافه می‌شود (v1.1.0)
-GAME_KNOWLEDGE = (
-    "دانشِ بازی «Life Simulator AI» (نسخه ۱.۱.۰، پیام‌رسان بله، تیم XR):\n"
-    "- واحدِ پول 💰 تومان است و ارزِ دوم 💎 سکه طلا است (با پول واقعی از پنل «💎 VIP» خریداری می‌شود).\n"
-    "- منوی اصلی ۲۴ دکمه دارد: 🎮 بازی، 👤 پروفایل، 💼 شغل، 🏠 خانه، 🏪 بازار، ⚔️ جنگ، 🏰 امپراتوری، 🕶 هک، "
-    "👨‍👩‍👧 خانواده، 🤝 اتحاد، 🐾 پت، 🏦 بانک، 🎡 سرگرمی، 🏙 شهر، 💰 اقتصاد، 📚 مهارت‌ها، 👥 روابط، 🎯 ماموریت‌ها، "
-    "🏆 رتبه‌بندی، 🔥 ویژه‌های ۱.۱.۰، 🤖 دستیار هوش، 📣 کانال و گروه، ⚙ تنظیمات، 💎 VIP.\n"
-    "- کار: ۴۷ شغل در ۴ رده (ساده/حرفه‌ای/نخبه/لوکس). حقوق پایه از ۳۰۰ تا ۴۵٬۰۰۰ در هر شیفت. "
-    "استخدام = مهارت + لول + مدرک تحصیلی (برای مشاغل نخبه). هر شیفت −۲۰⚡ و کول‌داون ۴۵ ثانیه. "
-    "مشاغل حرفه‌ای مصاحبه‌ی ۲ سؤالی دارند. شادی زیر ۲۰ خطرِ اخراج دارد. پنجمین شیفتِ روز = پاداش ۳×\n"
-    "- اقتصاد سخت است: حقوق ×۰.۳۵، مأموریت‌ها ×۰.۵، کسب‌وکار ×۰.۵، استریک ×۰.۵، کاوش ×۰.۵، برج ×۰.۵.\n"
-    "- ضریبِ حقوق: نرخ سرور × رویداد جهانی × اتحاد × شهر تهران × مدرک × بازتولد × طالع × درجه افتخار × محله "
-    "× تسلط منطقه × ساعت گاد (×۲) × هوای آفتابی. جمعه = جمعه‌ی طلایی (جوایز روزانه ×۲).\n"
-    "- بورس: ۲۶ نماد (طلا، دلار، بیت‌کوین، نفت، تتر، زعفران، مس، الماس…)، نوسان هر ۲۰ دقیقه، کارمزد ۲٪، "
-    "کف/سقف ضدتقلب. مسیر سریع: «💰 اقتصاد → 📈 سیگنال بورس».\n"
-    "- بانک: سپرده، وام ۱۵٪ (۳ روزه)، سپرده بلندمدت ۸٪، پس‌انداز خودکار ۱۰٪ حقوق.\n"
-    "- مسکن: ۶ سطح از کارتن‌خواب تا عمارت سلطنتی + قبوض روزانه + اجاره هر ۶ ساعت. محله‌ها: مرکز شهر(حقوق+۸٪)، "
-    "مسکونی(استراحت)، صنعتی(کسب‌وکار)، دانشگاهی(XP+۱۰٪)، مالی، ساحلی.\n"
-    "- جنگ/هک: ۴ ابزار حمله + ۴ دفاع، کول‌داون هک ۶۰۰ ثانیه، اختلاف لول مجاز ۱۰. غارت ارتشی ۹۰۰ ثانیه. "
-    "دوئل با ELO و شرط‌بندی. باس روزانه، آرنا هفتگی، برج قهرمانان.\n"
-    "- اتحاد (Guild): ساخت ۵٬۰۰۰💰، اهدا، جنگ، خزانه، مأموریت هفتگی، تسلط بر ۶ منطقه.\n"
-    "- خانواده: خواستگاری، ازدواج، تا ۴ فرزند، سفر خانوادگی. پت: ۵ گونه + آموزش/استعداد/مسابقه.\n"
-    "- شهر: انتخابات هفتگی شهردار (تعیین مالیات ۰/۵/۱۰٪)، زندان و وثیقه ۸۰۰💰، بیمه، اهدای خون، صدقه، "
-    "سفر بین ۵ شهر، رادیو، روزنامه، آب‌وهوا، شکار گنج.\n"
-    "- انگیزشی: استریک روزانه (۵۰۰→۳۰٬۰۰۰ در روز ۳۰)، فصل ۳۰ روزه، ماراتن XP روزانه (۳۰۰⭐ = +۳💎)، "
-    "۲۶ دستاورد، مأموریت‌های روزانه و هفتگی، ۵ لیگ، ۳ بازتولد، دعوت با کمیسیون ۵٪.\n"
-    "- 🔥 ویژه‌های ۱.۱.۰ (۳۰ فیچر): ماراتن ثروت، ماشین اسلات، اتاق فرار، دارت، نابغه، پیشگویی، درخت آرزوها، "
-    "آزمایشگاه ژنتیک، نبرد برق‌آسا، پرورش اژدها، نقشه‌ی گنج، پروژه آزاد، نامه عاشقانه، بیمه حادثه، "
-    "جعبه روزانه، سفر در زمان، بازار پیش‌بینی، کارگاه سازندگی شهر، صندوق امانات، سیرک هفتگی، طلسم‌ها، "
-    "آکواریوم، تئاتر شهر، زنجیره پیروزی، تالار مشاهیر، بمب ساعتی، بازار شبانه، تاس سرنوشت، "
-    "قطب‌نمای شانس (پاداش بعدی ×۲)، تاج هفته.\n"
-    "- 🍀 سکه شانس از: جایزه روزانه، گردونه، کوییز، چت با هوش، برد آرنا، بازار سیاه.\n"
-    "- 🗺️ نقشه‌ی گنج: ۵ تکه از فعالیت‌های ۱.۱.۰ جمع می‌شود → صندوقِ بزرگ.\n"
-    "- 🚫 در بازی هیچ قمار/شرط‌بندی واقعی نیست؛ شهربازی و قرعه‌کشی کاملاً رایگان و فرهنگی‌اند و جوایز از "
-    "خزانه‌ی شهر پرداخت می‌شود."
-)
-
-AI_DEFAULT_SYSTEM_PROMPT = (
-    "تو «هوش بله» هستی — دستیارِ اختصاصی و حرفه‌ایِ بازی «Life Simulator AI» (نسخه ۱.۱.۰) روی پیام‌رسان بله، "
-    "ساخته‌ی تیم XR.\n\n"
-    "🔒 قوانینِ سخت:\n"
-    "۱) فقط و فقط درباره‌ی همین بازی جواب بده: سیستم‌ها، پول درآوردن، لول‌آپ، شغل، بورس، هک و جنگ، "
-    "خانواده و اتحاد، پت، خانه و شهر، ویژه‌های ۱.۱.۰، و استراتژیِ پیشرفت.\n"
-    "۲) اگر سؤال ربطی به بازی نداشت، مؤدبانه بگو «من فقط راهنمای Life Simulator هستم 🙂» و بلافاصله یک نکته‌ی "
-    "کاربردیِ مرتبط از خودِ بازی بده.\n"
-    "۳) از وضعیتِ واقعیِ بازیکن (که زیرِ سؤال می‌آید) استفاده کن و دقیقاً برای «همان نقطه‌ای که هست» راهنمایی‌اش کن.\n"
-    "۴) مسیر را دقیق و دکمه‌به‌دکمه بگو؛ مثلاً: «💼 شغل → 🛠 کار کردن» یا «🔥 ویژه‌ها → 🎰 ماشین اسلات».\n"
-    "۵) فارسیِ روان، کوتاه (۳ تا ۶ خط)، بامزه و کاملاً عملیاتی بنویس؛ عدد و مقدار بده (مبالغ به تومان).\n"
-    "۶) آخرِ هر پاسخ یک «نکته‌ی طلایی» کوتاه بنویس.\n"
-    "۷) هرگز درباره‌ی قمار، شرط‌بندی یا موضوعِ خارج از بازی توصیه نده."
-)
-AI_TOTAL_BUDGET = 30          # ⏱ حداکثر ثانیه‌ای که کل تلاش‌های آنلاین اجازه دارند طول بکشند
-AI_MODEL_TIMEOUT = 12         # ⏱ تایم‌اوت هر مدل (قبلاً ۲۵ ثانیه × ۶ مدل = ربات ۲ دقیقه قفل می‌شد!)
-
-
-def ai_system_prompt(extra=None):
-    """پرامپت سیستم هوش: ادمین از پنل عوض می‌کند (کلید ai_system_prompt)؛ در غیر این صورت پیش‌فرض"""
-    try:
-        base = (get_setting("ai_system_prompt", "") or "").strip()
-    except Exception:
-        base = ""
-    if not base:
-        base = AI_DEFAULT_SYSTEM_PROMPT
-    # 🆕 v1.1.0: دانشِ کاملِ بازی همیشه ضمیمه می‌شود (حتی اگر ادمین پرامپتِ خودش را نوشته باشد)
-    try:
-        full = base + "\n\n" + GAME_KNOWLEDGE
-    except Exception:
-        full = base
-    if extra:
-        return full + "\n\n" + extra
-    return full
-
-
-def ai_api_key():
-    """کلید OpenRouter: اگر ادمین از پنل کلید گذاشته باشد اولویت با آن است، وگرنه مقدار ثابت فایل"""
-    try:
-        k = (get_setting("ai_api_key", "") or "").strip()
-    except Exception:
-        k = ""
-    return k or OPENROUTER_API_KEY
-
-
-def ai_model_name():
-    try:
-        m = (get_setting("ai_model", "") or "").strip()
-    except Exception:
-        m = ""
-    return m or (OPENROUTER_MODEL or "").strip()
-
-
-def ai_enabled() -> bool:
-    try:
-        return (get_setting("ai_online", "1") or "1") != "0"
-    except Exception:
-        return True
-
-
-def _ai_offline_answer(prompt):
-    """🆕 v1.1.0 — فال‌بک آفلاینِ «کاملاً بازی‌محور» بر اساس کلیدواژه‌های سؤال
-    (وقتی هیچ سرویس آنلاینی در دسترس نباشد). تمام پاسخ‌ها فقط درباره‌ی همین بازی هستند."""
-    low = (prompt or "").lower()
-
-    if any(w in low for w in ["ویژه", "1.1.0", "۱.۱.۰", "جدید", "جدیده", "فیچر", "امکانات تازه"]):
-        return ("🔥 جدیدترین بخشِ بازی «🔥 ویژه‌های ۱.۱.۰» است: ۳۰ قابلیتِ تازه!\n"
-                "شروعِ پیشنهادی: 🧭 قطب‌نمای شانس → بعد 🎁 جعبه روزانه → بعد 🎰 ماشین اسلات.\n"
-                "برای درآمدِ غیرفعال: 🐉 پرورش اژدها و 🔐 صندوق امانات (۱۵٪ سود ۲۴ساعته).\n"
-                "نکته طلایی: قطب‌نما رو قبل از بزرگ‌ترین جایزه مصرف کن! 🧭")
-    if any(w in low for w in ["اژدها", "دراگون", "dragon"]):
-        return ("🐉 اژدها از «🔥 ویژه‌ها → 🐉 پرورش اژدها» شروع می‌شه: اول تخم رو با ۳٬۰۰۰💰 بخر، "
-                "بعد با ۸۰۰💰 غذا بده تا سطحش بره بالا. هر ۶ ساعت درآمدش (۴۰۰ × سطح) رو برداشت کن.\n"
-                "نکته طلایی: اژدها در سطح‌های بالا بهترین درآمدِ غیرفعالِ بازیه! 🔥")
-    if any(w in low for w in ["نقشه", "گنج", "تکه"]):
-        return ("🗺️ نقشه‌ی گنج با ۵ تکه کامل می‌شه. تکه‌ها هنگام انجام فعالیت‌های ۱.۱.۰ پیدا می‌شن: "
-                "اسلات، دارت، نابغه، نبرد، اژدها، آرزو، صندوق امانات، بمب…\n"
-                "جایزه: ۶٬۰۰۰ تا ۱۵٬۰۰۰💰 + ۴۰۰⭐ + ۳ تا ۸💎\n"
-                "نکته طلایی: بیشتر فعالیت کن = زودتر کامل می‌شه! 🗺️")
-    if any(w in low for w in ["سکه شانس", "شانس", "طلسم", "lucky"]):
-        return ("🍀 سکه شانس از اینجاها میاد: جایزه روزانه، گردونه، کوییز، چت با هوش، برد آرنا، بازار سیاه.\n"
-                "خرجش: «🧿 طلسم‌ها» (شانس ×۱.۵ / XP ×۱.۵ / انرژی)، «🍀 فروشگاه سکه»، یا زیاد کردن شانسِ "
-                "«🌟 درخت آرزوها» (هر سکه +۸٪).\n"
-                "نکته طلایی: طلسمِ شانس + قطب‌نما = پاداش ×۳! 🤯")
-    if any(w in low for w in ["بیمه", "خسارت", "دزدی", "حمله خوردم"]):
-        return ("🛡️ «🔥 ویژه‌ها → 🛡️ بیمه‌ی حادثه»: با ۳۰۰💰 پوششِ امروز رو بخر؛ اگر امروز هک یا حمله خوردی، "
-                "۷۰٪ خسارت رو پس می‌گیری.\n"
-                "همچنین 🛡 استخدام گارد روزانه (۶۰۰💰) یک حمله رو کلاً دفع می‌کنه.\n"
-                "نکته طلایی: هر روز صبح هم بیمه بگیر هم گارد — ارزشش خیلی بیشتر از هزینه‌شه! 🛡️")
-    if any(w in low for w in ["صندوق", "امانات", "سود", "سرمایه گذاری", "پس انداز"]):
-        return ("🔐 «🔥 ویژه‌ها → 🔐 صندوق امانات» پولت رو ۲۴ ساعت قفل می‌کنه و ۱۵٪ سودِ تضمینی می‌ده "
-                "(۵k / ۲۰k / ۵۰k).\n"
-                "در کنارش: 🏦 بانک → سپرده بلندمدت (۸٪ بعد از ۳ روز) و 📈 VC خطرپذیر (روزی ۲ بار، ریسکی).\n"
-                "نکته طلایی: صندوق امانات امن‌ترین سودِ بازیه 💰")
-    if any(w in low for w in ["بمب", "منفجر", "ساعتی"]):
-        return ("🧨 بمب ساعتی یک بازیِ جمعیِ بامزه‌ست: بمب دستِ یکی از بازیکن‌هاست و ۱۵ دقیقه تا انفجار وقت داره. "
-                "اگر دستِ تو بود سریع «💨 پاس بده» (+۲۰۰💰)؛ اگر منفجر شد ۶۰۰💰 جریمه می‌شی!\n"
-                "نکته طلایی: اعلانِ بمب رو جدی بگیر 😄")
-    if any(w in low for w in ["تاج", "هفته", "رتبه", "لیگ", "رتبه بندی"]):
-        return ("👑 «تاجِ هفته» به ۳ نفرِ برترِ XP این هفته جایزه می‌ده (۲۰k/۱۲k/۷k 💰 + سکه). "
-                "XP این هفته با «👤 پروفایل» دیده می‌شه و هر دوشنبه صفر می‌شه.\n"
-                "برای صعود: 🎮 رویداد + 🎯 مأموریت + 🧠 کوییز + 📻 رادیو + 🗞 روزنامه، و جمعه‌ها ×۲!\n"
-                "نکته طلایی: XPِ هفتگی رو آخرِ هفته چک کن 👑")
-    if any(w in low for w in ["پول", "money", "درآمد", "ثروت", "پولدار", "میلیونر"]):
-        return ("💰 مسیرِ پولدار شدن در ۱.۱.۰:\n"
-                "۱) 🔥 ویژه‌ها: 🧭 قطب‌نما → 🎁 جعبه روزانه → 🎰 اسلات → 🐉 اژدها (درآمد غیرفعال)\n"
-                "۲) 💼 شغل با بالاترین حقوقی که شرایطش رو داری + اضافه‌کاری روزانه\n"
-                "۳) 🏢 شرکت بزن و کارمند استخدام کن (درآمدِ واقعی از اینجاست)\n"
-                "۴) 📈 بورس: کف بخر، ۱۵-۲۵٪ رشد کرد بفروش\n"
-                "۵) 🔐 صندوق امانات برای سودِ بدون ریسک\n"
-                "نکته طلایی: اقتصاد عمداً سخته — صبور باش و روی درآمدِ غیرفعال سرمایه‌گذاری کن 🚀")
-    if any(w in low for w in ["عشق", "ازدواج", "خانواده", "بچه", "رابطه"]):
-        return ("💕 عشق: اول اعتبارت رو بالا ببر (کار + صدقه + 🩸 اهدای خون)، بعد «👨‍👩‍👧 خانواده → پیشنهاد ازدواج»، "
-                "بعد 🏠 خانه بخر و بچه‌دار شو. «💌 نامه‌ی عاشقانه» (ویژه‌های ۱.۱.۰) رابطه با NPCها رو سریع می‌بره بالا.\n"
-                "نکته طلایی: خونه‌ی بهتر = شادیِ خانواده‌ی بیشتر 🏡")
-    if any(w in low for w in ["هک", "hack", "هکر"]):
-        return ("🕶 هک: «🕶 هک → 🛒 فروشگاه هک» اول کیلاگر (۸۰۰💰) بخر. هر هک ۱۵⚡ و کول‌داون ۶۰۰ ثانیه. "
-                "اختلاف لول با هدف باید زیر ۱۰ باشه. آنتی‌ویروس/فایروال برای دفاع بخر.\n"
-                "اگر وقت نداری: «🔥 ویژه‌ها → 🕰️ سفر در زمان» همه‌ی کول‌داون‌ها رو پاک می‌کنه!\n"
-                "نکته طلایی: بعد از هر هک، گاردِ روزانه استخدام کن 🛡️")
-    if any(w in low for w in ["لول", "xp", "سطح", "level", "ارتقا"]):
-        return ("⭐ لول‌آپ سریع در ۱.۱.۰: 🎯 مأموریت روزانه + 🎲 رویداد زندگی + 🧠 نابغه/کوییز + 📻 رادیو + "
-                "🗞 روزنامه + 💌 نامه + 🧱 مشارکت در کارگاه شهر.\n"
-                "جمعه‌ها همه‌چیز ×۲ و «⚡ ساعت گاد» حقوق رو ×۲ می‌کنه.\n"
-                "نکته طلایی: 🧿 طلسمِ تجربه + 🧬 ژنِ نبوغ = XPِ خیلی بیشتر! ⭐")
-    if any(w in low for w in ["بورس", "سهام", "سهم", "بازار", "دلار", "طلا", "بیت"]):
-        return ("📊 بورس: «💰 اقتصاد → 📈 سیگنال بورس» رو ببین؛ هر دارایی با روند نزولی رو کف بخر و با ۱۵-۲۵٪ سود بفروش. "
-                "سبدت رو پخش کن (طلا + دلار + یک سهم پرریسک). کارمزد ۲٪.\n"
-                "جدید: «🔥 ویژه‌ها → 📈 بازار پیش‌بینی» — جهتِ یک نماد رو حدس بزن و جایزه بگیر.\n"
-                "نکته طلایی: هیچ‌وقت همه‌ی پولت رو یک‌جا نذار 📈")
-    if any(w in low for w in ["خونه", "خانه", "ملک", "آپارتمان", "ویلا", "محله"]):
-        return ("🏠 خانه: «🏠 خانه → 🏪 خرید» از اتاق اجاره‌ای شروع کن (ارزون و اجاره می‌ده) و برس به عمارت سلطنتی. "
-                "املاک هر ۶ ساعت اجاره می‌دن (🏠 خانه → 💰 دریافت اجاره).\n"
-                "محله‌ها: 🎓 دانشگاهی (XP+۱۰٪) | 🏙 مرکز (حقوق+۸٪) | 🏭 صنعتی (کسب‌وکار+۱۰٪) | 💹 مالی.\n"
-                "نکته طلایی: 🏠 دکور (ویژه‌ها) شادی و بونس می‌ده!")
-    if any(w in low for w in ["شغل", "کار", "حقوق", "استخدام", "مصاحبه", "مدرک"]):
-        return ("💼 شغل: «💼 شغل» ۴۷ شغل در ۴ رده داره. شرطِ استخدام = مهارت + لول + مدرک (برای نخبه‌ها). "
-                "مشاغل حرفه‌ای مصاحبه‌ی ۲ سؤالی دارن (جواب‌ها منطقی‌اند!).\n"
-                "مدرک از «🏙 شهر → 🎓 تحصیل» (دیپلم/لیسانس/فوق‌لیسانس) میاد.\n"
-                "بدون شغل هم «🏗 کارگری روزمزد» و «🚕 تاکسی» هست.\n"
-                "نکته طلایی: شادی زیر ۲۰ = خطرِ اخراج! 😊")
-    if any(w in low for w in ["اتحاد", "کلن", "گروه", "guild"]):
-        return ("🤝 اتحاد: با ۵٬۰۰۰💰 بساز یا به یکی بپیوند. اهدا کن، جنگ راه بنداز، مأموریت هفتگی بگیر و "
-                "روی منطقه‌ها تسلط پیدا کن (هر منطقه بافِ دائمی می‌ده).\n"
-                "سطحِ اتحاد روی حقوقِ همه‌ی اعضا اثر داره (تا +۱۰٪).\n"
-                "نکته طلایی: اتحادِ فعال = رشدِ چندبرابری 🤝")
-    if any(w in low for w in ["پت", "حیوان", "سگ", "گربه"]):
-        return ("🐾 پت: «🐾 پت» ۵ گونه داره (تا 🐲 اژدها با سکه). غذا بده، بازی کن، آموزش بده (هر ۴ تمرین = +۱ لول) "
-                "و توی مسابقه شرکت بده. «🔥 ویژه‌ها → 🐉 پرورش اژدها» نسخه‌ی پیشرفته‌ست.\n"
-                "نکته طلایی: پتِ سطح‌بالا تو جنگ و دوئل کمکت می‌کنه 🐾")
-    if any(w in low for w in ["زندان", "جرم", "جنایت", "وثیقه", "پلیس"]):
-        return ("⛓ زندان: اگر «🏙 شهر → 🚨 جنایت» شکست خوردی ۲ ساعت می‌افتی تو زندان. "
-                "راه‌های خروج: وثیقه ۸۰۰💰 یا «🔥 ویژه‌ها → 🕰️ سفر در زمان».\n"
-                "شغلِ 👮 افسر پلیس برعکس: گشت بزن و مجرم‌ها رو بگیر و جایزه بگیر!\n"
-                "نکته طلایی: قبل از جنایت، بیمه‌ی حادثه بگیر 🛡️")
-    if any(w in low for w in ["جمعه", "گاد", "ساعت", "باف", "ضریب"]):
-        return ("🌟 تقویت‌کننده‌ها: جمعه = جمعه‌ی طلایی (جوایز روزانه ×۲) · «⚡ ساعت گاد» توسط ادمین (حقوق ×۲) · "
-                "🧿 طلسم‌ها · 🧬 ژن · 🧭 قطب‌نما (×۲) · 💪 باشگاه (+۱۵٪ قدرت جنگ) · 😎 محله و مدرک.\n"
-                "نکته طلایی: این‌ها رو با هم جمع کن تا ضریب چندبرابر بشه! ⚡")
-    if any(w in low for w in ["سلام", "چطوری", "خوبی", "hello", "hi", "درود"]):
-        return ("سلام رفیق! 😎 من «هوش بله»ام — راهنمای اختصاصیِ بازی Life Simulator (نسخه ۱.۱.۰).\n"
-                "هرچی درباره‌ی بازی بخوای می‌دونم: 💰 پول، ⭐ لول‌آپ، 💼 شغل، 📈 بورس، 🕶 هک، 💕 ازدواج، "
-                "🔥 ویژه‌های ۱.۱.۰…\n"
-                "نکته طلایی: همین الان «🔥 ویژه‌های ۱.۱.۰» رو باز کن و 🧭 قطب‌نما رو بچرخون!")
-    return ("🤖 من فقط راهنمای بازی Life Simulator هستم 🙂\n"
-            "نکته‌ی کاربردیِ امروز: «🔥 ویژه‌های ۱.۱.۰» رو باز کن — 🧭 قطب‌نما، 🎁 جعبه روزانه، "
-            "🎰 اسلات و 🐉 اژدها سریع‌ترین راهِ رشدن.\n"
-            "سؤالت رو دقیق‌تر بپرس تا دقیق‌تر راهنماییت کنم! 😉")
-
-
-def _ai_call(prompt, system=None, offline_fallback=True):
-    """پاسخ هوش: OpenRouter (کلید/مدل/پرامپت ادمین) → Pollinations رایگان → فال‌بک آفلاین. هیچ‌وقت None برنمی‌گرداند
-    (مگر offline_fallback=False برای «تست اتصال» ادمین). کل زمان آنلاین به AI_TOTAL_BUDGET محدود است."""
-    global _openrouter_invalid
-    ensure_v109()
-    system = system or ai_system_prompt()
-    deadline = time.time() + AI_TOTAL_BUDGET
-    key = ai_api_key()
-    model = ai_model_name()
-    if model in ("openrouter/free", "openrouter/auto", "free", ""):
-        model = "meta-llama/llama-3.2-3b-instruct:free"
-    try_models = [model]
-    if OPENROUTER_FALLBACK and OPENROUTER_FALLBACK not in try_models:
-        try_models.append(OPENROUTER_FALLBACK)
-    for m in ["google/gemma-2-9b-it:free", "qwen/qwen-2-7b-instruct:free", "meta-llama/llama-3.1-8b-instruct:free", "openai/gpt-4o-mini"]:
-        if m not in try_models:
-            try_models.append(m)
-    # 1) تلاش OpenRouter — فقط اگر قبلا 401 نگرفتیم و ادمین آنلاین را خاموش نکرده
-    if key and not _openrouter_invalid and ai_enabled():
-        for mdl in try_models:
-            if time.time() > deadline:
-                break
-            try:
-                headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json", "HTTP-Referer": "https://bale.ai", "X-Title": "Life Simulator AI"}
-                body = {"model": mdl, "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}], "max_tokens": OPENROUTER_MAX_TOKENS, "temperature": OPENROUTER_TEMPERATURE}
-                r = requests.post(OPENROUTER_BASE_URL, headers=headers, json=body,
-                                  timeout=min(AI_MODEL_TIMEOUT, max(3, int(deadline - time.time()))))
-                if r.status_code == 200:
-                    j = r.json()
-                    txt = (j.get("choices") or [{}])[0].get("message", {}).get("content", "")
-                    if txt and txt.strip():
-                        return txt.strip()[:1100]
-                if r.status_code == 401:
-                    _openrouter_invalid = True
-                    try: print(f"AI token invalid 401 for {mdl}: {r.text[:200]}")
-                    except: pass
-                    break  # توکن مشکل داره، بیخیال OpenRouter برو Pollinations
-                if r.status_code in (402, 403):   # اعتبار تمام‌شده / IP مسدود — مدل‌های دیگر هم جواب نمی‌دهند
-                    try: print(f"AI {r.status_code}: {r.text[:200]}")
-                    except: pass
-                    break
-                try: print(f"AI {mdl} fail {r.status_code}: {r.text[:200]}")
-                except: pass
-            except Exception as e:
-                try: print(f"AI {mdl} err", e)
-                except: pass
-                continue
-    # 2) فال‌بک رایگان Pollinations — بدون توکن
-    if ai_enabled() and time.time() < deadline:
-        try:
-            import urllib.parse
-            q = f"{system}\n\nسوال کاربر: {prompt}\nجواب کوتاه فارسی بده:"
-            url = "https://text.pollinations.ai/" + urllib.parse.quote(q[:1800])
-            r = requests.get(url, timeout=min(12, max(3, int(deadline - time.time()))), headers={"User-Agent": "LifeSim/1.0"})
-            if r.status_code == 200 and r.text and len(r.text.strip()) > 10:
-                txt = r.text.strip()
-                if len(txt) > 1200: txt = txt[:1200]
-                return txt
-        except Exception as e:
-            try: print("Pollinations err", e)
-            except: pass
-    if not offline_fallback:
-        return None
-    # 3) فال‌بک آفلاین هوشمند
-    return _ai_offline_answer(prompt)
-
-
-def _ai_background(fn, chat_id=None):
-    """🧵 پاسخ هوش در ترد جداگانه — حلقه‌ی اصلی ربات برای بقیه‌ی کاربرها قفل نمی‌شود (قبلاً تا ۲ دقیقه فریز می‌شد)"""
-    def _run():
-        try:
-            fn()
-        except Exception as e:
-            log.exception(f"AI background: {e}")
-            if chat_id:
-                try: api.send_message(chat_id, "🤖 یه خطای موقت تو هوش پیش اومد — چند لحظه بعد دوباره بپرس!")
-                except Exception: pass
-    t = threading.Thread(target=_run, daemon=True)
-    t.start()
-    return t
-
-def _ai_user_context(p):
-    """🆕 v1.1.0 — خلاصه‌ی کامل و واقعیِ وضعیت بازیکن برای پرامپتِ هوش
-    (اسم، لول، دارایی، ویژگی‌ها، شغل، مهارت‌ها، خانه/محله، استریک، اتحاد، خانواده، پت،
-     وضعیتِ ویژه‌های ۱.۱.۰) تا هوش دقیقاً برای «همین نقطه» راهنمایی کند."""
-    uid = p.get("user_id")
-    lines = []
-    try:
-        lvl = int(p.get("level") or 1)
-        lines.append(f"▫️ نام: {p.get('name') or 'رفیق'} | لول {lvl} (XP {int(p.get('xp') or 0)}؛ لول بعدی با {lvl * 100} XP)")
-        lines.append(f"▫️ دارایی: نقد {fmt_money(p.get('money') or 0)}💰 | بانک {fmt_money(p.get('bank_balance') or 0)}💰 | سکه {int(p.get('gems') or 0)}💎")
-        lines.append(f"▫️ وضعیت: انرژی {int(p.get('energy') or 0)}⚡ | سلامت {int(p.get('health') or 0)}❤️ | شادی {int(p.get('happiness') or 0)}😊 | اعتبار {int(p.get('reputation') or 0)}🏆")
-        job = "بی‌کار"
-        try:
-            if p.get("job_id"):
-                j = db.fetchone("SELECT title FROM jobs WHERE id=?", (p.get("job_id"),))
-                if j:
-                    job = f"{j['title']} (سطح {int(p.get('job_level') or 1)})"
-        except Exception:
-            pass
-        lines.append(f"▫️ شغل: {job} | مدرک تحصیلی: سطح {int(p.get('edu') or 0)}/۳ | بازتولد: {int(p.get('rebirth') or 0)}/۳")
-        try:
-            sk = get_skills(uid)
-            top = sorted(sk.items(), key=lambda kv: kv[1], reverse=True)[:3]
-            lines.append("▫️ مهارت‌های برتر: " + "، ".join(f"{SKILLS.get(k, k)} {v}" for k, v in top))
-        except Exception:
-            pass
-        try:
-            lines.append(f"▫️ خانه: {home_name(p)} | محله: {district_name(p)} | استریک: {int(p.get('streak') or 0)} روز")
-        except Exception:
-            pass
-        try:
-            g = guild_of(uid)
-            if g:
-                lines.append(f"▫️ اتحاد: {g['name']} (سطح {guild_level(g)})")
-            else:
-                lines.append("▫️ اتحاد: ندارد")
-        except Exception:
-            pass
-        try:
-            f = family_of(uid)
-            if f and f.get("spouse_id"):
-                lines.append(f"▫️ خانواده: متأهل با {int(f.get('children') or 0)} فرزند")
-            else:
-                lines.append("▫️ خانواده: مجرد")
-        except Exception:
-            pass
-        try:
-            pet = pet_of(uid)
-            if pet:
-                lines.append(f"▫️ پت: {pet.get('species')} سطح {int(pet.get('level') or 1)}")
-        except Exception:
-            pass
-        # ── وضعیتِ ویژه‌های ۱.۱.۰ ──
-        try:
-            d = _g110(uid)
-            bits = []
-            bits.append(f"سکه شانس {int(p.get('lucky_coins') or 0)}🍀")
-            bits.append(f"تکه نقشه {int(d.get('map_pieces', 0) or 0)}/{G110_MAP_PIECES}")
-            if d.get("dna"):
-                bits.append("ژن فعال: " + next((n for k, n, _c, _dd in DNA_GENES if k == d.get("dna")), "؟"))
-            if int(d.get("compass_mult", 0) or 0) > 0:
-                bits.append("قطب‌نما ×۲ آماده")
-            ch = d.get("charm") or {}
-            if ch.get("kind") and float(ch.get("until", 0) or 0) > time.time():
-                bits.append(f"طلسم {ch['kind']} فعال")
-            dg = d.get("dragon") or {}
-            if int(dg.get("lvl", 0) or 0) > 0:
-                bits.append(f"اژدها سطح {int(dg.get('lvl'))}")
-            bits.append(f"زنجیره پیروزی {int(d.get('chain', 0) or 0)}")
-            lines.append("▫️ ویژه‌های ۱.۱.۰: " + "، ".join(bits))
-        except Exception:
-            pass
-    except Exception:
-        pass
-    if not lines:
-        return f"بازیکن «{p.get('name') or 'رفیق'}»"
-    lines.append("")
-    lines.append("با توجه به این وضعیت، دقیق‌ترین و سریع‌ترین قدمِ بعدیِ این بازیکن را پیشنهاد بده.")
-    return "\n".join(lines)
-
-
-def ai_daily_reset(uid, p, kind="chat"):
-    """ریست شمارنده‌ی روزانه‌ی هوش/داستان (روز جدید)؛ p را هم به‌روز می‌کند"""
-    d = today()
-    if kind == "chat":
-        if p.get("ai_chat_day") != d:
-            db.execute("UPDATE profiles SET ai_chat_day=?, ai_chat_count=0 WHERE user_id=?", (d, uid))
-            p["ai_chat_day"] = d; p["ai_chat_count"] = 0
-    else:
-        if p.get("ai_story_day") != d:
-            db.execute("UPDATE profiles SET ai_story_day=?, ai_story_count=0 WHERE user_id=?", (d, uid))
-            p["ai_story_day"] = d; p["ai_story_count"] = 0
-
-
-def ai_chat_go(chat_id, uid):
-    ensure_v109()
-    if not guard_character(chat_id, uid): return
-    p = profile(uid)
-    ai_daily_reset(uid, p, "chat")
-    if (p.get("ai_chat_count") or 0) >= AI_CHAT_DAILY_LIMIT:
-        api.send_message(chat_id, f"🤖 سقف روزانه هوش پره! ({fn(AI_CHAT_DAILY_LIMIT)} سوال/روز) — فردا برگرد ✨")
-        return
-    if AI_CHAT_COST and (p.get("money") or 0) < AI_CHAT_COST:
-        api.send_message(chat_id, f"🤖 هر سوال {fmt_money(AI_CHAT_COST)}💰 هزینه داره — پولت کمه! برو کار کن بعد بیا 🧠")
-        return
-    set_state(uid, "ai_chat", {})
-    api.send_message(chat_id,
-        "🤖 دستیار هوش بله فعال شد!\n"
-        "هر چی می‌خوای بپرس — از بورس تا عشق تا هک! 😎\n"
-        f"هزینه هر سوال: {'رایگان 🎉' if not AI_CHAT_COST else fmt_money(AI_CHAT_COST) + '💰'} | باقی‌مانده امروز: {fn(AI_CHAT_DAILY_LIMIT - int(p.get('ai_chat_count') or 0))}\n"
-        "بنویس و بفرست — (لغو: /cancel)",
-        inline_keyboard([[("🎭 داستان‌ساز AI", "v109:story")]]))
-
-
-def ai_chat_handle(chat_id, uid, text):
-    ensure_v109()
-    text = (text or "").strip()
-    if not text or text.startswith("/"):
-        api.send_message(chat_id, "✍️ سوالت رو به‌صورت متن بنویس (یا /cancel)")
-        return True
-    p = profile(uid)
-    if not p:
-        set_state(uid); return False
-    if AI_CHAT_COST and (p.get("money") or 0) < AI_CHAT_COST:
-        api.send_message(chat_id, "💸 پولت کمه!")
-        return True
-    ai_daily_reset(uid, p, "chat")
-    if (p.get("ai_chat_count") or 0) >= AI_CHAT_DAILY_LIMIT:
-        api.send_message(chat_id, "🤖 سقف روزانه پره! فردا برگرد ✨"); set_state(uid); return True
-    if AI_CHAT_COST:
-        change_money(uid, -AI_CHAT_COST, "ai_chat", "سوال از هوش")
-    db.execute("UPDATE profiles SET ai_chat_count=COALESCE(ai_chat_count,0)+1 WHERE user_id=?", (uid,))
-    log_action(uid, "ai_chat", text[:40])
-    api.send_message(chat_id, "🤖 دارم فکر می‌کنم...")
-    prompt = f"{_ai_user_context(p)} می‌پرسه: {text[:300]}"
-
-    def _work():
-        ans = _ai_call(prompt) or _ai_offline_answer(text)
-        gain_xp(uid, 8)
-        extra = ""
-        if random.random() < 0.15:
-            db.execute("UPDATE profiles SET lucky_coins=COALESCE(lucky_coins,0)+1 WHERE user_id=?", (uid,))
-            extra += "\n\n🍀 +۱ سکه شانس گرفتی!"
-        try:
-            n = db.fetchone("SELECT COUNT(*) c FROM logs WHERE actor=? AND action IN ('ai_chat','ai_chat_q')", (uid,))["c"]
-            if n >= 10:
-                badge_add(uid, "ai_friend")
-        except Exception:
-            pass
-        api.send_message(chat_id, f"🤖 هوش بله:\n{ans}{extra}\n\n— دوباره بپرس یا /cancel بزن",
-                         inline_keyboard([[("🔄 سوال دیگه", "v109:ai"), ("🏠 منو", "menu:main")]]))
-    _ai_background(_work, chat_id)
-    return True
-
-
-def ai_story_go(chat_id, uid):
-    ensure_v109()
-    if not guard_character(chat_id, uid): return
-    p = profile(uid)
-    ai_daily_reset(uid, p, "story")
-    if (p.get("ai_story_count") or 0) >= AI_STORY_DAILY_LIMIT:
-        api.send_message(chat_id, f"🎭 امروز {fn(AI_STORY_DAILY_LIMIT)} داستان ساختی — فردا برگرد!")
-        return
-    if AI_STORY_COST and (p.get("money") or 0) < AI_STORY_COST:
-        api.send_message(chat_id, f"🎭 هر داستان {fmt_money(AI_STORY_COST)}💰 — پولت کمه!")
-        return
-    set_state(uid, "ai_story", {})
-    api.send_message(chat_id,
-        "🎭 داستان‌ساز هوش فعاله!\n"
-        "یه موضوع بده (مثلا: «دزدی از بانک با ربات» یا «عشق تو مترو»)\n"
-        "من برات یه داستان تعاملی می‌سازم با 2 انتخاب! ✨\n"
-        f"هزینه: {'رایگان 🎉' if not AI_STORY_COST else fmt_money(AI_STORY_COST) + '💰'} (لغو: /cancel)")
-
-
-def _offline_story(p, topic):
-    name = p.get("name") or "قهرمان"
-    return (f"📖 «{topic}»\n"
-            f"{name} صبح با یه ایده‌ی عجیب از خواب بیدار شد: {topic}. همه‌ی شهر می‌گفتن دیوونگیه، ولی {name} لول {fn(p.get('level', 1))} "
-            f"کسی نبود که با «نمی‌شه» جا بزنه.\n"
-            f"تا ظهر نقشه‌اش آماده بود؛ فقط یه مشکل کوچیک داشت: پول کم، انرژی کمتر، و یه رقیب قدیمی که بو برده بود.\n"
-            f"حالا وقت انتخابه:\n"
-            f"A) ریسک کن و همین امشب اجراش کن 🎲\n"
-            f"B) یه هفته صبر کن، پول جمع کن و با تیم برو 🧠")
-
-
-def ai_story_handle(chat_id, uid, text):
-    ensure_v109()
-    text = (text or "").strip()
-    if not text or text.startswith("/"):
-        api.send_message(chat_id, "✍️ موضوع داستان رو به‌صورت متن بنویس (یا /cancel)")
-        return True
-    p = profile(uid)
-    if not p:
-        set_state(uid); return False
-    if AI_STORY_COST and (p.get("money") or 0) < AI_STORY_COST:
-        api.send_message(chat_id, "💸 پول کمه!"); return True
-    ai_daily_reset(uid, p, "story")
-    if (p.get("ai_story_count") or 0) >= AI_STORY_DAILY_LIMIT:
-        set_state(uid); api.send_message(chat_id, "🎭 سقف امروز پره — فردا برگرد!"); return True
-    if AI_STORY_COST:
-        change_money(uid, -AI_STORY_COST, "ai_story", "داستان AI")
-    db.execute("UPDATE profiles SET ai_story_count=COALESCE(ai_story_count,0)+1 WHERE user_id=?", (uid,))
-    log_action(uid, "ai_story", text[:30])
-    api.send_message(chat_id, "🎭 دارم داستان رو می‌نویسم...")
-    prompt = (f"یه داستان کوتاه تعاملی بساز با موضوع: {text[:120]}. شخصیت اصلی {p.get('name', 'بازیکن')} لول {p.get('level', 1)} "
-              f"تو شهر شبیه‌سازی زندگی. 3 پاراگراف کوتاه + در پایان 2 انتخاب A و B بده. فارسی، بامزه.")
-    system = ai_system_prompt("الان نقش نویسنده‌ی داستان تعاملی رو داری: جذاب، کوتاه و با پایان باز (دو انتخاب A/B).")
-
-    def _work():
-        story = _ai_call(prompt, system, offline_fallback=False) or _offline_story(p, text[:60])
-        gain_xp(uid, 15)
-        if random.random() < 0.2:
-            gain = random.randint(300, 900)
-            change_money(uid, gain, "ai_story_bonus", "جایزه داستان")
-            story += f"\n\n🎁 جایزه داستان: +{fmt_money(gain)}💰"
-        api.send_message(chat_id, f"🎭 داستان تو:\n{story}\n\n— موضوع جدید بفرست یا /cancel",
-                         inline_keyboard([[("🎭 دوباره", "v109:story"), ("🤖 چت هوش", "v109:ai")]]))
-    _ai_background(_work, chat_id)
-    return True
 
 # ── 🗂 کمکی کلکسیون (مشترک بین گردونه/جعبه/بازار سیاه/حراجی/کوییز/آرنا) ──
 def collection_cards_of(uid):
@@ -12409,7 +11950,7 @@ def badge_progress(uid, p):
     """پیشرفت هر مدال برای نمایش (بر اساس لاگ‌ها)"""
     prog = {}
     try:
-        prog["ai_friend"] = (db.fetchone("SELECT COUNT(*) c FROM logs WHERE actor=? AND action IN ('ai_chat','ai_chat_q')", (uid,))["c"], 10)
+        prog["fc_champion"] = (db.fetchone("SELECT COALESCE(wins,0) wins FROM fc_accounts WHERE user_id=?", (uid,))["wins"], 10)
         prog["wheel_king"] = (db.fetchone("SELECT COUNT(*) c FROM logs WHERE actor=? AND action='wheel'", (uid,))["c"], 20)
         prog["quiz_master"] = (db.fetchone("SELECT COUNT(*) c FROM logs WHERE actor=? AND action='quiz109_ok'", (uid,))["c"], 10)
         prog["arena_hero"] = (db.fetchone("SELECT COUNT(*) c FROM logs WHERE actor=? AND action='arena_win'", (uid,))["c"], 10)
@@ -12509,16 +12050,15 @@ def panel_v109(chat_id, uid):
     if not guard_character(chat_id, uid): return
     p = profile(uid)
     txt = (
-        f"🚀 مرکز 1.0.9 — «هوش + هیجان»\n"
+        f"🚀 مرکز 1.0.9 — «هیجان»\n"
         f"نسخه {BOT_VERSION} | {TEAM_NAME}\n"
         f"━━━━━━━━━━━━━━\n"
-        f"🤖 هوش: {fn(p.get('ai_chat_count') or 0)}/{fn(AI_CHAT_DAILY_LIMIT)} | 🎡 گردونه: {'✅' if p.get('wheel_day')==today() else '🎁 آماده'} | 🧠 کوییز: {'✅' if p.get('quiz_day')==today() else '❓'}\n"
+        f"🎡 گردونه: {'✅' if p.get('wheel_day')==today() else '🎁 آماده'} | 🧠 کوییز: {'✅' if p.get('quiz_day')==today() else '❓'}\n"
         f"🍀 سکه شانس: {fn(p.get('lucky_coins') or 0)} | ❄️ فریز: {fn(p.get('streak_freezes') or 0)}\n"
         f"━━━━━━━━━━━━━━\n"
         f"20 فیچر جدید — بزن و کیف کن! 👇"
     )
     kb = [
-        [("🤖 چت هوش", "v109:ai"), ("🎭 داستان AI", "v109:story")],
         [("🎡 گردونه", "v109:wheel"), ("📦 جعبه", "v109:box")],
         [("💎 حراجی", "v109:auction"), ("🖤 بازار سیاه", "v109:black")],
         [("⚔️ آرنا", "v109:arena"), ("📻 رادیو", "v109:radio")],
@@ -12532,83 +12072,13 @@ def panel_v109(chat_id, uid):
     ]
     api.send_message(chat_id, txt, inline_keyboard(kb))
 
-def panel_ai(chat_id, uid):
-    ensure_v109()
-    if not guard_character(chat_id, uid): return
-    p = profile(uid)
-    d = today()
-    used = int(p.get("ai_chat_count") or 0) if p.get("ai_chat_day")==d else 0
-    left = max(0, AI_CHAT_DAILY_LIMIT - used)
-    story_used = int(p.get("ai_story_count") or 0) if p.get("ai_story_day") == d else 0
-    lines = [
-        f"سلام {p.get('name', 'رفیق')}! من «هوش بله»ام ✨",
-        f"راهنمای اختصاصیِ خودِ این بازی — با توجه به لول و داراییِ واقعیِت جواب می‌دم.",
-        "",
-        ui_kv("💬 چتِ امروز", f"{fn(used)}/{fn(AI_CHAT_DAILY_LIMIT)} (باقی‌مانده {fn(left)})"),
-        ui_kv("🎭 داستانِ امروز", f"{fn(story_used)}/{fn(AI_STORY_DAILY_LIMIT)}"),
-        ui_kv("💸 هزینه", "رایگان 🎉" if AI_CHAT_COST == 0 else fmt_money(AI_CHAT_COST) + "💰"),
-    ]
-    kb = [
-        [("💬 چت آزاد", "v109:ai"), ("🎭 داستان‌ساز", "v109:story")],
-        [("💰 چطور پولدار شم؟", "v109:ai_q:money"), ("❤️ ازدواج چطوری؟", "v109:ai_q:love")],
-        [("📈 بورس چی بخرم؟", "v109:ai_q:market"), ("🕶 هک چطوری؟", "v109:ai_q:hack")],
-        [("🎯 ترفند لول‌آپ", "v109:ai_q:level"), ("🏠 بهترین خونه؟", "v109:ai_q:home")],
-        [("🔥 ویژه‌های ۱.۱.۰ چیست؟", "v109:ai_q:v110"), ("🐉 اژدها چطوریه؟", "v109:ai_q:dragon")],
-        [("🍀 سکه شانس چی بخرم؟", "v109:ai_q:lucky"), ("🛡️ چطور ضرر نکنم؟", "v109:ai_q:safe")],
-        [("🔥 ویژه‌های ۱.۱.۰", "v110:hub:0"), ("🏠 منو اصلی", "menu:main")],
-    ]
-    api.send_message(chat_id,
-                     ui_card("🤖 دستیار هوش بازی", lines, "هر سؤالی درباره‌ی بازی داری بپرس 👇", "🤖"),
-                     inline_keyboard(kb))
 
 # ── دیسپچر کال‌بک v109 ──
 def handle_v109_callback(chat_id, uid, data, cb_id, message_id):
     ensure_v109()
     # data = "v109:xxx" یا "v109:xxx:yyy"
     cmd = data[5:]  # بعد از v109:
-    if cmd == "ai": ai_chat_go(chat_id, uid); api.answer_callback(cb_id, "🤖")
-    elif cmd.startswith("ai_q:"):
-        q = cmd.split(":",1)[1]
-        qmap = {
-            "money": "چطور سریع پولدار شم؟ بهترین روش درآمد الان چیه؟",
-            "love": "چطور ازدواج کنم و خانواده بسازم؟",
-            "market": "الان تو بورس چی بخرم؟ کدوم دارایی سود میده؟",
-            "hack": "چطور هک کنم و هکر حرفه‌ای شم؟",
-            "level": "چطور سریع لول‌آپ کنم و XP بگیرم؟",
-            "home": "بهترین خونه کدومه و چطور بخرم؟",
-            # 🆕 v1.1.0
-            "v110": "درباره‌ی ۳۰ فیچرِ جدیدِ نسخه ۱.۱.۰ توضیح بده و بگو از کدوم شروع کنم؟",
-            "dragon": "پرورش اژدها در نسخه ۱.۱.۰ چطور کار می‌کنه و چقدر درآمد داره؟",
-            "lucky": "سکه شانس رو بهترین شکل چطور خرج کنم؟ طلسم بخرم یا آرزو؟",
-            "safe": "چطور جلوی هک شدن، حمله و ضرر مالی رو بگیرم؟",
-        }
-        prompt = qmap.get(q, q)
-        # چک سقف روزانه
-        p = profile(uid)
-        if not p:
-            api.answer_callback(cb_id, "اول کاراکتر بساز!"); guard_character(chat_id, uid); return True
-        ai_daily_reset(uid, p, "chat")
-        if (p.get("ai_chat_count") or 0) >= AI_CHAT_DAILY_LIMIT:
-            api.answer_callback(cb_id, "سقف پره!"); api.send_message(chat_id, "🤖 سقف روزانه‌ات پره! فردا بیا ✨"); return True
-        if AI_CHAT_COST and (p.get("money") or 0) < AI_CHAT_COST:
-            api.answer_callback(cb_id, "پول کمه!"); return True
-        if AI_CHAT_COST: change_money(uid, -AI_CHAT_COST, "ai_chat", "سوال سریع هوش")
-        db.execute("UPDATE profiles SET ai_chat_count=COALESCE(ai_chat_count,0)+1 WHERE user_id=?", (uid,))
-        log_action(uid, "ai_chat_q", q)
-        api.answer_callback(cb_id, "🤖")
-        api.send_message(chat_id, "🤖 دارم فکر می‌کنم...")
-        full_prompt = f"{_ai_user_context(p)} می‌پرسه: {prompt}"
-
-        def _work_q():
-            ans = _ai_call(full_prompt) or _ai_offline_answer(prompt)
-            gain_xp(uid, 6)
-            if random.random() < 0.12:
-                db.execute("UPDATE profiles SET lucky_coins=COALESCE(lucky_coins,0)+1 WHERE user_id=?", (uid,))
-                ans += "\n\n🍀 +۱ سکه شانس!"
-            api.send_message(chat_id, f"🤖 هوش بله:\n{ans}", inline_keyboard([[("💬 سوال آزاد", "v109:ai"), ("🔄 سوال دیگه", "menu:ai")]]))
-        _ai_background(_work_q, chat_id)
-    elif cmd == "story": ai_story_go(chat_id, uid); api.answer_callback(cb_id, "🎭")
-    elif cmd == "wheel": wheel_go(chat_id, uid); api.answer_callback(cb_id, "🎡")
+    if cmd == "wheel": wheel_go(chat_id, uid); api.answer_callback(cb_id, "🎡")
     elif cmd == "box": box_go(chat_id, uid); api.answer_callback(cb_id, "📦")
     elif cmd == "auction": auction_panel(chat_id, uid); api.answer_callback(cb_id, "💎")
     elif cmd == "auc_sell": auction_sell_go(chat_id, uid); api.answer_callback(cb_id, "")
@@ -13027,7 +12497,7 @@ def grow_share_card(chat_id, uid):
     api.send_message(chat_id,
                      "📣 این پیام رو لمس نگه دار و برای رفیقات فوروارد کن:\n\n"
                      "━━━━━━━━━━━━━━━\n"
-                     "🎮 بازی «Life Simulator AI» رو جدی امتحان کن!\n"
+                     "🎮 بازی «Life Simulator» رو جدی امتحان کن!\n"
                      f"من {p['name']}م — لول {fn(p['level'])}، با {fn(p.get('ref_count') or 0)} رفیق دعوتی!\n"
                      "کار می‌کنی، شرکت می‌زنی، تو بورس بازی می‌کنی و هر جمعه جایزه‌ها ×۲ می‌شه 😎\n"
                      "تو هم بیا! موقع ثبت‌نام کد منو بزن تا هر دومون جایزه بگیریم:\n"
@@ -13740,7 +13210,8 @@ MENU_ROUTES = {
     "🎯 ماموریت‌ها": panel_missions,
     "🏆 رتبه‌بندی": panel_leaderboard,
     "🔥 ویژه‌های ۱.۱.۰": (lambda c, u: panel_god(c, u)),   # 🆕 v1.1.0: هابِ ۳۰ فیچر گاد
-    "🤖 دستیار هوش": panel_ai,     # 🆕 v1.0.9 — نگه‌داشته شد
+    "🎟 بتل‌پس": (lambda c, u: battle_pass_panel(c, u)),
+    "⚽ لیگ ستاره‌ها": (lambda c, u: fc_panel(c, u)),
     "📣 کانال و گروه": lambda c, u: panel_social(c, u),
     "⚙ تنظیمات": panel_settings,
 }
@@ -13908,6 +13379,16 @@ def handle_callback(cb):
     if not force_join_gate(chat_id, uid):
         return
 
+    if data.startswith("bp:"):
+        handle_battle_pass_callback(chat_id, uid, data, cb_id)
+        return
+    if data.startswith("fc:"):
+        handle_fc_callback(chat_id, uid, data, cb_id)
+        return
+    if data.startswith("adslot:"):
+        handle_ad_slot_callback(chat_id, uid, data, cb_id)
+        return
+
     # ── 🆕 v1.1.0: هابِ «۳۰ فیچر گاد» (باید قبل از بقیه باشد) ──
     if data.startswith("v110:"):
         handle_v110_callback(chat_id, uid, data, cb_id)
@@ -13926,12 +13407,8 @@ def handle_callback(cb):
             "🏠 دکور → خانه | 🗂 کلکسیون/🏅 مدال/⭐ پرستیژ → پروفایل\n"
             "⏳ بانک زمان/🍀 سکه → بانک | 📈 VC → اقتصاد\n"
             "🎥 استریمر → روابط | 🔔 یادآور → تنظیمات\n"
-            "🤖 چت هوش همچنان فعاله — از منو بزن!",
-            inline_keyboard([[("🤖 دستیار هوش", "menu:ai"), ("🏠 منو", "menu:main")]]))
-        return
-    if data == "menu:ai":
-        api.answer_callback(cb_id)
-        panel_ai(chat_id, uid)
+            "⚽ لیگ ستاره‌ها هم از منوی 🎮 بازی در دسترس است.",
+            inline_keyboard([[("⚽ لیگ ستاره‌ها", "fc:home"), ("🏠 منو", "menu:main")]]))
         return
     if data == "menu:main":
         api.answer_callback(cb_id)
@@ -14119,7 +13596,9 @@ def handle_callback(cb):
         return
     if data.startswith("ord:new:"):
         api.answer_callback(cb_id)
-        order_new(chat_id, uid, data.split(":")[2])
+        result = order_new(chat_id, uid, data.split(":")[2])
+        if result:
+            api.send_message(chat_id, result)
         return
     if data.startswith("ord:paid:"):
         res = order_paid(chat_id, uid, int(data.split(":")[2]))
@@ -15009,7 +14488,7 @@ def handle_update(update):
 
 
 # ══════════════════════════════════════════════════════════════════
-#  🆕 v1.1.0 — «۳۰ فیچر گاد» + ظاهر تازه + هوشِ کاملاً بازی‌محور
+#  🆕 v1.1.0 — «۳۰ فیچر گاد» + ظاهر تازه + قابلیت‌های بازی‌محور
 # ══════════════════════════════════════════════════════════════════
 #  همه‌ی داده‌های این بخش در یک ستون JSON (v110_json روی profiles) و
 #  یک جدول مشترک (v110_glob) ذخیره می‌شود → بدون مهاجرتِ سنگین.
@@ -17115,7 +16594,7 @@ handle_v110_callback = _handle_v110
 
 BANNER = """
 ╔══════════════════════════════════════════╗
-║   🤖  Life Simulator AI برای بله  🤖     ║
+║   🤖  Life Simulator برای بله  🤖     ║
 ║   بازی متنی شبیه‌ساز زندگی — نسخه ۱.۱.۰    ║
 ║        ⚡ ساخته‌ی تیم XR ⚡                ║
 ╚══════════════════════════════════════════╝
@@ -17290,7 +16769,7 @@ def main():
         ensure_v109()
         ensure_v110()   # 🆕 v1.1.0: جدول مشترک + ستون JSONِ ویژه‌ها
         _cols = {r[1] for r in db.fetchall("PRAGMA table_info(profiles)")}
-        _missing = [c for c in ("wheel_day", "lucky_coins", "streak_freezes", "ai_chat_day", "collection_json") if c not in _cols]
+        _missing = [c for c in ("wheel_day", "lucky_coins", "streak_freezes", "collection_json") if c not in _cols]
         if _missing:
             log.warning(f"⚠️ ستون‌های ۱.۰.۹ هنوز کم است {_missing} — خود-ترمیمی هنگام اولین استفاده اجرا می‌شود")
         else:
@@ -17339,6 +16818,1167 @@ def main():
             log.exception(f"💥 خطای اصلی حلقه: {e}")
             time.sleep(3)
 
+
+
+# ══════════════════════════════════════════════════════════════════
+# 🆕 v1.2.0 — بتل‌پس فصلی، لیگ فوتبال درون‌بازی، جایگاه‌های تبلیغ
+# ══════════════════════════════════════════════════════════════════
+
+BP_SEASON_EPOCH = datetime(2026, 1, 1)
+BP_SEASON_DAYS = 30
+BP_MAX_TIERS = 30
+BP_XP_PER_TIER = 250
+BP_ACTIVITY_DAILY_CAP = 80
+BP_PREMIUM_PRICE_DEFAULT = 100_000
+BP_ORDER_PREFIX = "bp-premium@"
+BP_MISSION_DEFS = {
+    "work_day": {"period": "daily", "title": "دو شیفت کاری انجام بده", "action": "job_work", "target": 2, "xp": 60},
+    "daily_claim": {"period": "daily", "title": "جایزه‌ی روزانه را بگیر", "action": "streak_claim", "target": 1, "xp": 45},
+    "train_day": {"period": "daily", "title": "یک مهارت را تمرین کن", "action": "skill_train", "target": 1, "xp": 45},
+    "fc_match_day": {"period": "daily", "title": "یک مسابقه فوتبال انجام بده", "action": "fc_match", "target": 1, "xp": 60},
+    "work_week": {"period": "weekly", "title": "ده شیفت کاری در هفته", "action": "job_work", "target": 10, "xp": 180},
+    "war_week": {"period": "weekly", "title": "سه نبرد را پیروز شو", "action": "war_win", "target": 3, "xp": 180},
+    "fc_win_week": {"period": "weekly", "title": "سه مسابقه فوتبال را ببر", "action": "fc_win", "target": 3, "xp": 220},
+}
+BP_ACTIVITY_XP = {
+    "job_work": 10, "streak_claim": 15, "skill_train": 10,
+    "fc_match": 15, "fc_win": 15, "war_win": 10,
+    "arena_win": 10, "daily_quest": 10, "explore": 5,
+}
+
+AD_SLOT_NAMES = {
+    "main": "اتاق بازی", "economy": "اقتصاد", "market": "بازار",
+    "city": "شهر", "social": "روابط", "vip": "فروشگاه VIP",
+}
+
+FC_MATCH_DAILY_LIMIT = 5
+FC_MAX_SQUAD = 30
+FC_MARKET_FEE_RATE = 0.05
+FC_MIN_LIST_PRICE = 100
+FC_STARTERS = [
+    ("GK", "دروازه‌بان", 64),
+    ("DEF", "مدافع راست", 63), ("DEF", "مدافع میانی ۱", 64),
+    ("DEF", "مدافع میانی ۲", 62), ("DEF", "مدافع چپ", 63),
+    ("MID", "هافبک دفاعی", 64), ("MID", "هافبک مرکزی", 65), ("MID", "هافبک هجومی", 63),
+    ("FWD", "وینگر راست", 64), ("FWD", "مهاجم نوک", 66), ("FWD", "وینگر چپ", 63),
+]
+FC_SCOUT_NAMES = [
+    "آرمان", "سامان", "نیما", "پارسا", "ماهان", "بردیا", "آرش", "کیان",
+    "سینا", "امیر", "یاسین", "مهراد", "شایان", "رادین", "نوید", "مانی",
+]
+FC_POSITIONS = ["GK", "DEF", "MID", "FWD"]
+FC_FORMATIONS = {
+    "4-3-3": ("⚔️ چهار-سه-سه", 2),
+    "4-4-2": ("⚖️ چهار-چهار-دو", 1),
+    "3-5-2": ("🎯 سه-پنج-دو", 2),
+    "5-3-2": ("🛡 پنج-سه-دو", 0),
+}
+FC_RIVALS = ["پارس جوان", "ستاره‌های شهر", "آذرخش", "یوزهای کویر", "سپهر یونایتد", "آریا اسپورت", "دریا FC", "شاهین سرخ"]
+
+
+def battle_pass_season_info(now=None):
+    now = now or datetime.now()
+    days = max(0, (now.date() - BP_SEASON_EPOCH.date()).days)
+    season_index = days // BP_SEASON_DAYS
+    start = BP_SEASON_EPOCH + timedelta(days=season_index * BP_SEASON_DAYS)
+    end = start + timedelta(days=BP_SEASON_DAYS)
+    return start.strftime("%Y%m%d"), start, end
+
+
+def battle_pass_week_key(now=None):
+    now = now or datetime.now()
+    iso = now.isocalendar()
+    return f"{iso.year}-W{iso.week:02d}"
+
+
+def battle_pass_order_price():
+    try:
+        return max(10_000, min(10_000_000, int(get_setting("bp_order_price", str(BP_PREMIUM_PRICE_DEFAULT)))))
+    except (TypeError, ValueError):
+        return BP_PREMIUM_PRICE_DEFAULT
+
+
+def battle_pass_ensure(uid, season_id=None):
+    sid = season_id or battle_pass_season_info()[0]
+    db.execute("INSERT OR IGNORE INTO battle_pass(user_id,season_id,updated_at) VALUES(?,?,?)",
+               (int(uid), sid, now_iso()))
+    return db.fetchone("SELECT * FROM battle_pass WHERE user_id=? AND season_id=?", (int(uid), sid))
+
+
+def battle_pass_ensure_missions(uid, season_id=None):
+    sid = season_id or battle_pass_season_info()[0]
+    day_key, week_key_ = today(), battle_pass_week_key()
+    for key, mission in BP_MISSION_DEFS.items():
+        period_key = day_key if mission["period"] == "daily" else week_key_
+        db.execute("""INSERT OR IGNORE INTO battle_pass_missions
+                       (user_id,season_id,period,period_key,mission_key,progress,claimed)
+                       VALUES(?,?,?,?,?,0,0)""",
+                   (int(uid), sid, mission["period"], period_key, key))
+
+
+def battle_pass_track_action(uid, action):
+    if action not in BP_ACTIVITY_XP and action not in {x["action"] for x in BP_MISSION_DEFS.values()}:
+        return
+    try:
+        uid = int(uid)
+    except (TypeError, ValueError):
+        return
+    if not profile(uid):
+        return
+    sid = battle_pass_season_info()[0]
+    battle_pass_ensure(uid, sid)
+    battle_pass_ensure_missions(uid, sid)
+    points = BP_ACTIVITY_XP.get(action, 0)
+    if points:
+        with db.lock:
+            conn = db.conn
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                row = conn.execute("SELECT xp,activity_day,activity_xp FROM battle_pass WHERE user_id=? AND season_id=?",
+                                   (uid, sid)).fetchone()
+                day = today()
+                used = int(row["activity_xp"] or 0) if row["activity_day"] == day else 0
+                add = min(points, max(0, BP_ACTIVITY_DAILY_CAP - used))
+                if add:
+                    conn.execute("""UPDATE battle_pass SET xp=MIN(?,xp+?),activity_day=?,
+                                    activity_xp=?,updated_at=? WHERE user_id=? AND season_id=?""",
+                                 (BP_MAX_TIERS * BP_XP_PER_TIER, add, day, used + add, now_iso(), uid, sid))
+                elif row["activity_day"] != day:
+                    conn.execute("UPDATE battle_pass SET activity_day=?,activity_xp=0 WHERE user_id=? AND season_id=?",
+                                 (day, uid, sid))
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+    for key, mission in BP_MISSION_DEFS.items():
+        if mission["action"] != action:
+            continue
+        period_key = today() if mission["period"] == "daily" else battle_pass_week_key()
+        db.execute("""UPDATE battle_pass_missions SET progress=MIN(?,progress+1)
+                       WHERE user_id=? AND season_id=? AND period=? AND period_key=? AND mission_key=? AND claimed=0""",
+                   (mission["target"], uid, sid, mission["period"], period_key, key))
+
+
+def battle_pass_reward(tier, track):
+    tier = int(tier)
+    if track == "free":
+        return {"money": 1_000 + tier * 100,
+                "gems": 1 if tier % 10 == 0 else 0,
+                "lucky": 1 if tier % 5 == 0 else 0}
+    return {"money": 2_500 + tier * 250,
+            "gems": 1 + (1 if tier % 5 == 0 else 0),
+            "lucky": 1 if tier % 3 == 0 else 0}
+
+
+def battle_pass_reward_text(tier, track):
+    reward = battle_pass_reward(tier, track)
+    parts = [f"+{fmt_money(reward['money'])}💰"]
+    if reward["gems"]:
+        parts.append(f"+{fn(reward['gems'])}💎")
+    if reward["lucky"]:
+        parts.append(f"+{fn(reward['lucky'])}🍀")
+    return "، ".join(parts)
+
+
+def battle_pass_claimed_set(row):
+    value = jl(row["claimed_json"] or "[]", [])
+    return set(value) if isinstance(value, list) else set()
+
+
+def battle_pass_claim_tier(uid, track, tier, season_id=None):
+    sid = season_id or battle_pass_season_info()[0]
+    if track not in ("free", "premium") or not (1 <= int(tier) <= BP_MAX_TIERS):
+        return "❌ جایزه نامعتبر است."
+    tier = int(tier)
+    battle_pass_ensure(uid, sid)
+    key = f"{tier}:{track}"
+    reward = battle_pass_reward(tier, track)
+    with db.lock:
+        conn = db.conn
+        conn.execute("BEGIN IMMEDIATE")
+        try:
+            bp = conn.execute("SELECT * FROM battle_pass WHERE user_id=? AND season_id=?", (uid, sid)).fetchone()
+            p = conn.execute("SELECT user_id FROM profiles WHERE user_id=?", (uid,)).fetchone()
+            if not bp or not p:
+                conn.rollback()
+                return "❌ پروفایل کاربر پیدا نشد."
+            if int(bp["xp"] or 0) < tier * BP_XP_PER_TIER:
+                conn.rollback()
+                return "⏳ هنوز XP لازم برای این سطح را نداری."
+            if track == "premium" and not bp["premium"]:
+                conn.rollback()
+                return "🔒 این پاداش فقط برای بتل‌پس Premium است."
+            claimed = battle_pass_claimed_set(bp)
+            if key in claimed:
+                conn.rollback()
+                return "⚠️ این جایزه قبلاً دریافت شده است."
+            claimed.add(key)
+            if reward["money"]:
+                conn.execute("UPDATE profiles SET money=money+? WHERE user_id=?", (reward["money"], uid))
+                conn.execute("INSERT INTO transactions(user_id,amount,type,description,created_at) VALUES(?,?,?,?,?)",
+                             (uid, reward["money"], "battle_pass", f"جایزه سطح {tier} ({track})", now_iso()))
+            if reward["gems"]:
+                conn.execute("UPDATE profiles SET gems=COALESCE(gems,0)+? WHERE user_id=?", (reward["gems"], uid))
+            if reward["lucky"]:
+                conn.execute("UPDATE profiles SET lucky_coins=COALESCE(lucky_coins,0)+? WHERE user_id=?", (reward["lucky"], uid))
+            conn.execute("UPDATE battle_pass SET claimed_json=?,updated_at=? WHERE user_id=? AND season_id=?",
+                         (jd(sorted(claimed)), now_iso(), uid, sid))
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+    log_action(uid, "bp_reward_claim", f"{sid}:{key}")
+    return f"🎉 جایزه‌ی سطح {fn(tier)} ({'Premium' if track == 'premium' else 'رایگان'}) دریافت شد: {battle_pass_reward_text(tier, track)}"
+
+
+def battle_pass_claim_all(uid, track):
+    sid = battle_pass_season_info()[0]
+    bp = battle_pass_ensure(uid, sid)
+    if track == "premium" and not bp["premium"]:
+        return "🔒 اول دسترسی Premium را فعال کن."
+    unlocked = min(BP_MAX_TIERS, int(bp["xp"] or 0) // BP_XP_PER_TIER)
+    claimed = battle_pass_claimed_set(bp)
+    ready = [tier for tier in range(1, unlocked + 1) if f"{tier}:{track}" not in claimed]
+    if not ready:
+        return "🎁 جایزه‌ی آماده‌ای برای دریافت نداری."
+    paid = 0
+    for tier in ready:
+        result = battle_pass_claim_tier(uid, track, tier, sid)
+        if result.startswith("🎉"):
+            paid += 1
+    return f"✅ {fn(paid)} جایزه‌ی {('Premium' if track == 'premium' else 'رایگان')} دریافت شد." if paid else "⚠️ جایزه‌ای دریافت نشد؛ دوباره پنل را باز کن."
+
+
+def battle_pass_mission_claim(uid, period, mission_key):
+    mission = BP_MISSION_DEFS.get(mission_key)
+    if not mission or mission["period"] != period:
+        return "❌ مأموریت نامعتبر است."
+    sid = battle_pass_season_info()[0]
+    battle_pass_ensure(uid, sid)
+    battle_pass_ensure_missions(uid, sid)
+    period_key = today() if period == "daily" else battle_pass_week_key()
+    with db.lock:
+        conn = db.conn
+        conn.execute("BEGIN IMMEDIATE")
+        try:
+            row = conn.execute("""SELECT * FROM battle_pass_missions WHERE user_id=? AND season_id=?
+                                 AND period=? AND period_key=? AND mission_key=?""",
+                               (uid, sid, period, period_key, mission_key)).fetchone()
+            if not row or row["progress"] < mission["target"]:
+                conn.rollback()
+                return "⏳ این مأموریت هنوز کامل نشده است."
+            if row["claimed"]:
+                conn.rollback()
+                return "⚠️ جایزه‌ی این مأموریت قبلاً گرفته شده است."
+            conn.execute("UPDATE battle_pass_missions SET claimed=1 WHERE user_id=? AND season_id=? AND period=? AND period_key=? AND mission_key=? AND claimed=0",
+                         (uid, sid, period, period_key, mission_key))
+            conn.execute("UPDATE battle_pass SET xp=MIN(?,xp+?),updated_at=? WHERE user_id=? AND season_id=?",
+                         (BP_MAX_TIERS * BP_XP_PER_TIER, mission["xp"], now_iso(), uid, sid))
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+    log_action(uid, "bp_mission_claim", f"{mission_key}:{mission['xp']}")
+    return f"🎯 مأموریت کامل شد! +{fn(mission['xp'])} XP بتل‌پس؛ «{mission['title']}»"
+
+
+def battle_pass_panel(chat_id, uid):
+    if not guard_character(chat_id, uid):
+        return
+    sid, start, end = battle_pass_season_info()
+    bp = battle_pass_ensure(uid, sid)
+    battle_pass_ensure_missions(uid, sid)
+    xp = int(bp["xp"] or 0)
+    tier = min(BP_MAX_TIERS, xp // BP_XP_PER_TIER)
+    inside = xp % BP_XP_PER_TIER if tier < BP_MAX_TIERS else 0
+    claimed = battle_pass_claimed_set(bp)
+    free_ready = sum(1 for n in range(1, tier + 1) if f"{n}:free" not in claimed)
+    premium_ready = sum(1 for n in range(1, tier + 1) if f"{n}:premium" not in claimed) if bp["premium"] else 0
+    missions = db.fetchone("""SELECT COUNT(*) c FROM battle_pass_missions WHERE user_id=? AND season_id=?
+                              AND ((period='daily' AND period_key=?) OR (period='weekly' AND period_key=?))
+                              AND progress>0 AND claimed=0""", (uid, sid, today(), battle_pass_week_key()))["c"]
+    premium_label = "✅ فعال تا پایان فصل" if bp["premium"] else "🔒 قفل"
+    lines = [
+        f"🎟 بتل‌پس فصل {sid}",
+        f"📅 {start.strftime('%Y-%m-%d')} تا {end.strftime('%Y-%m-%d')} | {fn(max(0, (end.date()-datetime.now().date()).days))} روز مانده",
+        f"⭐ XP: {fn(xp)}/{fn(BP_MAX_TIERS * BP_XP_PER_TIER)} | سطح {fn(tier)}/{fn(BP_MAX_TIERS)}",
+        f"📈 پیشرفت سطح بعدی: {fn(inside)}/{fn(BP_XP_PER_TIER)}",
+        f"🆓 جوایز آماده: {fn(free_ready)} | 👑 Premium: {premium_label}{f' | آماده: {fn(premium_ready)}' if bp['premium'] else ''}",
+        f"🎯 مأموریت‌های شروع‌شده/آماده: {fn(missions)}",
+        "🪙 کوین فوتبال از این مسیر جداست و قابل‌برداشت نقدی نیست.",
+        "",
+        "🎁 جدول کامل پاداش هر سطح (مسیر رایگان | Premium):",
+    ]
+    for reward_tier in range(1, BP_MAX_TIERS + 1):
+        lines.append(f"سطح {fn(reward_tier)} — 🆓 {battle_pass_reward_text(reward_tier, 'free')} | 👑 {battle_pass_reward_text(reward_tier, 'premium')}")
+    rows = [[("🎯 مأموریت‌های روزانه و هفتگی", "bp:missions")]]
+    if free_ready:
+        rows.append([(f"🎁 دریافت همه‌ی جایزه‌های رایگان ({fn(free_ready)})", "bp:claimall:free")])
+    if bp["premium"] and premium_ready:
+        rows.append([(f"👑 دریافت همه‌ی جایزه‌های Premium ({fn(premium_ready)})", "bp:claimall:premium")])
+    if not bp["premium"]:
+        rows.append([(f"💳 سفارش بتل‌پس Premium — {fmt_money(battle_pass_order_price())} تومان", "bp:buy")])
+    rows.append([("⚽ لیگ ستاره‌ها", "fc:home"), ("🏠 منوی اصلی", "menu:main")])
+    rows.append([ad_slot_button("main")])
+    api.send_message(chat_id, "\n".join(lines), inline_keyboard(rows))
+
+
+def battle_pass_missions_panel(chat_id, uid):
+    if not guard_character(chat_id, uid):
+        return
+    sid = battle_pass_season_info()[0]
+    battle_pass_ensure(uid, sid)
+    battle_pass_ensure_missions(uid, sid)
+    lines = ["🎯 مأموریت‌های بتل‌پس\n━━━━━━━━━━━━━━"]
+    rows = []
+    for key, mission in BP_MISSION_DEFS.items():
+        period_key = today() if mission["period"] == "daily" else battle_pass_week_key()
+        row = db.fetchone("""SELECT progress,claimed FROM battle_pass_missions WHERE user_id=? AND season_id=?
+                            AND period=? AND period_key=? AND mission_key=?""",
+                          (uid, sid, mission["period"], period_key, key))
+        progress = int(row["progress"] or 0) if row else 0
+        claimed = bool(row["claimed"]) if row else False
+        period_label = "امروز" if mission["period"] == "daily" else "این هفته"
+        status = "✅ جایزه گرفته شد" if claimed else ("🎁 آماده‌ی دریافت" if progress >= mission["target"] else f"⏳ {fn(progress)}/{fn(mission['target'])}")
+        lines.append(f"{period_label} — {mission['title']}\n{status} | پاداش: +{fn(mission['xp'])} XP بتل‌پس")
+        if progress >= mission["target"] and not claimed:
+            rows.append([(f"🎁 دریافت ({fn(mission['xp'])} XP) — {mission['title'][:20]}", f"bp:mission:{mission['period']}:{key}")])
+    rows.extend([[ad_slot_button("main")], [("🔙 بتل‌پس", "bp:home")]])
+    api.send_message(chat_id, "\n".join(lines), inline_keyboard(rows))
+
+
+def battle_pass_order_pack_title(pack_id):
+    if (pack_id or "").startswith(BP_ORDER_PREFIX):
+        season = pack_id[len(BP_ORDER_PREFIX):]
+        return f"🎟 بتل‌پس Premium — فصل {season}"
+    pack = next((item for item in GEM_PACKS if item[0] == pack_id), None)
+    return pack[1] if pack else str(pack_id)
+
+
+def battle_pass_is_order(pack_id):
+    return (pack_id or "").startswith(BP_ORDER_PREFIX)
+
+
+def battle_pass_grant_premium(uid, season_id=None):
+    sid = season_id or battle_pass_season_info()[0]
+    battle_pass_ensure(uid, sid)
+    db.execute("UPDATE battle_pass SET premium=1,updated_at=? WHERE user_id=? AND season_id=?",
+               (now_iso(), int(uid), sid))
+
+
+def panel_admin_battle_pass(chat_id):
+    sid = battle_pass_season_info()[0]
+    api.send_message(chat_id,
+                     f"🎟 مدیریت بتل‌پس\n━━━━━━━━━━━━━━\nفصل فعال: {sid}\n"
+                     f"قیمت سفارش Premium: {fmt_money(battle_pass_order_price())} تومان\n"
+                     "ادمین می‌تواند Premium یا پنج سطح جایزه را به کاربر بدهد.",
+                     inline_keyboard([
+                         [("🎁 اعطای بتل‌پس به کاربر", "adm:bpuser"), ("💵 تغییر قیمت", "adm:bpprice")],
+                         [("📣 تنظیم جایگاه‌های تبلیغ", "adm:adpanel"), ("⚽ جدول لیگ فوتبال", "fc:league")],
+                     ]))
+
+
+def battle_pass_admin_grant(admin_id, target_id, mode):
+    if mode not in ("premium", "levels5", "both"):
+        return "❌ نوع اعطا نامعتبر است."
+    sid = battle_pass_season_info()[0]
+    battle_pass_ensure(target_id, sid)
+    amount = 5 * BP_XP_PER_TIER if mode in ("levels5", "both") else 0
+    premium = 1 if mode in ("premium", "both") else 0
+    with db.lock:
+        conn = db.conn
+        conn.execute("BEGIN IMMEDIATE")
+        try:
+            conn.execute("UPDATE battle_pass SET premium=MAX(premium,?),xp=MIN(?,xp+?),updated_at=? WHERE user_id=? AND season_id=?",
+                         (premium, BP_MAX_TIERS * BP_XP_PER_TIER, amount, now_iso(), target_id, sid))
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+    log_action(admin_id, "bp_admin_grant", f"{target_id}:{mode}:{sid}")
+    tier_note = f" و +{fn(5)} سطح" if amount else ""
+    prem_note = "Premium فعال شد" if premium else ""
+    notice = f"🎁 مدیریت برایت بتل‌پس فصل {sid} را اعطا کرد: {prem_note}{tier_note}."
+    try:
+        api.send_message(target_id, notice)
+    except Exception:
+        pass
+    return f"✅ بتل‌پس به {fn(target_id)} اعطا شد: {prem_note}{tier_note}."
+
+
+def panel_admin_ad_slots(chat_id):
+    lines = ["📣 جایگاه‌های تبلیغ\n━━━━━━━━━━━━━━"]
+    rows = []
+    for slot, label in AD_SLOT_NAMES.items():
+        ad = ad_slot_get(slot)
+        if ad:
+            preview = (ad.get("text") or "").replace("\n", " ")[:70]
+            lines.append(f"✅ {label}: {preview}")
+        else:
+            lines.append(f"▫️ {label}: تنظیم نشده — دکمه‌ی عمومی نمایش داده می‌شود")
+        rows.append([(f"✏️ تنظیم {label}", f"adm:adedit:{slot}"), (f"🗑 پاک‌کردن", f"adm:adclear:{slot}")])
+    api.send_message(chat_id, "\n".join(lines), inline_keyboard(rows))
+
+
+def ad_slot_get(slot):
+    if slot not in AD_SLOT_NAMES:
+        return None
+    value = jl(get_setting(f"adslot.{slot}", ""), None)
+    if not isinstance(value, dict) or not (value.get("text") or "").strip():
+        return None
+    return {"text": str(value.get("text") or "").strip(),
+            "url": str(value.get("url") or "").strip(),
+            "updated_at": str(value.get("updated_at") or "")}
+
+
+def ad_slot_button(slot):
+    ad = ad_slot_get(slot)
+    if not ad:
+        return ("📣 جایگاه تبلیغ شما", f"adslot:open:{slot}")
+    title = next((line.strip() for line in ad["text"].splitlines() if line.strip()), "پیشنهاد ویژه")
+    title = title[:25]
+    return (f"📣 {title}", f"adslot:open:{slot}")
+
+
+def ad_slot_save(slot, text, url="", actor=None):
+    if slot not in AD_SLOT_NAMES:
+        return False
+    text = (text or "").strip()
+    url = (url or "").strip()
+    if not text or len(text) > 1200:
+        return False
+    if url and (len(url) > 500 or not (url.startswith("https://") or url.startswith("http://")) or any(ch.isspace() for ch in url)):
+        return False
+    set_setting(f"adslot.{slot}", jd({"text": text, "url": url, "updated_at": now_iso()}))
+    if actor:
+        log_action(actor, "admin_ad_slot_set", slot)
+    return True
+
+
+def ad_slot_show(chat_id, slot):
+    ad = ad_slot_get(slot)
+    if not ad:
+        api.send_message(chat_id, "📣 جایگاه تبلیغ شما هنوز تنظیم نشده است.",
+                         inline_keyboard([[("🏠 منوی اصلی", "menu:main")]]))
+        return
+    buttons = []
+    if ad["url"] and (ad["url"].startswith("https://") or ad["url"].startswith("http://")):
+        buttons.append([{"text": "🔗 باز کردن پیشنهاد", "url": ad["url"]}])
+    buttons.append([{"text": "🏠 منوی اصلی", "callback_data": "menu:main"}])
+    api.send_message(chat_id, f"📣 {AD_SLOT_NAMES[slot]}\n━━━━━━━━━━━━━━\n{ad['text']}", {"inline_keyboard": buttons})
+
+
+def handle_ad_slot_callback(chat_id, uid, data, cb_id):
+    parts = data.split(":")
+    slot = parts[2] if len(parts) == 3 else ""
+    if parts[:2] != ["adslot", "open"] or slot not in AD_SLOT_NAMES:
+        api.answer_callback(cb_id, "⚠️ جایگاه پیدا نشد.")
+        return
+    api.answer_callback(cb_id, "📣")
+    ad_slot_show(chat_id, slot)
+
+
+def fc_ensure_team(uid):
+    p = profile(uid)
+    if not p:
+        return None
+    team_name = (p.get("name") or "تیم من")[:24]
+    with db.lock:
+        conn = db.conn
+        conn.execute("BEGIN IMMEDIATE")
+        try:
+            created = conn.execute("INSERT OR IGNORE INTO fc_teams(user_id,team_name,coins,formation,created_at) VALUES(?,?,1500,'4-3-3',?)",
+                                    (int(uid), f"{team_name} FC", now_iso()))
+            if created.rowcount:
+                conn.execute("INSERT INTO fc_coin_ledger(user_id,amount,reason,details,created_at) VALUES(?,1500,'team_start','starter wallet',?)",
+                             (int(uid), now_iso()))
+            count = conn.execute("SELECT COUNT(*) c FROM fc_players WHERE owner_id=?", (int(uid),)).fetchone()["c"]
+            if count == 0:
+                for position, name, overall in FC_STARTERS:
+                    conn.execute("INSERT INTO fc_players(owner_id,name,position,overall,level,rarity,origin,created_at) VALUES(?,?,?,?,1,'معمولی','starter',?)",
+                                 (int(uid), name, position, overall, now_iso()))
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+    return db.fetchone("SELECT * FROM fc_teams WHERE user_id=?", (int(uid),))
+
+
+def fc_season_id():
+    return battle_pass_week_key()
+
+
+def fc_league_name(wins):
+    wins = int(wins or 0)
+    if wins >= 15: return "💎 لیگ الماس"
+    if wins >= 8: return "🥇 لیگ طلا"
+    if wins >= 3: return "🥈 لیگ نقره"
+    return "🥉 لیگ برنز"
+
+
+def fc_team_power(uid, conn=None):
+    team = (conn.execute("SELECT * FROM fc_teams WHERE user_id=?", (uid,)).fetchone() if conn else
+            db.fetchone("SELECT * FROM fc_teams WHERE user_id=?", (uid,)))
+    if not team:
+        return 0
+    players = (conn.execute("SELECT id,overall FROM fc_players WHERE owner_id=? ORDER BY overall DESC LIMIT 11", (uid,)).fetchall() if conn else
+               db.fetchall("SELECT id,overall FROM fc_players WHERE owner_id=? ORDER BY overall DESC LIMIT 11", (uid,)))
+    if not players:
+        return 0
+    avg = sum(int(player["overall"] or 0) for player in players) / len(players)
+    formation_bonus = FC_FORMATIONS.get(team["formation"], FC_FORMATIONS["4-3-3"])[1]
+    captain_bonus = 0
+    if team["captain_id"]:
+        captain = next((p for p in players if int(p["id"]) == int(team["captain_id"])), None)
+        if captain and int(captain["overall"] or 0) >= 75:
+            captain_bonus = 1
+    return min(99, int(round(avg)) + formation_bonus + captain_bonus)
+
+
+def fc_team_panel_text(uid, team):
+    wins = db.fetchone("SELECT COUNT(*) c FROM fc_matches WHERE user_id=? AND season_id=? AND result='W'",
+                       (uid, fc_season_id()))["c"]
+    draws = db.fetchone("SELECT COUNT(*) c FROM fc_matches WHERE user_id=? AND season_id=? AND result='D'",
+                        (uid, fc_season_id()))["c"]
+    losses = db.fetchone("SELECT COUNT(*) c FROM fc_matches WHERE user_id=? AND season_id=? AND result='L'",
+                         (uid, fc_season_id()))["c"]
+    today_count = db.fetchone("SELECT COUNT(*) c FROM fc_matches WHERE user_id=? AND played_at LIKE ?",
+                              (uid, today() + "%"))["c"]
+    name, bonus = FC_FORMATIONS.get(team["formation"], FC_FORMATIONS["4-3-3"])
+    return (f"⚽ لیگ ستاره‌ها — {team['team_name']}\n━━━━━━━━━━━━━━\n"
+            f"🪙 کوین فوتبال: {fmt_money(team['coins'])} (فقط درون‌بازی)\n"
+            f"⭐ قدرت ترکیب: {fn(fc_team_power(uid))}/۹۹ | آرایش: {name}\n"
+            f"📊 رکورد این هفته: {fn(wins)} برد / {fn(draws)} مساوی / {fn(losses)} باخت\n"
+            f"🏆 رتبه: {fc_league_name(wins)}\n"
+            f"🎮 مسابقه‌های امروز: {fn(today_count)}/{fn(FC_MATCH_DAILY_LIMIT)}\n"
+            "🛡️ کوین و بازیکن‌ها قابل‌برداشت یا تبدیل به پول واقعی نیستند.")
+
+
+def fc_panel(chat_id, uid):
+    if not guard_character(chat_id, uid):
+        return
+    team = fc_ensure_team(uid)
+    if not team:
+        return
+    rows = [
+        [("⚽ مسابقه سریع", "fc:match"), ("👥 ترکیب تیم", "fc:squad")],
+        [("🛒 بازار بازیکن", "fc:market"), ("🔎 استعدادیابی (۹۰۰🪙)", "fc:scout")],
+        [("📈 آرایش تیم", "fc:formation"), ("🏅 جدول لیگ هفته", "fc:league")],
+        [("📜 سابقه مسابقه/انتقال", "fc:history"), ("✏️ نام تیم", "fc:rename")],
+        [("🎟 بتل‌پس", "bp:home"), ("🏠 منوی اصلی", "menu:main")],
+        [ad_slot_button("market")],
+    ]
+    api.send_message(chat_id, fc_team_panel_text(uid, team), inline_keyboard(rows))
+
+
+def fc_squad_panel(chat_id, uid):
+    team = fc_ensure_team(uid)
+    if not team:
+        api.send_message(chat_id, "⚠️ اول کاراکتر بازی را بساز.")
+        return
+    players = db.fetchall("SELECT * FROM fc_players WHERE owner_id=? ORDER BY overall DESC,position,id", (uid,))
+    listed = {r["player_id"] for r in db.fetchall("SELECT player_id FROM fc_listings WHERE seller_id=? AND status='active'", (uid,))}
+    lines = [f"👥 ترکیب — {team['team_name']} | {fn(len(players))} بازیکن\n━━━━━━━━━━━━━━"]
+    rows = []
+    for player in players[:18]:
+        captain = " 👑" if team["captain_id"] == player["id"] else ""
+        market = " | 📣 آگهی شده" if player["id"] in listed else ""
+        lines.append(f"{player['position']} | {player['name']} — OVR {fn(player['overall'])} | Lv.{fn(player['level'])}{captain}{market}")
+        if player["overall"] < 95:
+            rows.append([(f"🏋️ تمرین {player['name']} (هزینه افزایشی)", f"fc:train:{player['id']}")])
+    rows.append([("👑 انتخاب کاپیتان", "fc:captain"), ("📤 ثبت بازیکن برای فروش", "fc:sell")])
+    rows.append([("🔙 لیگ ستاره‌ها", "fc:home")])
+    api.send_message(chat_id, "\n".join(lines), inline_keyboard(rows))
+
+
+def fc_train_player(uid, player_id):
+    team = fc_ensure_team(uid)
+    if not team:
+        return "⚠️ تیمی پیدا نشد."
+    with db.lock:
+        conn = db.conn
+        conn.execute("BEGIN IMMEDIATE")
+        try:
+            player = conn.execute("SELECT * FROM fc_players WHERE id=? AND owner_id=?", (player_id, uid)).fetchone()
+            if not player:
+                conn.rollback(); return "❌ این بازیکن در تیم تو نیست."
+            if player["overall"] >= 95:
+                conn.rollback(); return "👑 بازیکن به حداکثر قدرت رسیده است."
+            cost = 500 + max(0, int(player["level"] or 1) - 1) * 350
+            cur = conn.execute("UPDATE fc_teams SET coins=coins-? WHERE user_id=? AND coins>=?", (cost, uid, cost))
+            if not cur.rowcount:
+                conn.rollback(); return f"🪙 برای تمرین {fmt_money(cost)} کوین فوتبال لازم داری."
+            conn.execute("UPDATE fc_players SET overall=MIN(95,overall+1),level=level+1 WHERE id=? AND owner_id=?",
+                         (player_id, uid))
+            conn.execute("INSERT INTO fc_coin_ledger(user_id,amount,reason,details,created_at) VALUES(?,?,?,?,?)",
+                         (uid, -cost, "training", f"player={player_id}", now_iso()))
+            conn.commit()
+        except Exception:
+            conn.rollback(); raise
+    return f"🏋️ تمرین انجام شد! {player['name']} به OVR {fn(min(95,int(player['overall'])+1))} رسید. (-{fmt_money(cost)}🪙)"
+
+
+def fc_scout_player(uid):
+    team = fc_ensure_team(uid)
+    if not team:
+        return "⚠️ تیمی پیدا نشد."
+    count = db.fetchone("SELECT COUNT(*) c FROM fc_players WHERE owner_id=?", (uid,))["c"]
+    if count >= FC_MAX_SQUAD:
+        return f"⚠️ سقف تیم {fn(FC_MAX_SQUAD)} بازیکن است؛ برای جذب تازه اول یک بازیکن بفروش."
+    roll = random.random()
+    if roll < 0.04:
+        overall, rarity = random.randint(84, 90), "ستاره"
+    elif roll < 0.22:
+        overall, rarity = random.randint(75, 83), "ویژه"
+    else:
+        overall, rarity = random.randint(60, 74), "معمولی"
+    name, position = pick(FC_SCOUT_NAMES), pick(FC_POSITIONS)
+    cost = 900
+    with db.lock:
+        conn = db.conn
+        conn.execute("BEGIN IMMEDIATE")
+        try:
+            cur = conn.execute("UPDATE fc_teams SET coins=coins-? WHERE user_id=? AND coins>=?", (cost, uid, cost))
+            if not cur.rowcount:
+                conn.rollback(); return f"🪙 استعدادیابی {fmt_money(cost)} کوین فوتبال لازم دارد."
+            cur = conn.execute("INSERT INTO fc_players(owner_id,name,position,overall,level,rarity,origin,created_at) VALUES(?,?,?,?,1,?,'scout',?)",
+                               (uid, name, position, overall, rarity, now_iso()))
+            player_id = cur.lastrowid
+            conn.execute("INSERT INTO fc_coin_ledger(user_id,amount,reason,details,created_at) VALUES(?,?,?,?,?)",
+                         (uid, -cost, "scout", f"player={player_id}", now_iso()))
+            conn.commit()
+        except Exception:
+            conn.rollback(); raise
+    return f"🔎 استعدادیاب بازیکن تازه‌ای پیدا کرد!\n{position} | {name} — OVR {fn(overall)} ({rarity})\n-{fmt_money(cost)}🪙"
+
+
+def fc_formation_panel(chat_id, uid):
+    team = fc_ensure_team(uid)
+    if not team:
+        return
+    rows = []
+    for key, (label, bonus) in FC_FORMATIONS.items():
+        current = "✅ " if team["formation"] == key else ""
+        rows.append([(f"{current}{label} | بونس قدرت +{fn(bonus)}", f"fc:setformation:{key}")])
+    rows.append([("🔙 لیگ ستاره‌ها", "fc:home")])
+    api.send_message(chat_id, "📈 آرایش تیمت را برای مسابقه انتخاب کن:", inline_keyboard(rows))
+
+
+def fc_captain_panel(chat_id, uid):
+    team = fc_ensure_team(uid)
+    if not team:
+        return
+    players = db.fetchall("SELECT id,name,position,overall FROM fc_players WHERE owner_id=? ORDER BY overall DESC LIMIT 18", (uid,))
+    rows = [[(f"👑 {p['name']} ({p['position']} | {fn(p['overall'])})", f"fc:setcaptain:{p['id']}")] for p in players]
+    rows.append([("🔙 ترکیب", "fc:squad")])
+    api.send_message(chat_id, "👑 کاپیتان با OVR ۷۵ به بالا یک امتیاز به قدرت تیم می‌دهد:", inline_keyboard(rows))
+
+
+def fc_play_match(uid):
+    team = fc_ensure_team(uid)
+    if not team:
+        return "⚠️ اول کاراکتر بازی را بساز."
+    sid, rival = fc_season_id(), pick(FC_RIVALS)
+    with db.lock:
+        conn = db.conn
+        conn.execute("BEGIN IMMEDIATE")
+        try:
+            count = conn.execute("SELECT COUNT(*) c FROM fc_matches WHERE user_id=? AND played_at LIKE ?",
+                                 (uid, today() + "%")).fetchone()["c"]
+            if count >= FC_MATCH_DAILY_LIMIT:
+                conn.rollback()
+                return f"⏳ سقف روزانه‌ات پر شد؛ فردا حداکثر {fn(FC_MATCH_DAILY_LIMIT)} مسابقه‌ی تازه داری."
+            own_power = fc_team_power(uid, conn)
+            rival_power = random.randint(56, 82)
+            for_score = max(0, min(6, round(1.4 + (own_power - rival_power) / 13 + random.gauss(0, 1.0))))
+            against_score = max(0, min(6, round(1.4 + (rival_power - own_power) / 13 + random.gauss(0, 1.0))))
+            if for_score > against_score:
+                result, reward, result_label = "W", 650, "برد"
+            elif for_score == against_score:
+                result, reward, result_label = "D", 350, "مساوی"
+            else:
+                result, reward, result_label = "L", 150, "باخت"
+            played_at = now_iso()
+            conn.execute("UPDATE fc_teams SET coins=coins+?,wins=wins+?,draws=draws+?,losses=losses+? WHERE user_id=?",
+                         (reward, int(result == "W"), int(result == "D"), int(result == "L"), uid))
+            conn.execute("INSERT INTO fc_matches(user_id,season_id,opponent_name,opponent_power,team_power,result,score_for,score_against,coin_reward,played_at) VALUES(?,?,?,?,?,?,?,?,?,?)",
+                         (uid, sid, rival, rival_power, own_power, result, for_score, against_score, reward, played_at))
+            conn.execute("INSERT INTO fc_coin_ledger(user_id,amount,reason,details,created_at) VALUES(?,?,?,?,?)",
+                         (uid, reward, "match", f"{rival} {for_score}-{against_score}", played_at))
+            conn.commit()
+        except Exception:
+            conn.rollback(); raise
+    log_action(uid, "fc_match", result)
+    if result == "W":
+        log_action(uid, "fc_win", f"{rival}:{for_score}-{against_score}")
+    return (f"⚽ بازی مقابل «{rival}» تمام شد!\n"
+            f"🏟 نتیجه: {fn(for_score)} - {fn(against_score)} ({result_label})\n"
+            f"💪 قدرت تو {fn(own_power)} | حریف {fn(rival_power)}\n"
+            f"🪙 پاداش درون‌بازی: +{fmt_money(reward)} کوین فوتبال\n"
+            "این کوین‌ها قابل‌برداشت یا تبدیل به پول واقعی نیستند.")
+
+
+def fc_league_panel(chat_id, uid):
+    team = fc_ensure_team(uid)
+    if not team:
+        return
+    season = fc_season_id()
+    rows = db.fetchall("""SELECT m.user_id,p.name,
+                         SUM(CASE WHEN m.result='W' THEN 1 ELSE 0 END) wins,
+                         SUM(CASE WHEN m.result='D' THEN 1 ELSE 0 END) draws,
+                         MAX(t.coins) coins
+                         FROM fc_matches m JOIN profiles p ON p.user_id=m.user_id
+                         JOIN fc_teams t ON t.user_id=m.user_id
+                         WHERE m.season_id=? GROUP BY m.user_id,p.name
+                         ORDER BY wins DESC,draws DESC,coins DESC LIMIT 10""", (season,))
+    my_wins = db.fetchone("SELECT COUNT(*) c FROM fc_matches WHERE user_id=? AND season_id=? AND result='W'", (uid, season))["c"]
+    lines = [f"🏅 جدول لیگ فوتبال — {season}\n━━━━━━━━━━━━━━"]
+    medals = ["🥇", "🥈", "🥉"]
+    for i, row in enumerate(rows):
+        lines.append(f"{medals[i] if i < 3 else fn(i+1)+'.'} {row['name']} — {fn(row['wins'])} برد / {fn(row['draws'])} مساوی")
+    if not rows:
+        lines.append("هنوز کسی این هفته بازی نکرده؛ اولین بازی را تو شروع کن!")
+    lines.append(f"\nرتبه‌ی فعلی تو: {fc_league_name(my_wins)} | بردهای هفته: {fn(my_wins)}")
+    api.send_message(chat_id, "\n".join(lines), inline_keyboard([[("⚽ بازی کن", "fc:match"), ("🔙 لیگ ستاره‌ها", "fc:home")], [ad_slot_button("market")]]))
+
+
+def fc_history_panel(chat_id, uid):
+    team = fc_ensure_team(uid)
+    if not team:
+        return
+    matches = db.fetchall("SELECT * FROM fc_matches WHERE user_id=? ORDER BY id DESC LIMIT 7", (uid,))
+    transfers = db.fetchall("""SELECT t.*,p.name,p.position,p.overall FROM fc_transfers t
+                              JOIN fc_players p ON p.id=t.player_id
+                              WHERE t.buyer_id=? OR t.seller_id=? ORDER BY t.id DESC LIMIT 7""", (uid, uid))
+    lines = ["📜 سابقه‌ی لیگ فوتبال\n━━━━━━━━━━━━━━", "⚽ مسابقه‌های اخیر:"]
+    if matches:
+        for m in matches:
+            lines.append(f"{m['played_at'][:10]} — {m['opponent_name']} {fn(m['score_for'])}-{fn(m['score_against'])} | {m['result']} | +{fmt_money(m['coin_reward'])}🪙")
+    else:
+        lines.append("مسابقه‌ای ثبت نشده است.")
+    lines.append("\n🔁 نقل‌وانتقال‌ها:")
+    if transfers:
+        for t in transfers:
+            direction = "خرید" if t["buyer_id"] == uid else "فروش"
+            lines.append(f"{direction} {t['position']} {t['name']} OVR {fn(t['overall'])} — {fmt_money(t['price'])}🪙 (کارمزد {fmt_money(t['fee'])})")
+    else:
+        lines.append("هنوز خرید یا فروشی انجام ندادی.")
+    api.send_message(chat_id, "\n".join(lines), inline_keyboard([[("🔙 لیگ ستاره‌ها", "fc:home")]]))
+
+
+def fc_market_panel(chat_id, uid):
+    team = fc_ensure_team(uid)
+    if not team:
+        return
+    db.execute("UPDATE fc_listings SET status='expired' WHERE status='active' AND expires_at IS NOT NULL AND expires_at<=?", (now_iso(),))
+    listings = db.fetchall("""SELECT l.*,p.name,p.position,p.overall,p.level,pr.name seller_name
+                             FROM fc_listings l JOIN fc_players p ON p.id=l.player_id
+                             LEFT JOIN profiles pr ON pr.user_id=l.seller_id
+                             WHERE l.status='active' ORDER BY l.created_at DESC LIMIT 12""")
+    rows = []
+    lines = [f"🛒 بازار بازیکن — موجودی تو: {fmt_money(team['coins'])}🪙\n"
+             f"کارمزد فروش: {fn(int(FC_MARKET_FEE_RATE*100))}٪ | آگهی‌ها ۷ روز اعتبار دارند.\n"
+             "🪙 فقط کوین درون‌بازی؛ بدون نقدکردن یا تبدیل به پول واقعی.\n━━━━━━━━━━━━━━"]
+    for item in listings:
+        seller = item["seller_name"] or f"کاربر {item['seller_id']}"
+        lines.append(f"{item['position']} | {item['name']} OVR {fn(item['overall'])} Lv.{fn(item['level'])} — {fmt_money(item['price'])}🪙 | {seller}")
+        if item["seller_id"] == uid:
+            rows.append([(f"🗑 لغو آگهی #{item['id']}", f"fc:cancel:{item['id']}")])
+        else:
+            rows.append([(f"🛒 خرید #{item['id']} — {fmt_money(item['price'])}🪙", f"fc:buy:{item['id']}")])
+    if not listings:
+        lines.append("فعلاً آگهی فعالی نیست؛ بازیکن اضافه‌ات را برای فروش بگذار.")
+    rows.extend([[ ("📤 ثبت بازیکن برای فروش", "fc:sell"), ("🔎 استعدادیابی", "fc:scout") ],
+                 [("🔙 لیگ ستاره‌ها", "fc:home")], [ad_slot_button("market")]])
+    api.send_message(chat_id, "\n".join(lines), inline_keyboard(rows))
+
+
+def fc_sell_menu(chat_id, uid):
+    team = fc_ensure_team(uid)
+    if not team:
+        return
+    count = db.fetchone("SELECT COUNT(*) c FROM fc_players WHERE owner_id=?", (uid,))["c"]
+    if count <= 11:
+        api.send_message(chat_id, "⚠️ برای حفظ تیم مسابقه‌ای، همیشه باید حداقل ۱۱ بازیکن داشته باشی؛ اول با استعدادیابی بازیکن اضافه بگیر.",
+                         inline_keyboard([[("🔎 استعدادیابی", "fc:scout"), ("🔙 بازار", "fc:market")]]))
+        return
+    listed = {r["player_id"] for r in db.fetchall("SELECT player_id FROM fc_listings WHERE seller_id=? AND status='active'", (uid,))}
+    players = db.fetchall("SELECT * FROM fc_players WHERE owner_id=? ORDER BY overall DESC", (uid,))
+    rows = []
+    for player in players:
+        if player["id"] not in listed:
+            rows.append([(f"📤 {player['position']} {player['name']} — OVR {fn(player['overall'])}", f"fc:listplayer:{player['id']}")])
+    rows.append([("🔙 بازار بازیکن", "fc:market")])
+    api.send_message(chat_id, "کدام بازیکن اضافه را آگهی می‌کنی؟ (کمینه‌ی ترکیب یازده نفر است.)", inline_keyboard(rows))
+
+
+def fc_start_listing(uid, player_id, chat_id):
+    team = fc_ensure_team(uid)
+    player = db.fetchone("SELECT * FROM fc_players WHERE id=? AND owner_id=?", (player_id, uid))
+    count = db.fetchone("SELECT COUNT(*) c FROM fc_players WHERE owner_id=?", (uid,))["c"] if team else 0
+    if not player or count <= 11:
+        return "❌ بازیکن معتبر نیست یا باید ابتدا ترکیب ۱۱نفره‌ات را حفظ کنی."
+    if db.fetchone("SELECT 1 FROM fc_listings WHERE player_id=? AND status='active'", (player_id,)):
+        return "⚠️ این بازیکن همین حالا آگهی فعال دارد."
+    set_state(uid, "fc_sell_price", {"player_id": int(player_id)})
+    api.send_message(chat_id, f"💵 قیمت «{player['name']}» را به کوین فوتبال بنویس (حداقل {fmt_money(FC_MIN_LIST_PRICE)}).\nآگهی تا ۷ روز فعال می‌ماند؛ لغو: /cancel")
+    return None
+
+
+def fc_sell_price_done(chat_id, uid, text, data):
+    parsed = parse_num(text.strip())
+    if not parsed.isdigit() or not (FC_MIN_LIST_PRICE <= int(parsed) <= 100_000_000):
+        api.send_message(chat_id, f"⚠️ قیمت باید بین {fmt_money(FC_MIN_LIST_PRICE)} و ۱۰۰٬۰۰۰٬۰۰۰ کوین باشد:")
+        return True
+    player_id = int((data or {}).get("player_id") or 0)
+    player = db.fetchone("SELECT * FROM fc_players WHERE id=? AND owner_id=?", (player_id, uid))
+    count = db.fetchone("SELECT COUNT(*) c FROM fc_players WHERE owner_id=?", (uid,))["c"]
+    if not player or count <= 11:
+        set_state(uid)
+        api.send_message(chat_id, "❌ ثبت آگهی انجام نشد؛ مالکیت بازیکن یا حداقل ترکیب تغییر کرده است.")
+        return True
+    try:
+        db.execute("INSERT INTO fc_listings(seller_id,player_id,price,created_at,expires_at,status) VALUES(?,?,?,?,?,'active')",
+                   (uid, player_id, int(parsed), now_iso(), (datetime.now()+timedelta(days=7)).isoformat(timespec="seconds")))
+    except sqlite3.IntegrityError:
+        api.send_message(chat_id, "⚠️ برای این بازیکن آگهی فعال دیگری ثبت شده است.")
+        return True
+    set_state(uid)
+    log_action(uid, "fc_market_list", f"{player_id}:{parsed}")
+    api.send_message(chat_id, f"✅ آگهی «{player['name']}» با قیمت {fmt_money(int(parsed))}🪙 ثبت شد.",
+                     inline_keyboard([[("🛒 دیدن بازار", "fc:market")]]))
+    return True
+
+
+def fc_cancel_listing(uid, listing_id):
+    row = db.fetchone("SELECT * FROM fc_listings WHERE id=? AND seller_id=? AND status='active'", (listing_id, uid))
+    if not row:
+        return "❌ آگهی فعال خودت پیدا نشد."
+    db.execute("UPDATE fc_listings SET status='cancelled' WHERE id=? AND seller_id=? AND status='active'", (listing_id, uid))
+    log_action(uid, "fc_market_cancel", str(listing_id))
+    return "🗑 آگهی لغو شد؛ بازیکن در تیمت باقی ماند."
+
+
+def fc_buy_listing(uid, listing_id):
+    fc_ensure_team(uid)
+    with db.lock:
+        conn = db.conn
+        conn.execute("BEGIN IMMEDIATE")
+        try:
+            item = conn.execute("""SELECT l.*,p.name,p.position,p.overall FROM fc_listings l
+                                   JOIN fc_players p ON p.id=l.player_id
+                                   WHERE l.id=? AND l.status='active'""", (listing_id,)).fetchone()
+            if not item:
+                conn.rollback(); return "❌ این آگهی دیگر فعال نیست."
+            if item["seller_id"] == uid:
+                conn.rollback(); return "😂 نمی‌توانی از خودت بخری."
+            if item["expires_at"] and item["expires_at"] <= now_iso():
+                conn.execute("UPDATE fc_listings SET status='expired' WHERE id=?", (listing_id,))
+                conn.commit(); return "⏳ مهلت آگهی تمام شده است."
+            seller_count = conn.execute("SELECT COUNT(*) c FROM fc_players WHERE owner_id=?", (item["seller_id"],)).fetchone()["c"]
+            if seller_count <= 11:
+                conn.rollback(); return "❌ فروشنده باید حداقل ۱۱ بازیکن برای تیمش نگه دارد."
+            buyer_count = conn.execute("SELECT COUNT(*) c FROM fc_players WHERE owner_id=?", (uid,)).fetchone()["c"]
+            if buyer_count >= FC_MAX_SQUAD:
+                conn.rollback(); return f"⚠️ سقف تیم {fn(FC_MAX_SQUAD)} بازیکن است؛ اول یک بازیکن بفروش."
+            player = conn.execute("SELECT owner_id FROM fc_players WHERE id=?", (item["player_id"],)).fetchone()
+            if not player or player["owner_id"] != item["seller_id"]:
+                conn.execute("UPDATE fc_listings SET status='cancelled' WHERE id=?", (listing_id,))
+                conn.commit(); return "❌ مالکیت بازیکن تغییر کرده بود؛ آگهی بسته شد."
+            buyer_team = conn.execute("SELECT coins FROM fc_teams WHERE user_id=?", (uid,)).fetchone()
+            if not buyer_team or int(buyer_team["coins"] or 0) < int(item["price"]):
+                conn.rollback(); return f"🪙 موجودی کافی نیست؛ {fmt_money(item['price'])} کوین فوتبال لازم داری."
+            fee = int(int(item["price"]) * FC_MARKET_FEE_RATE)
+            seller_gain = int(item["price"]) - fee
+            conn.execute("UPDATE fc_teams SET coins=coins-? WHERE user_id=?", (item["price"], uid))
+            conn.execute("UPDATE fc_teams SET coins=coins+? WHERE user_id=?", (seller_gain, item["seller_id"]))
+            moved = conn.execute("UPDATE fc_players SET owner_id=? WHERE id=? AND owner_id=?", (uid, item["player_id"], item["seller_id"]))
+            if not moved.rowcount:
+                conn.rollback(); return "❌ انتقال بازیکن انجام نشد؛ آگهی دوباره بررسی کن."
+            conn.execute("UPDATE fc_teams SET captain_id=NULL WHERE user_id=? AND captain_id=?", (item["seller_id"], item["player_id"]))
+            closed = conn.execute("UPDATE fc_listings SET status='sold',buyer_id=? WHERE id=? AND status='active'", (uid, listing_id))
+            if not closed.rowcount:
+                conn.rollback(); return "❌ آگهی هم‌زمان تغییر کرد؛ دوباره بازار را باز کن."
+            conn.execute("INSERT INTO fc_transfers(buyer_id,seller_id,player_id,price,fee,created_at) VALUES(?,?,?,?,?,?)",
+                         (uid, item["seller_id"], item["player_id"], item["price"], fee, now_iso()))
+            conn.execute("INSERT INTO fc_coin_ledger(user_id,amount,reason,details,created_at) VALUES(?,?,?,?,?)",
+                         (uid, -int(item["price"]), "market_buy", f"listing={listing_id}", now_iso()))
+            conn.execute("INSERT INTO fc_coin_ledger(user_id,amount,reason,details,created_at) VALUES(?,?,?,?,?)",
+                         (item["seller_id"], seller_gain, "market_sell", f"listing={listing_id};fee={fee}", now_iso()))
+            conn.commit()
+        except Exception:
+            conn.rollback(); raise
+    log_action(uid, "fc_market_buy", str(listing_id))
+    log_action(item["seller_id"], "fc_market_sell", str(listing_id))
+    try:
+        api.send_message(item["seller_id"], f"🎉 بازیکن {item['name']} فروخته شد؛ +{fmt_money(seller_gain)}🪙 پس از کسر کارمزد {fmt_money(fee)}🪙")
+    except Exception:
+        pass
+    return f"✅ خرید انجام شد: {item['position']} {item['name']} OVR {fn(item['overall'])}\n-{fmt_money(item['price'])}🪙 | کارمزد بازار: {fmt_money(fee)}🪙"
+
+
+def fc_set_team_name(uid, text):
+    name = (text or "").strip()
+    if not (2 <= len(name) <= 24) or name_is_bad(name):
+        return "⚠️ نام تیم باید ۲ تا ۲۴ نویسه‌ی محترمانه باشد. دوباره بنویس:"
+    if not fc_ensure_team(uid):
+        return "⚠️ تیمی پیدا نشد."
+    db.execute("UPDATE fc_teams SET team_name=? WHERE user_id=?", (name, uid))
+    set_state(uid)
+    log_action(uid, "fc_team_rename", name)
+    return f"✅ نام تیم فوتبال به «{name}» تغییر کرد."
+
+
+def handle_fc_callback(chat_id, uid, data, cb_id):
+    parts = data.split(":")
+    cmd = parts[1] if len(parts) > 1 else ""
+    api.answer_callback(cb_id, "⚽")
+    if cmd == "home":
+        fc_panel(chat_id, uid)
+    elif cmd == "match":
+        api.send_message(chat_id, fc_play_match(uid), inline_keyboard([[("⚽ بازی بعدی", "fc:home"), ("🏆 جدول لیگ", "fc:league")]]))
+    elif cmd == "squad":
+        fc_squad_panel(chat_id, uid)
+    elif cmd == "market":
+        fc_market_panel(chat_id, uid)
+    elif cmd == "scout":
+        api.send_message(chat_id, fc_scout_player(uid), inline_keyboard([[("👥 ترکیب", "fc:squad"), ("🛒 بازار", "fc:market")]]))
+    elif cmd == "train" and len(parts) == 3:
+        try: result = fc_train_player(uid, int(parts[2]))
+        except ValueError: result = "❌ بازیکن نامعتبر است."
+        api.send_message(chat_id, result, inline_keyboard([[("👥 ترکیب", "fc:squad"), ("⚽ لیگ", "fc:home")]]))
+    elif cmd == "formation":
+        fc_formation_panel(chat_id, uid)
+    elif cmd == "setformation" and len(parts) == 3:
+        formation = parts[2]
+        if formation in FC_FORMATIONS and fc_ensure_team(uid):
+            db.execute("UPDATE fc_teams SET formation=? WHERE user_id=?", (formation, uid))
+            log_action(uid, "fc_formation", formation)
+            api.send_message(chat_id, f"✅ آرایش تیم روی {FC_FORMATIONS[formation][0]} تنظیم شد.", inline_keyboard([[("⚽ لیگ ستاره‌ها", "fc:home")]]))
+        else:
+            api.send_message(chat_id, "❌ آرایش نامعتبر است.")
+    elif cmd == "captain":
+        fc_captain_panel(chat_id, uid)
+    elif cmd == "setcaptain" and len(parts) == 3:
+        try: player_id = int(parts[2])
+        except ValueError: player_id = 0
+        player = db.fetchone("SELECT id,name FROM fc_players WHERE id=? AND owner_id=?", (player_id, uid))
+        if player:
+            db.execute("UPDATE fc_teams SET captain_id=? WHERE user_id=?", (player_id, uid))
+            log_action(uid, "fc_captain", str(player_id))
+            api.send_message(chat_id, f"👑 {player['name']} کاپیتان تیمت شد.", inline_keyboard([[("👥 ترکیب", "fc:squad")]]))
+        else:
+            api.send_message(chat_id, "❌ بازیکن تیم پیدا نشد.")
+    elif cmd == "league":
+        fc_league_panel(chat_id, uid)
+    elif cmd == "history":
+        fc_history_panel(chat_id, uid)
+    elif cmd == "sell":
+        fc_sell_menu(chat_id, uid)
+    elif cmd == "listplayer" and len(parts) == 3:
+        try: result = fc_start_listing(uid, int(parts[2]), chat_id)
+        except ValueError: result = "❌ بازیکن نامعتبر است."
+        if result:
+            api.send_message(chat_id, result)
+    elif cmd == "buy" and len(parts) == 3:
+        try: result = fc_buy_listing(uid, int(parts[2]))
+        except ValueError: result = "❌ آگهی نامعتبر است."
+        api.send_message(chat_id, result, inline_keyboard([[("🛒 بازار", "fc:market"), ("⚽ لیگ", "fc:home")]]))
+    elif cmd == "cancel" and len(parts) == 3:
+        try: result = fc_cancel_listing(uid, int(parts[2]))
+        except ValueError: result = "❌ آگهی نامعتبر است."
+        api.send_message(chat_id, result, inline_keyboard([[("🛒 بازار", "fc:market")]]))
+    elif cmd == "rename":
+        if not fc_ensure_team(uid):
+            api.send_message(chat_id, "⚠️ اول کاراکتر بازی را بساز.")
+        else:
+            set_state(uid, "fc_team_name")
+            api.send_message(chat_id, "✏️ نام تازه‌ی تیم را بنویس (۲ تا ۲۴ نویسه؛ لغو: /cancel):")
+    else:
+        api.send_message(chat_id, "❌ این گزینه‌ی فوتبال دیگر فعال نیست.")
+
+
+def handle_battle_pass_callback(chat_id, uid, data, cb_id):
+    if not guard_character(chat_id, uid):
+        api.answer_callback(cb_id, "ابتدا کاراکترت را بساز")
+        return
+    parts = data.split(":")
+    cmd = parts[1] if len(parts) > 1 else ""
+    api.answer_callback(cb_id, "🎟")
+    if cmd == "home":
+        battle_pass_panel(chat_id, uid)
+    elif cmd == "missions":
+        battle_pass_missions_panel(chat_id, uid)
+    elif cmd == "claimall" and len(parts) == 3:
+        result = battle_pass_claim_all(uid, parts[2])
+        api.send_message(chat_id, result, inline_keyboard([[("🎟 بتل‌پس", "bp:home")]]))
+    elif cmd == "mission" and len(parts) == 4:
+        result = battle_pass_mission_claim(uid, parts[2], parts[3])
+        api.send_message(chat_id, result, inline_keyboard([[("🎯 مأموریت‌ها", "bp:missions"), ("🎟 بتل‌پس", "bp:home")]]))
+    elif cmd == "buy":
+        bp = battle_pass_ensure(uid)
+        if bp["premium"]:
+            api.send_message(chat_id, "👑 Premium همین فصل برایت فعال است.")
+        else:
+            result = order_new(chat_id, uid, "bp-premium")
+            if result:
+                api.send_message(chat_id, result)
+    else:
+        api.send_message(chat_id, "❌ این دکمه‌ی بتل‌پس معتبر نیست.")
+
+
+def handle_admin_ad_callback(chat_id, uid, data, cb_id):
+    parts = data.split(":")
+    if len(parts) != 3:
+        api.answer_callback(cb_id, "⚠️")
+        return True
+    action, slot = parts[1], parts[2]
+    if slot not in AD_SLOT_NAMES:
+        api.answer_callback(cb_id, "⚠️ جایگاه نامعتبر")
+        return True
+    if action == "adedit":
+        set_state(uid, "adm_ad_content", {"slot": slot})
+        api.answer_callback(cb_id)
+        api.send_message(chat_id, f"📣 متن تبلیغ جایگاه «{AD_SLOT_NAMES[slot]}» را بفرست (حداکثر ۱۲۰۰ نویسه؛ لغو: /cancel):")
+        return True
+    if action == "adclear":
+        set_setting(f"adslot.{slot}", "")
+        log_action(uid, "admin_ad_slot_clear", slot)
+        api.answer_callback(cb_id, "🗑 پاک شد")
+        panel_admin_ad_slots(chat_id)
+        return True
+    if action == "adnolink":
+        state, data_ = get_state(uid)
+        if state != "adm_ad_link" or (data_ or {}).get("slot") != slot:
+            api.answer_callback(cb_id, "⚠️ فرم منقضی شده")
+            return True
+        ok = ad_slot_save(slot, data_.get("text"), "", uid)
+        set_state(uid)
+        api.answer_callback(cb_id, "✅ ذخیره شد" if ok else "❌")
+        panel_admin_ad_slots(chat_id)
+        return True
+    return False
+
+
+def handle_battle_pass_admin_callback(chat_id, uid, data, cb_id):
+    parts = data.split(":")
+    if data == "adm:bpuser":
+        set_state(uid, "adm_bp_uid")
+        api.answer_callback(cb_id)
+        api.send_message(chat_id, "🎁 آیدی عددی یا نام دقیق کاربر را بفرست تا بتل‌پس فصل جاری را برایش اعطا کنم:")
+        return True
+    if data == "adm:bpprice":
+        set_state(uid, "adm_bp_price")
+        api.answer_callback(cb_id)
+        api.send_message(chat_id, f"💵 قیمت جدید به تومان را بفرست (۱۰٬۰۰۰ تا ۱۰٬۰۰۰٬۰۰۰؛ فعلی: {fmt_money(battle_pass_order_price())}):")
+        return True
+    if data.startswith("adm:bpgrant:") and len(parts) == 4:
+        try: target_id = int(parts[2])
+        except ValueError:
+            api.answer_callback(cb_id, "❌ آیدی نامعتبر"); return True
+        result = battle_pass_admin_grant(uid, target_id, parts[3])
+        api.answer_callback(cb_id, "🎁")
+        api.send_message(chat_id, result, ADMIN_KB)
+        return True
+    return False
+
+
+def fc_transaction_daily_count(uid):
+    return int(db.fetchone("SELECT COUNT(*) c FROM fc_matches WHERE user_id=? AND played_at LIKE ?",
+                           (uid, today() + "%"))["c"] or 0)
+
+
+# ───── Stage handlers used by the shared message-state router ─────
+def battle_pass_admin_user_lookup(chat_id, admin_id, text):
+    query = (text or "").strip()
+    target = None
+    if query.isdigit():
+        row = db.fetchone("SELECT user_id FROM profiles WHERE user_id=?", (int(query),))
+        target = row["user_id"] if row else None
+    else:
+        row = db.fetchone("SELECT user_id FROM profiles WHERE name=? COLLATE NOCASE LIMIT 1", (query,))
+        target = row["user_id"] if row else None
+    if not target:
+        api.send_message(chat_id, "❌ کاربر پیدا نشد؛ آیدی عددی یا نام دقیق‌تر بفرست (لغو: /cancel):")
+        return True
+    set_state(admin_id)
+    p = profile(target) or {}
+    api.send_message(chat_id, f"👤 {p.get('name','کاربر')} — {target}\nچه چیزی اعطا شود؟",
+                     inline_keyboard([
+                         [("👑 Premium فصل جاری", f"adm:bpgrant:{target}:premium")],
+                         [("⭐ +۵ سطح", f"adm:bpgrant:{target}:levels5"), ("🎁 Premium +۵ سطح", f"adm:bpgrant:{target}:both")],
+                     ]))
+    return True
+
+
+def admin_ad_content_done(chat_id, uid, text, data):
+    slot = (data or {}).get("slot")
+    content = (text or "").strip()
+    if slot not in AD_SLOT_NAMES:
+        set_state(uid)
+        api.send_message(chat_id, "❌ جایگاه نامعتبر است.", ADMIN_KB)
+        return True
+    if not content or len(content) > 1200:
+        api.send_message(chat_id, "⚠️ متن تبلیغ باید بین ۱ تا ۱۲۰۰ نویسه باشد:")
+        return True
+    set_state(uid, "adm_ad_link", {"slot": slot, "text": content})
+    api.send_message(chat_id,
+                     "🔗 اگر لینک می‌خواهی، آدرس کامل http:// یا https:// را بفرست.\n"
+                     "اگر لینک لازم نیست، دکمه‌ی پایین را بزن:",
+                     inline_keyboard([[("بدون لینک", f"adm:adnolink:{slot}")]]))
+    return True
+
+
+def admin_ad_link_done(chat_id, uid, text, data):
+    slot = (data or {}).get("slot")
+    link = (text or "").strip()
+    if slot not in AD_SLOT_NAMES:
+        set_state(uid)
+        api.send_message(chat_id, "❌ جایگاه نامعتبر است.", ADMIN_KB)
+        return True
+    if link in ("-", "بدون لینک", "هیچ"):
+        url = ""
+    elif len(link) <= 500 and (link.startswith("https://") or link.startswith("http://")) and not any(ch.isspace() for ch in link):
+        url = link
+    else:
+        api.send_message(chat_id, "⚠️ لینک کامل و بدون فاصله بفرست (http:// یا https://)؛ یا /cancel کن و «بدون لینک» را بزن:")
+        return True
+    ok = ad_slot_save(slot, (data or {}).get("text"), url, uid)
+    set_state(uid)
+    api.send_message(chat_id, "✅ جایگاه تبلیغ ذخیره شد." if ok else "❌ تبلیغ ذخیره نشد.", ADMIN_KB)
+    panel_admin_ad_slots(chat_id)
+    return True
+
+
+def battle_pass_price_done(chat_id, uid, text):
+    parsed = parse_num((text or "").strip())
+    if not parsed.isdigit() or not (10_000 <= int(parsed) <= 10_000_000):
+        api.send_message(chat_id, "⚠️ قیمت معتبر بین ۱۰٬۰۰۰ و ۱۰٬۰۰۰٬۰۰۰ تومان بفرست:")
+        return True
+    set_setting("bp_order_price", str(int(parsed)))
+    set_state(uid)
+    log_action(uid, "bp_price_set", str(parsed))
+    api.send_message(chat_id, f"✅ قیمت بتل‌پس روی {fmt_money(int(parsed))} تومان تنظیم شد.", ADMIN_KB)
+    panel_admin_battle_pass(chat_id)
+    return True
+
+
+def handle_new_feature_state(chat_id, uid, text, state, data):
+    if state == "fc_sell_price":
+        return fc_sell_price_done(chat_id, uid, text, data or {})
+    if state == "fc_team_name":
+        result = fc_set_team_name(uid, text)
+        api.send_message(chat_id, result, MAIN_KB if get_state(uid)[0] is None else None)
+        return True
+    if state == "adm_bp_uid":
+        return battle_pass_admin_user_lookup(chat_id, uid, text)
+    if state == "adm_bp_price":
+        return battle_pass_price_done(chat_id, uid, text)
+    if state == "adm_ad_content":
+        return admin_ad_content_done(chat_id, uid, text, data or {})
+    if state == "adm_ad_link":
+        return admin_ad_link_done(chat_id, uid, text, data or {})
+    return False
 
 if __name__ == "__main__":
     try:
